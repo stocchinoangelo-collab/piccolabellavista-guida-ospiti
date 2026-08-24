@@ -1,0 +1,10 @@
+ Verifica rapida post-salvataggio
+
+grep -c "pbv-v12" sw.js                       # atteso 1
+grep -o "sanctuar\|santuari" js/data.js       # atteso solo "santuari"
+grep -c "di sei metri\|Sa genti is mentulus" js/data.js   # atteso 0
+grep -c "upd_hint" js/app.js js/i18n.js       # atteso 0 e 0
+grep -c "più grande nuraghe della Sardegna" js/data.js    # atteso ≥1
+grep -c "134–135" js/data.js                  # atteso ≥1
+grep "eventsCsv" js/data.js                   # atteso presente
+grep -c "Require valid-user" .htaccess        # atteso 1
