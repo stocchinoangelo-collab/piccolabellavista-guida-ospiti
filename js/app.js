@@ -1,15 +1,15 @@
 /* Piccolabellavista V1.2 — compatibility loader.
-   The uploaded source files contain a human-readable header line and live in the
-   repository root. This loader removes that header and evaluates the three
-   original sources together, preserving their original shared scope/order. */
+   The uploaded source files contain a human-readable header line and are preserved
+   under _source_originale/. This loader removes that header and evaluates the
+   three original sources together, preserving their original shared scope/order. */
 (function(){
   "use strict";
   if(window.__PBV_BOOTED)return;
   window.__PBV_BOOTED=true;
   const files=[
-    "../🌐 jsi18n.js",
-    "../jsdata.js",
-    "../jsapp.js — V1.2 finale.txt"
+    "../_source_originale/🌐 jsi18n.js",
+    "../_source_originale/jsdata.js",
+    "../_source_originale/jsapp.js — V1.2 finale.txt"
   ];
   function load(path){
     const x=new XMLHttpRequest();
