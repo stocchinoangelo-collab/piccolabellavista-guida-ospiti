@@ -8,11 +8,27 @@
     "../_source_originale/jsdata.js",
     "../_source_originale/jsapp.js — V1.2 finale.txt"
   ];
+
   async function load(path){
     const r=await fetch(path,{cache:"no-store"});
     if(!r.ok)throw new Error("HTTP "+r.status+" — "+path);
-    return String(await r.text()).replace(/^\uFEFF/,"").replace(/^[^\r\n]*\r?\n/,"");
+    const raw=String(await r.text()).replace(/^\uFEFF/,"");
+
+    // Alcuni file della cartella _source_originale sono archiviati come
+    // wrapper JSON {"content":"...","encoding":"utf-8",...}.
+    // Estraiamo il vero sorgente prima di passararlo al motore JS.
+    const trimmed=raw.trim();
+    if(trimmed.startsWith("{") && trimmed.includes('"content"')){
+      try{
+        const obj=JSON.parse(trimmed);
+        if(typeof obj.content==="string") return obj.content.replace(/^\uFEFF/,"");
+      }catch(e){
+        // Se non è un wrapper JSON valido, lo trattiamo come sorgente normale.
+      }
+    }
+    return raw;
   }
+
   async function boot(){
     try{
       const parts=await Promise.all(files.map(load));
