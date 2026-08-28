@@ -1,6 +1,6 @@
-/* Piccolabellavista service worker — V1.2 structural repair */
-const CACHE="pbv-v14";
-const ASSETS=["./","index.html","css/style.css","js/i18n.js","js/data.js","js/app.js","manifest.webmanifest","icon.svg","_source_originale/🌐 jsi18n.js","_source_originale/jsdata.js","_source_originale/jsapp.js — V1.2 finale.txt","_source_originale/🎨 cssstyle.css"];
+/* Piccolabellavista service worker — V1.2 photography layer */
+const CACHE="pbv-v15";
+const ASSETS=["./","index.html","css/style.css","js/i18n.js","js/data.js","js/app.js","js/beach-images.js","manifest.webmanifest","icon.svg","_source_originale/🌐 jsi18n.js","_source_originale/jsdata.js","_source_originale/jsapp.js — V1.2 finale.txt","_source_originale/🎨 cssstyle.css","credits/beach-images.json"];
 self.addEventListener("install",e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)));});
 self.addEventListener("activate",e=>{e.waitUntil((async()=>{const ks=await caches.keys();await Promise.all(ks.filter(k=>k!==CACHE&&k!=="pbv-csv").map(k=>caches.delete(k)));await self.clients.claim();})());});
 self.addEventListener("fetch",e=>{
