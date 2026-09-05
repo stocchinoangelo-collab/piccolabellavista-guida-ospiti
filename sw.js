@@ -1,13 +1,18 @@
-/* Piccolabellavista service worker — V1.2 photography layer */
-const CACHE="pbv-v15";
-const ASSETS=["./","index.html","css/style.css","js/i18n.js","js/data.js","js/app.js","js/beach-images.js","manifest.webmanifest","icon.svg","_source_originale/🌐 jsi18n.js","_source_originale/jsdata.js","_source_originale/jsapp.js — V1.2 finale.txt","_source_originale/🎨 cssstyle.css","credits/beach-images.json"];
-self.addEventListener("install",e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)));});
-self.addEventListener("activate",e=>{e.waitUntil((async()=>{const ks=await caches.keys();await Promise.all(ks.filter(k=>k!==CACHE&&k!=="pbv-csv").map(k=>caches.delete(k)));await self.clients.claim();})());});
+const PREFIX="pbv-boutique:"+new URL(self.registration.scope).pathname+":";
+const CACHE=PREFIX+"v1";
+const LOCAL=["./","index.html","css/base.css","css/style.css","js/i18n.js","js/data.js","js/photos.js","js/app.js","manifest.webmanifest","icon.svg","icon-192.png","icon-512.png"];
+self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(LOCAL)).then(()=>self.skipWaiting())));
+self.addEventListener("activate",e=>e.waitUntil((async()=>{for(const key of await caches.keys())if(key.startsWith(PREFIX)&&key!==CACHE)await caches.delete(key);await self.clients.claim();})()));
 self.addEventListener("fetch",e=>{
- const u=new URL(e.request.url);
- if(u.hostname==="api.open-meteo.com")return;
- if(u.hostname==="docs.google.com"||u.hostname.endsWith("googleusercontent.com")){
-  e.respondWith(fetch(e.request).then(res=>{try{const cp=res.clone();caches.open("pbv-csv").then(c=>c.put(e.request,cp));}catch(_){}return res;}).catch(()=>caches.match(e.request)));return;
- }
- if(u.origin===location.origin)e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(r2=>{if(r2.ok){const cp=r2.clone();caches.open(CACHE).then(c=>c.put(e.request,cp));}return r2;})));
+ if(e.request.method!=="GET")return;
+ const url=new URL(e.request.url),local=url.origin===self.location.origin;
+ if(!local)return;
+ if(!url.href.startsWith(self.registration.scope))return;
+ e.respondWith((async()=>{try{const response=await fetch(e.request);
+ if(response.ok&&!response.redirected&&response.type!=="opaqueredirect"){const cache=await caches.open(CACHE);await cache.put(e.request,response.clone());}
+ return response;
+ }catch{const cached=await caches.match(e.request);if(cached)return cached;
+ if(e.request.mode==="navigate"){const page=await caches.match(new URL("index.html",self.registration.scope));if(page)return page;}
+ return new Response("Offline",{status:503,headers:{"Content-Type":"text/plain"}});
+ }})());
 });
