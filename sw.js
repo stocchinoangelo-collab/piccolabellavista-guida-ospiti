@@ -1,6 +1,6 @@
 const PREFIX="pbv-boutique:"+new URL(self.registration.scope).pathname+":";
-const CACHE=PREFIX+"v1";
-const LOCAL=["./","index.html","css/base.css","css/style.css","js/i18n.js","js/data.js","js/photos.js","js/app.js","manifest.webmanifest","icon.svg","icon-192.png","icon-512.png"];
+const CACHE=PREFIX+"v2";
+const LOCAL=["./","index.html","css/style.css","css/boutique.css","js/i18n.js","js/data.js","js/photos.js","js/app.js","manifest.webmanifest","icon.svg","icon-192.png","icon-512.png","img/icons/apple-touch-icon.png","img/casa/bagno.jpg","img/casa/letto.jpg","img/casa/panoramica.jpg","img/casa/zona-pranzo.jpg"];
 self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(LOCAL)).then(()=>self.skipWaiting())));
 self.addEventListener("activate",e=>e.waitUntil((async()=>{for(const key of await caches.keys())if(key.startsWith(PREFIX)&&key!==CACHE)await caches.delete(key);await self.clients.claim();})()));
 self.addEventListener("fetch",e=>{

@@ -1,5 +1,5 @@
 # Piccolabellavista — Boutique mediterraneo
-Redesign della guida ospiti IT/EN/DE basato su main e266d5b (28 agosto 2026).
+Redesign della guida ospiti basato su main e266d5b e sui sorgenti aggiornati forniti da Angelo (app v3.1, dati v3.3).
 
 ## Avvio e contenuti
 Sito statico: nessuna dipendenza di runtime e nessun eval/loader di sorgenti.
@@ -10,19 +10,20 @@ I vecchi sorgenti _source_originale nel repository GitHub sono archivio, non dip
 Non caricare l'archivio dei vecchi sorgenti sul server.
 
 ## Design e funzioni
-Blu mare/bianco, fotografia editoriale del Poetto, tre spiagge fotografiche verificate, navigazione mobile.
-Restano le 12 viste in tre lingue, vento Open-Meteo, filtri, eventi locali e motore CSV, mappa, itinerari.
-Il CSV eventi non è configurato nei dati originali: la lista locale resta la fonte corrente.
+Blu mare/bianco, grandi fotografie reali dell'appartamento, home editoriale, navigazione desktop e mobile.
+Sono presenti 11 viste, interfaccia IT/EN/DE, vento Open-Meteo, filtri, eventi locali, mappa e itinerari.
+Molte descrizioni sono disponibili solo in italiano e inglese: in tedesco un avviso segnala il testo italiano di riserva.
 Le informazioni turistiche preesistenti non sono state tutte riverificate: date, tariffe, aperture e regole richiedono controllo prima dell'uso operativo.
 Avvio immediato; meteo aggiornato in seguito, con timeout di 6 secondi e gestione offline.
 Dettagli accessibili con focus, chiusura Escape e ritorno al pulsante di origine.
 
 ## Fotografie
-Tre foto reali da Wikimedia Commons, autori/fonti/licenza CC BY 2.0 in js/photos.js e nella pagina Fonti.
+Quattro fotografie originali fornite da Angelo sono incluse in img/casa/: camera, bagno, panoramica e zona pranzo. La home usa la camera.
+Le associazioni fotografiche verificate da Wikimedia Commons sono in js/photos.js; la pagina Fonti espone i crediti disponibili. Altre immagini Commons ereditate dai dati richiedono ancora revisione completa delle attribuzioni.
 Le foto sono esterne: il download locale è stato impedito dall'ambiente di lavoro; caricamento sui dispositivi e disponibilità esterna vanno collaudati.
 Le altre spiagge restano schede testuali: nessuna foto generica viene spacciata per un luogo specifico.
 Il ritaglio avviene soltanto con object-fit:cover.
-Le fotografie esterne NON sono garantite offline. Testi, interfaccia e icone locali sono precache.
+Le fotografie esterne NON sono garantite offline. Testi, interfaccia, icone e quattro fotografie locali sono precache.
 
 ## Sicurezza e cache
 L'anteprima Sites è privata per il proprietario. Non equivale a una pubblicazione aperta agli ospiti.
@@ -37,13 +38,13 @@ Aggiornare la versione cache quando cambia il contenuto.
 ## Verifiche eseguite
 node scripts/verify.cjs
 - Sintassi dei cinque JavaScript.
-- Rendering di tutte le 12 viste in IT, EN e DE (36 combinazioni), senza undefined.
-- Associazione delle tre fotografie e assenza di foto inventate.
+- Rendering di tutte le 11 viste in IT, EN e DE (33 combinazioni), senza undefined o immagini con src vuoto.
+- Pannelli di dettaglio, filtro ristoranti e quattro fotografie locali.
+- Assenza delle credenziali di esempio nei dati distribuiti.
 - Riferimenti locali di index.html e icone manifest.
 
 ## Collaudo reale ancora necessario
 Android Chrome e iPhone Safari: home, menu, lingue, filtri, dettagli, focus e ingrandimento testo.
 Fotografie su rete mobile; PWA installazione; modalità aereo dopo primo caricamento; aggiornamento da versione precedente.
-Destinazioni Maps e collegamenti esterni, vento live/errori e CSV quando verrà configurato.
+Destinazioni Maps e collegamenti esterni, vento live/errori e date degli eventi.
 Il controllo automatico non è un collaudo visuale su browser o telefono.
-

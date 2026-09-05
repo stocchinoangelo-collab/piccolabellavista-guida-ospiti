@@ -18,3 +18,18 @@ const PHOTOS={
     "source": "https://commons.wikimedia.org/wiki/File:Tueredda.jpg"
   }
 };
+
+/* Keep each photograph tied to its actual place. */
+if(typeof DATA!=="undefined"){
+ for(const b of DATA.spiagge){
+  const photo=PHOTOS[b.id];
+  if(photo){b.image=photo.src;b.imageCredit=photo.author+" — CC BY 2.0 — Wikimedia Commons";}
+ }
+ const sea=DATA.cagliari.find(x=>x.id==="mare");
+ if(sea){sea.image=PHOTOS.poetto.src;sea.imageCredit=PHOTOS.poetto.author+" — CC BY 2.0 — Wikimedia Commons";}
+ DATA.fonti.text={
+ it:"Questa guida raccoglie le indicazioni di Piccolabellavista per il soggiorno. Prima di partire, controlla orari, prezzi e date sui siti ufficiali indicati. Le quattro fotografie dell’alloggio sono state fornite da Angelo.",
+ en:"This guide brings together Piccolabellavista’s suggestions for your stay. Before setting out, check opening times, prices and dates on the linked official websites. The four apartment photographs were provided by Angelo.",
+ de:"Dieser Reiseführer enthält die Empfehlungen von Piccolabellavista. Bitte prüfe Öffnungszeiten, Preise und Termine vor dem Besuch auf den verlinkten offiziellen Websites. Die vier Fotos der Unterkunft wurden von Angelo bereitgestellt."};
+ DATA.fonti.credits=DATA.fonti.credits.filter(x=>!String(x.it).startsWith("Fotografie"));
+}
