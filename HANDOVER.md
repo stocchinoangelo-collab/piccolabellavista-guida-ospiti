@@ -1,33 +1,16 @@
-HANDOVER.md
+# Consegna · 6 settembre 2026
 
-# PICCOLABELLAVISTA · HANDOVER — stato V1.2 FINALE
-Audit tecnico PASS (V1.1.1) · contenuti verificati/correctti su fonti istituzionali
-(Fase 2: 12 interventi + extra D'Annunzio 1882) · patch R1–R6 applicate ·
-Basic Auth server-side pronta (da attivare al deploy).
+Base remota: e266d5b342666717553508341a0c6794db19d3a9, ramo main.
 
-CORREZIONI FATTO PRINCIPALI (tracciabilità completa nella chat, messaggio Fase 2):
-Su Gologone −134/−135 m · Porto Giunco facing S·SE + stelle · Arrubiu "più grande
-della Sardegna", mastio 15 m/25–30 stimati · Nebida "più alto del Mediterraneo, 133 m"
-+ Concali su Terràinu · Baunei Su Sterru ~200 m + San Pietro di Golgo · Santa Cristina
-ipotesi archeoastronomica (18,61 anni) · Sinis "una delle più antiche", V–VII sec. ·
-Santa Vittoria "uno dei più vasti" · Bosa "secondo la tradizione" · Molentargius
-parafrasi etimologia · stele senza numero · refusi puliti (punicao→punico,
-capelletto→capotto, sanctuario→santuari) · nota lingue guide Barumini (IT/EN/FR).
+Implementati tema boutique mediterraneo, homepage porto/Castello, cinque locali per mangiare, quattro per aperitivi, otto voci enogastronomiche, percorsi storici, casa, informazioni utili e sette destinazioni senza auto. Conservati itinerari, filtri, vento manuale/meteo, schede luoghi e tre lingue.
+Risolti caricamento duplicato, percorsi errati, intestazioni non JavaScript ed errore di sintassi nei consigli giornalieri. Undici originali esatti sono ora locali.
+Consultare PHOTO_SELECTIONS.md, PHOTO_CREDITS.md e IMPLEMENTATION_CHECKLIST.md. Le istruzioni precedenti sulla struttura dei sorgenti sono superate.
 
-TECNICA: vanilla JS, PWA, SW pbv-v12 (bump a ogni modifica), Open-Meteo live,
-CSV eventi con triple protezioni (timeout 6s / avvio 3s / try-catch totale),
-fallback locale garantito, IT/EN/DE complete, tempi sempre stime "~".
-
-PRIVACY: Basic Auth Apache (file password fuori web root, chmod 600, utenti separati),
-noindex meta + X-Robots-Tag header, -Indexes, gate SHA-256 OFF, zero dati personali,
-zero API key. MAI committare .htpasswd.
-
-DEPLOY: AutoSSL → upload cartella+.htaccess → credenziali → curl 401/200 → test mobile
-anonimo → PWA installabile → offline OK.
-
-MANUTENZIONE MENSILE: pagina Eventi (conferma date sui siti ufficiali, aggiorna checked);
-eventuale eventsCsv.url; bump CACHE a ogni modifica contenuti; revoca credenziali ospiti
-a fine stagione.
-
-APERTI (non bloccanti): foto reali in img/<id>.jpg · fonti da collegare alle 17 schede
-enogastronomiche · comune Cala Luna (Dorgali/Baunei) da chiarire in UI futura.
+## Punti aperti
+- Permessi delle nove foto dei locali e delle scelte originali di malloreddus e pane carasau. Nessun messaggio di richiesta è stato inviato.
+- La hero resta il candidato legale del pacchetto, non una scelta artistica definitiva.
+- Il sito commerciale usa attualmente toni terracotta. La guida segue la successiva decisione blu mediterraneo; il sito commerciale non è stato modificato.
+- Installazione PWA e aggiornamento cache su dispositivo reale tramite HTTPS da verificare dopo il deploy.
+- Gate OFF come in origine; nessuna autenticazione server creata dal commit.
+- Dati operativi non confermati di locali e trasporti omessi. I tempi dei contenuti storici mantenuti sono indicativi; non è stata svolta una nuova verifica completa di tutti i luoghi.
+- Fraunces/Inter predisposti come nel brand, con Georgia/Arial disponibili offline; i font esterni non sono scaricati né necessari all'avvio.

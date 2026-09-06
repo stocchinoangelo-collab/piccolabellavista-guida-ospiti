@@ -6,23 +6,23 @@
 <title>Piccolabellavista · Guida privata alla Sardegna</title>
 <meta name="description" content="Guida privata riservata agli ospiti di Piccolabellavista, Pirri/Cagliari.">
 <meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#faf7f2">
+<meta name="theme-color" content="#135777">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon.svg">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;600&display=swap">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/boutique.css">
 </head>
 <body>
+<a class="skip" href="#view" data-i18n="skip_content"></a>
 <div id="gate" class="gate hidden">
   <div class="gate__box">
     <div class="gate__logo">PBV</div>
     <h1>Piccolabellavista</h1>
     <p data-i18n="gate_text"></p>
+    <label for="gate-pass" data-i18n="password"></label>
     <input type="password" id="gate-pass" autocomplete="current-password">
     <button class="btn btn--primary" id="gate-btn" data-i18n="gate_enter"></button>
     <p class="gate__err hidden" id="gate-err" data-i18n="gate_err"></p>
@@ -32,14 +32,14 @@
   <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
   <a class="brand" href="#home">Piccola<span>bella</span>vista</a>
   <div class="langs" role="group" aria-label="Lingua / Language / Sprache">
-    <button data-lang="it" aria-label="Italiano">🇮🇹</button>
-    <button data-lang="en" aria-label="English">🇬🇧</button>
-    <button data-lang="de" aria-label="Deutsch">🇩🇪</button>
+    <button data-lang="it" aria-label="Italiano">IT</button>
+    <button data-lang="en" aria-label="English">EN</button>
+    <button data-lang="de" aria-label="Deutsch">DE</button>
   </div>
 </header>
 <nav class="menu" id="menu" aria-label="Principale"></nav>
 <div class="scrim" id="scrim"></div>
-<main id="view"></main>
+<main id="view" tabindex="-1"></main>
 <noscript><div style="padding:2rem;text-align:center">Questa guida richiede JavaScript attivo. / JavaScript is required. / JavaScript wird benötigt.</div></noscript>
 <footer class="foot">
   <a href="#fonti" data-i18n="nav_fonti"></a>
@@ -54,7 +54,10 @@
 </div>
 <script src="js/i18n.js" defer></script>
 <script src="js/data.js" defer></script>
+<script src="js/guide.js" defer></script>
+<script src="js/photos.js" defer></script>
+<script src="js/editorial.js" defer></script>
 <script src="js/app.js" defer></script>
-<script src="js/beach-images.js" defer></script>
 </body>
 </html>
+

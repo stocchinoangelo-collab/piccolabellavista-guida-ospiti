@@ -1,13 +1,44 @@
-/* Piccolabellavista service worker — V1.2 photography layer */
-const CACHE="pbv-v15";
-const ASSETS=["./","index.html","css/style.css","js/i18n.js","js/data.js","js/app.js","js/beach-images.js","manifest.webmanifest","icon.svg","_source_originale/🌐 jsi18n.js","_source_originale/jsdata.js","_source_originale/jsapp.js — V1.2 finale.txt","_source_originale/🎨 cssstyle.css","credits/beach-images.json"];
-self.addEventListener("install",e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)));});
-self.addEventListener("activate",e=>{e.waitUntil((async()=>{const ks=await caches.keys();await Promise.all(ks.filter(k=>k!==CACHE&&k!=="pbv-csv").map(k=>caches.delete(k)));await self.clients.claim();})());});
-self.addEventListener("fetch",e=>{
- const u=new URL(e.request.url);
- if(u.hostname==="api.open-meteo.com")return;
- if(u.hostname==="docs.google.com"||u.hostname.endsWith("googleusercontent.com")){
-  e.respondWith(fetch(e.request).then(res=>{try{const cp=res.clone();caches.open("pbv-csv").then(c=>c.put(e.request,cp));}catch(_){}return res;}).catch(()=>caches.match(e.request)));return;
- }
- if(u.origin===location.origin)e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(r2=>{if(r2.ok){const cp=r2.clone();caches.open(CACHE).then(c=>c.put(e.request,cp));}return r2;})));
+/* Versioned app shell and local photography. Live services are never fabricated offline. */
+const PREFIX='pbv-guide-'+encodeURIComponent(new URL(self.registration.scope).pathname)+'-';
+const CACHE=PREFIX+'2026-09-06-1';
+const CORE=['./','index.html','css/style.css','css/boutique.css','js/i18n.js','js/data.js','js/guide.js','js/photos.js','js/editorial.js','js/app.js','manifest.webmanifest','icon.svg','icons/icon-192.png','icons/icon-512.png','icons/maskable-512.png','credits/photos.json'];
+self.addEventListener('install',event=>{
+ event.waitUntil((async()=>{
+  const cache=await caches.open(CACHE);
+  await cache.addAll(CORE);
+  const manifest=await (await cache.match('credits/photos.json')).json();
+  const assets=[...new Set(manifest.flatMap(p=>[p.file,p.thumb].filter(Boolean)))];
+  await cache.addAll(assets);
+  await self.skipWaiting();
+ })());
+});
+self.addEventListener('activate',event=>{
+ event.waitUntil((async()=>{
+  await Promise.all((await caches.keys()).filter(k=>(k.startsWith(PREFIX)&&k!==CACHE)||/^pbv-v\d+$/.test(k)).map(k=>caches.delete(k)));
+  await self.clients.claim();
+  const clients=await self.clients.matchAll({type:'window'});
+  clients.forEach(client=>client.postMessage({type:'PBV_UPDATED',version:CACHE}));
+ })());
+});
+self.addEventListener('fetch',event=>{
+ const request=event.request,url=new URL(request.url);
+ if(request.method!=='GET'||url.origin!==self.location.origin)return;
+ const scope=new URL(self.registration.scope);
+ if(!url.pathname.startsWith(scope.pathname))return;
+ // Restrict caches to this guide; do not cache arbitrary files under a shared origin.
+ const relative=url.pathname.slice(scope.pathname.length);
+ const isApp=CORE.includes(relative)||relative===''||relative.startsWith('images/');
+ if(!isApp)return;
+ event.respondWith((async()=>{
+  const cache=await caches.open(CACHE);
+  const cached=await cache.match(request,{ignoreSearch:true});
+  if(cached)return cached;
+  try{
+   const response=await fetch(request);
+   if(response.ok)await cache.put(request,response.clone());
+   return response;
+  }catch{
+   return new Response('Offline',{status:503,headers:{'Content-Type':'text/plain'}});
+  }
+ })());
 });

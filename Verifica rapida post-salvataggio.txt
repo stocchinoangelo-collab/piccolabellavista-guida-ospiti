@@ -1,32 +1,4 @@
-VERIFICA RAPIDA POST-SALVATAGGIO — V1.2
-
-1) Service Worker / cache
-   grep -c "pbv-v14" sw.js                         # atteso 1
-
-2) Controlli contenuti già stabiliti
-   grep -o "sanctuar\|santuari" js/data.js       # atteso solo "santuari"
-   grep -c "di sei metri\|Sa genti is mentulus" js/data.js   # atteso 0
-   grep -c "upd_hint" js/app.js js/i18n.js        # atteso 0 e 0
-   grep -c "più grande nuraghe della Sardegna" js/data.js    # atteso >=1
-   grep -c "134–135" js/data.js                    # atteso >=1
-
-3) Eventi dinamici
-   grep "eventsCsv" js/data.js                    # atteso presente
-
-4) Sicurezza DEPLOY — NON inserire password nel repository
-   .htaccess deve essere configurato sul server Apache/cPanel.
-   Verifica live senza credenziali: HTTP 401.
-   Verifica live con credenziali: HTTP 200.
-   Il file password deve stare FUORI dalla web root.
-
-5) Test finale manuale obbligatorio
-   - Android Chrome: menu, lingue, vento, eventi, Maps
-   - iPhone Safari: stessi test
-   - PWA: installazione e avvio
-   - Offline: dopo caricamento/login, modalità aereo e navigazione
-   - Open-Meteo: dati vento live e comportamento in caso di errore
-   - CSV eventi: caricamento e fallback locale
-   - Link esterni e Google Maps
-   - Nessun errore JavaScript in console
-
-NOTA: il vecchio controllo "pbv-v12" è stato aggiornato a "pbv-v14" perché la cache attuale di sw.js è pbv-v14.
+Verifica corrente: IMPLEMENTATION_CHECKLIST.md.
+Eseguire node tests/verify.cjs prima degli aggiornamenti.
+Incrementare la cache in sw.js dopo modifiche.
+Controllare ramo e commit prima della pubblicazione.

@@ -1,0 +1,10 @@
+{
+  "name": "piccolabellavista-guida-ospiti",
+  "version": "1.3.0",
+  "private": true,
+  "description": "Static trilingual PWA; no build or runtime dependencies.",
+  "scripts": {
+    "dev": "node scripts/serve.cjs",
+    "test": "node tests/verify.cjs"
+  }
+}
