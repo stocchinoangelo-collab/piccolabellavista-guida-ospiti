@@ -1,8 +1,11 @@
 from __future__ import annotations
 
-from pathlib import Path
-from urllib.request import Request, urlopen
 from io import BytesIO
+from pathlib import Path
+from time import sleep
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
+
 from PIL import Image
 
 OUT = Path("images/beaches")
@@ -18,9 +21,29 @@ IMAGES = {
 
 
 def fetch(url: str) -> Image.Image:
-    req = Request(url, headers={"User-Agent": "PiccolabellavistaGuestGuide/1.0 (image preparation)"})
-    with urlopen(req, timeout=60) as response:
-        return Image.open(BytesIO(response.read())).convert("RGB")
+    req = Request(
+        url,
+        headers={
+            "User-Agent": "PiccolabellavistaGuestGuide/1.0 (contact: GitHub repository owner)",
+            "Accept": "image/avif,image/webp,image/png,image/jpeg,*/*",
+        },
+    )
+    delays = (0, 8, 20, 40)
+    last_error: Exception | None = None
+    for delay in delays:
+        if delay:
+            sleep(delay)
+        try:
+            with urlopen(req, timeout=90) as response:
+                data = response.read()
+            return Image.open(BytesIO(data)).convert("RGB")
+        except HTTPError as exc:
+            last_error = exc
+            if exc.code != 429:
+                raise
+            print(f"Wikimedia rate limit (429); retrying after cooldown: {url}")
+    assert last_error is not None
+    raise last_error
 
 
 def save_webp(image: Image.Image, path: Path, max_width: int, quality: int = 84) -> None:
@@ -30,7 +53,9 @@ def save_webp(image: Image.Image, path: Path, max_width: int, quality: int = 84)
     image.save(path, "WEBP", quality=quality, method=6)
 
 
-for slug, url in IMAGES.items():
+for index, (slug, url) in enumerate(IMAGES.items()):
+    if index:
+        sleep(6)
     image = fetch(url)
     save_webp(image, OUT / f"{slug}.webp", 1280)
     save_webp(image, OUT / f"{slug}-800.webp", 800, 82)
