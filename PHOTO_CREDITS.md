@@ -1,6 +1,6 @@
 # Crediti fotografici
 
-Verifica: 6 settembre 2026. Tutte le derivate WebP conservano la licenza della fonte; ridimensionamento e ritaglio applicati.
+Verifica: 8 settembre 2026. Tutte le derivate WebP conservano la licenza della fonte; ridimensionamento e ritaglio applicati.
 
 - hero: Smiley.toerist — [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) — [Fonte originale](https://commons.wikimedia.org/wiki/File:Cagliari_haven_2018_1.jpg). Asset: `images/cagliari-porto-smiley-toerist.webp`.
 
@@ -21,5 +21,15 @@ Verifica: 6 settembre 2026. Tutte le derivate WebP conservano la licenza della f
 - bottarga: Freek Janssens — [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) — [Fonte originale](https://commons.wikimedia.org/wiki/File:Bottarga.png). Asset: `images/enogastronomia/bottarga-san-benedetto-freek-janssens.webp`.
 
 - poetto: Phil Venditti — [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) — [Fonte originale](https://commons.wikimedia.org/wiki/File:Panoramic_view_of_Poetto_from_Sella_del_Diavolo.jpg). Asset: `images/poetto.webp`.
+
+- mari_pintau: Ramon Espiña Fernandez — [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) — [Fonte originale](https://commons.wikimedia.org/wiki/File:Cala_Mari_Pintau_-_panoramio.jpg). Asset: `images/beaches/mari-pintau.webp`.
+
+- chia: Cristiano Cani — [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) — [Fonte originale](https://commons.wikimedia.org/wiki/File:Dune_di_Chia.jpg). Asset: `images/beaches/chia-su-giudeu.webp`.
+
+- tuerredda: Pampuco — [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) — [Fonte originale](https://commons.wikimedia.org/wiki/File:Isola_Tuerredda.png). Asset: `images/beaches/tuerredda.webp`.
+
+- porto_giunco: dronepicr — [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) — [Fonte originale](https://commons.wikimedia.org/wiki/File:Aerial_view_of_the_beach_of_Porto_Giunco_(Spiaggia_di_Porto_Giunco)_and_the_nearby_lake_Stagno_di_Notteri_in_Sardinia,_Italy_(48402731012).jpg). Asset: `images/beaches/porto-giunco.webp`.
+
+- punta_molentis: dronepicr — [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) — [Fonte originale](https://commons.wikimedia.org/wiki/File:Aerial_view_of_Punta_Molentis_Beach_in_Sardinia,_Italy_(48399314582).jpg). Asset: `images/beaches/punta-molentis.webp`.
 
 - bastione: Elisa.Mnn — [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) — [Fonte originale](https://commons.wikimedia.org/wiki/File:Bastione_di_San_Remy,_prospetto.jpg). Asset: `images/bastione.webp`.
