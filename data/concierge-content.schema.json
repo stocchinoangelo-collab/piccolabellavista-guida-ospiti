@@ -68,6 +68,24 @@
       },
       "additionalProperties": false
     },
+    "operations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["kind", "value", "volatility", "verification"],
+        "properties": {
+          "kind": {
+            "enum": ["parking", "access", "booking", "transport", "service", "opening", "restriction", "accessibility", "other"]
+          },
+          "value": { "$ref": "#/$defs/i18nText" },
+          "volatility": { "enum": ["stable", "seasonal", "dynamic"] },
+          "validFrom": { "type": "string", "format": "date" },
+          "validUntil": { "type": "string", "format": "date" },
+          "verification": { "$ref": "#/$defs/verificationRecord" }
+        },
+        "additionalProperties": false
+      }
+    },
     "media": {
       "type": "array",
       "items": {
@@ -83,17 +101,7 @@
         "additionalProperties": false
       }
     },
-    "verification": {
-      "type": "object",
-      "required": ["status"],
-      "properties": {
-        "status": { "enum": ["verified", "review_due", "unverified", "retired"] },
-        "checkedAt": { "type": "string", "format": "date" },
-        "source": { "type": "string" },
-        "notes": { "type": "string" }
-      },
-      "additionalProperties": false
-    }
+    "verification": { "$ref": "#/$defs/verificationRecord" }
   },
   "$defs": {
     "i18nText": {
@@ -103,6 +111,18 @@
         "it": { "type": "string" },
         "en": { "type": "string" },
         "de": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "verificationRecord": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": { "enum": ["verified", "review_due", "unverified", "retired"] },
+        "checkedAt": { "type": "string", "format": "date" },
+        "source": { "type": "string" },
+        "sourceUrl": { "type": "string" },
+        "notes": { "type": "string" }
       },
       "additionalProperties": false
     }
