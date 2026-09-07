@@ -129,3 +129,18 @@ Fino a quel momento: nessun merge su `main`.
 | Esperienza complessiva | 7 | privacy e prova fisica impediscono ancora il 9/10 |
 
 L'obiettivo 9/10 resta raggiungibile, ma non viene dichiarato senza le prove finali indicate sopra.
+
+## Secondo intervento — pacchetto pubblico e installazione cache
+
+Integrati senza sovrascriverli i quattro commit successivi al consolidamento, fino a `c233aaed4497b8f5e4756dae0c9c0c5e62f53129`.
+
+| AREA | STATO | PROBLEMA | GRAVITÀ | CORREZIONE |
+|---|---|---|---|---|
+| Pacchetto di rilascio | CORRETTO | Il runbook pubblicava la radice con documenti operativi e test | MEDIO | Export esplicito di 43 file in dist; esclusi sorgenti di test, audit e registri delle scelte |
+| Download della cache | CORRETTO NEI TEST | Il precache non rifiutava esplicitamente redirect di autenticazione o HTML ricevuto al posto di JS | ALTO | Download con redirect:error, verifica del MIME e pulizia della sola installazione fallita |
+| Aggiornamento asset | CORRETTO NEI TEST | Il nuovo precache poteva riutilizzare risposte della cache HTTP | ALTO | cache:reload durante il download; nuova versione del service worker |
+| Origini alternative | DOCUMENTATO, APERTO | Access sul dominio principale non certifica protezione di Pages, anteprime o repository pubblico | BLOCKER | Runbook ampliato con verifica di tutte le origini e limiti delle copie offline |
+
+`npm test` locale superato: suite precedenti più `tests/build.cjs`. Il test offline ora verifica anche HTML di login, risposta reindirizzata e rimozione della cache incompleta. `tests/build.cjs` verifica byte identici, presenza dell’intero precache ed esclusione dei documenti interni. Nessun test aggiunto sostituisce Safari, Android, installazione PWA o modalità aereo reali. Il workflow include il nuovo controllo, ma il suo esito remoto va verificato dopo il push.
+
+Fonti tecniche: [Cache API](https://developer.mozilla.org/en-US/docs/Web/API/Cache), [modalità cache delle richieste](https://developer.mozilla.org/en-US/docs/Web/API/Request/cache), [header Cloudflare Pages](https://developers.cloudflare.com/pages/configuration/headers/). Gli header non attivano autenticazione. Nessuna configurazione di hosting è stata applicata in questo intervento e nessun punteggio viene aumentato sulla sola base dei test.

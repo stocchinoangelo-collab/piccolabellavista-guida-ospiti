@@ -51,3 +51,6 @@ jobs:
 
       - name: HTTP path verification
         run: node tests/http.cjs
+
+      - name: Guest distribution verification
+        run: node tests/build.cjs

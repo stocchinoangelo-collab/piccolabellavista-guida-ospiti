@@ -39,11 +39,11 @@ const manifest=JSON.parse(read('manifest.webmanifest'));for(const icon of manife
  const handlers={},buckets=new Map(),deleted=[],scope='https://example.com/guide/';
  const key=r=>new URL(typeof r==='string'?r:r.url,scope).href;
  const caches={async open(name){if(!buckets.has(name))buckets.set(name,new Map());const bucket=buckets.get(name);return {async addAll(files){for(const file of files){const full=path.join(root,file==='./'?'index.html':file);assert(fs.existsSync(full),`Precache missing ${file}`);bucket.set(key(file),new Response(fs.readFileSync(full))) }},async match(r){return bucket.get(key(r))?.clone()},async put(r,response){bucket.set(key(r),response)}}},async keys(){return [...buckets.keys()]},async delete(k){deleted.push(k);return buckets.delete(k)}};
- let skipped=false,claimed=false,online=false;
+ let skipped=false,claimed=false,online=true;
  const self={registration:{scope},location:new URL(scope+'sw.js'),addEventListener:(n,fn)=>handlers[n]=fn,skipWaiting:async()=>{skipped=true},clients:{claim:async()=>{claimed=true},matchAll:async()=>[]}};
- const worker={self,caches,URL,Response,fetch:async()=>{if(!online)throw Error('offline');return new Response('live')}};
+ const worker={self,caches,URL,Response,fetch:async url=>{if(!online)throw Error('offline');return require('./asset-response.cjs')(root,scope,url)}};
  vm.createContext(worker);vm.runInContext(read('sw.js'),worker);
- let job;handlers.install({waitUntil:p=>job=p});await job;assert(skipped);
+ let job;handlers.install({waitUntil:p=>job=p});await job;assert(skipped);online=false;
  buckets.set('unrelated-cache',new Map());buckets.set('pbv-guide-other-scope-old',new Map());buckets.set('pbv-v15',new Map());
  handlers.activate({waitUntil:p=>job=p});await job;assert(claimed);assert(!deleted.includes('pbv-v15'));assert(buckets.has('unrelated-cache'));assert(buckets.has('pbv-guide-other-scope-old'));
  for(const file of ['index.html','js/app.js',photos[0].file]){let reply;handlers.fetch({request:new Request(scope+file),respondWith:p=>reply=p});const response=await reply;assert.equal(response.status,200);assert((await response.arrayBuffer()).byteLength>0)}
