@@ -1,6 +1,6 @@
 # SCELTE FOTOGRAFICHE — VERIFICA ESPERTA 6 SETTEMBRE 2026
 
-Questo file è la fonte di verità per le SCELTE ESTETICHE fatte dall'utente durante la mattina del 6 settembre 2026.
+Questo file è la fonte di verità per le SCELTE ESTETICHE fatte dall'utente durante la mattina del 6 settembre 2026 e per le successive scelte confermate.
 Distingue in modo rigoroso:
 - `SCELTA_ESTETICA_CONFERMATA`: immagine scelta dall'utente;
 - `APPROVATA_USO`: immagine legalmente utilizzabile in produzione;
@@ -107,6 +107,54 @@ Distingue in modo rigoroso:
 - Asset già individuato: Wikimedia `Cannonau di Sardegna.jpg` — CC BY-SA 3.0.
 - Stato: `APPROVATA_USO`; usare in card, non come immagine grande.
 
+## SPIAGGE — SCELTE CONFERMATE 8 SETTEMBRE 2026
+
+### Poetto
+- Asset già presente: `images/poetto.webp`.
+- Fonte: Wikimedia Commons `Panoramic view of Poetto from Sella del Diavolo.jpg`.
+- Autore: Phil Venditti.
+- Licenza: CC BY 2.0.
+- Stato: `APPROVATA_USO`.
+
+### Mari Pintau
+- Scelta utente: foto n.1.
+- Asset scelto: Wikimedia Commons `Cala Mari Pintau - panoramio.jpg`.
+- Autore: Ramon Espiña Fernandez.
+- Dimensioni originali: 2979 × 1981.
+- Licenza: CC BY-SA 3.0.
+- Stato: `SCELTA_ESTETICA_CONFERMATA` + `APPROVATA_USO`.
+
+### Chia / Su Giudeu
+- Scelta utente: foto n.1.
+- Asset scelto: Wikimedia Commons `Dune di Chia.jpg`.
+- Autore: Cristiano Cani.
+- Dimensioni originali: 2588 × 1138.
+- Licenza: CC BY 2.0.
+- Stato: `SCELTA_ESTETICA_CONFERMATA` + `APPROVATA_USO`.
+
+### Tuerredda
+- Scelta utente: foto n.1.
+- Asset scelto: Wikimedia Commons `Isola Tuerredda.png`.
+- Autore: Pampuco.
+- Dimensioni originali: 2134 × 1010.
+- Licenza: CC BY-SA 4.0.
+- Stato: `SCELTA_ESTETICA_CONFERMATA` + `APPROVATA_USO`.
+
+### Porto Giunco
+- Scelta utente: foto n.1.
+- Asset scelto: Wikimedia Commons `Aerial view of the beach of Porto Giunco (Spiaggia di Porto Giunco) and the nearby lake Stagno di Notteri in Sardinia, Italy (48402731012).jpg`.
+- Autore: dronepicr.
+- Dimensioni originali: 5464 × 3070.
+- Licenza: CC BY 2.0.
+- Stato: `SCELTA_ESTETICA_CONFERMATA` + `APPROVATA_USO`.
+
+### Punta Molentis
+- Scelta utente: direzione n.1, vista panoramica completa, approvata senza ulteriore selezione manuale.
+- Asset fissato per questa direzione: Wikimedia Commons `Aerial view of Punta Molentis Beach in Sardinia, Italy (48399314582).jpg`.
+- Autore: dronepicr.
+- Dimensioni originali: 5464 × 3640.
+- Licenza: CC BY 2.0.
+- Stato: `SCELTA_ESTETICA_CONFERMATA` + `APPROVATA_USO`.
 
 ## Vincolo
 Nessuna sostituzione delle scelte confermate. I fallback restano temporanei.
