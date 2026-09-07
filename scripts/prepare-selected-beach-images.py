@@ -66,10 +66,17 @@ def save_webp(image: Image.Image, path: Path, max_width: int, quality: int = 84)
     image.save(path, "WEBP", quality=quality, method=6)
 
 
-for index, (slug, filename) in enumerate(FILES.items()):
-    if index:
+first_download = True
+for slug, filename in FILES.items():
+    main_path = OUT / f"{slug}.webp"
+    thumb_path = OUT / f"{slug}-800.webp"
+    if main_path.exists() and thumb_path.exists():
+        print(f"skip existing {slug}")
+        continue
+    if not first_download:
         sleep(12)
+    first_download = False
     image = fetch(filename)
-    save_webp(image, OUT / f"{slug}.webp", 1280)
-    save_webp(image, OUT / f"{slug}-800.webp", 800, 82)
+    save_webp(image, main_path, 1280)
+    save_webp(image, thumb_path, 800, 82)
     print(f"prepared {slug}: {image.width}x{image.height}")
