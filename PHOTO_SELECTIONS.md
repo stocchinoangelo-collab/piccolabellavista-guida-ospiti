@@ -180,5 +180,14 @@ Distingue in modo rigoroso:
 - Licenza: CC BY 4.0.
 - Stato: `SCELTA_ESTETICA_CONFERMATA` + `APPROVATA_USO`.
 
+### San Giovanni di Sinis
+- Scelta utente: foto n.1.
+- Asset scelto: Wikimedia Commons `At Tharros, Sardinia 2024 010.jpg`.
+- Autore: Mike Peel.
+- Dimensioni originali: 6960 × 4640.
+- Licenza: CC BY-SA 4.0.
+- Soggetto: spiaggia e torre di San Giovanni di Sinis.
+- Stato: `SCELTA_ESTETICA_CONFERMATA` + `APPROVATA_USO`.
+
 ## Vincolo
 Nessuna sostituzione delle scelte confermate. I fallback restano temporanei.
