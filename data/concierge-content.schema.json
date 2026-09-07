@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://piccolabellavista.it/schema/concierge-content.schema.json",
+  "title": "Piccolabellavista Concierge Content",
+  "type": "object",
+  "required": ["id", "type", "status", "access", "name", "summary", "verification"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]*$" },
+    "type": {
+      "enum": ["restaurant", "beach", "place", "itinerary", "transport", "event", "tip", "service"]
+    },
+    "status": { "enum": ["active", "draft", "retired"] },
+    "access": { "enum": ["public", "guest", "private"] },
+    "name": { "type": "string", "minLength": 1 },
+    "summary": { "$ref": "#/$defs/i18nText" },
+    "description": { "$ref": "#/$defs/i18nText" },
+    "tags": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "audience": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "location": {
+      "type": "object",
+      "properties": {
+        "address": { "type": "string" },
+        "area": { "type": "string" },
+        "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+        "lng": { "type": "number", "minimum": -180, "maximum": 180 }
+      },
+      "additionalProperties": false
+    },
+    "mobility": {
+      "type": "object",
+      "properties": {
+        "carRequired": { "type": "boolean" },
+        "publicTransportFriendly": { "type": "boolean" },
+        "walkingFriendly": { "type": "boolean" },
+        "driveMin": { "type": "integer", "minimum": 0 },
+        "transitMin": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "budget": { "enum": ["free", "low", "medium", "high", "variable"] },
+    "timeOfDay": {
+      "type": "array",
+      "items": { "enum": ["morning", "lunch", "afternoon", "aperitivo", "dinner", "evening", "night", "any"] },
+      "uniqueItems": true
+    },
+    "durationMin": { "type": "integer", "minimum": 0 },
+    "familyFriendly": { "type": "boolean" },
+    "romantic": { "type": "boolean" },
+    "localAuthenticity": { "type": "integer", "minimum": 1, "maximum": 5 },
+    "weather": {
+      "type": "object",
+      "properties": {
+        "rainSuitable": { "type": "boolean" },
+        "hotDaySuitable": { "type": "boolean" },
+        "windSuitability": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 1, "maximum": 5 }
+        }
+      },
+      "additionalProperties": false
+    },
+    "editorial": {
+      "type": "object",
+      "properties": {
+        "whyWeRecommend": { "$ref": "#/$defs/i18nText" },
+        "guestNote": { "$ref": "#/$defs/i18nText" },
+        "internalNote": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "media": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["src", "rightsStatus"],
+        "properties": {
+          "src": { "type": "string" },
+          "alt": { "$ref": "#/$defs/i18nText" },
+          "credit": { "type": "string" },
+          "license": { "type": "string" },
+          "rightsStatus": { "enum": ["verified", "pending", "restricted", "owned"] }
+        },
+        "additionalProperties": false
+      }
+    },
+    "verification": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": { "enum": ["verified", "review_due", "unverified", "retired"] },
+        "checkedAt": { "type": "string", "format": "date" },
+        "source": { "type": "string" },
+        "notes": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "i18nText": {
+      "type": "object",
+      "required": ["it"],
+      "properties": {
+        "it": { "type": "string" },
+        "en": { "type": "string" },
+        "de": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": true
+}
