@@ -1,0 +1,57 @@
+[
+  {
+    "id": "poetto",
+    "type": "beach",
+    "status": "draft",
+    "access": "public",
+    "name": "Poetto",
+    "summary": {
+      "it": "La spiaggia urbana di Cagliari.",
+      "en": "Cagliari's urban beach.",
+      "de": "Der Stadtstrand von Cagliari."
+    },
+    "description": {
+      "it": "Esempio di migrazione: i contenuti definitivi verranno trasferiti dal dataset attuale solo dopo verifica.",
+      "en": "Migration example; final content will be transferred only after verification.",
+      "de": "Migrationsbeispiel; endgültige Inhalte werden erst nach Prüfung übernommen."
+    },
+    "tags": ["mare", "cagliari", "senza-auto"],
+    "audience": ["couple", "family", "without-car"],
+    "location": {
+      "area": "Cagliari",
+      "lat": 39.2092,
+      "lng": 9.1815
+    },
+    "mobility": {
+      "carRequired": false,
+      "publicTransportFriendly": true,
+      "walkingFriendly": true,
+      "driveMin": 15
+    },
+    "budget": "variable",
+    "timeOfDay": ["morning", "afternoon", "evening"],
+    "familyFriendly": true,
+    "romantic": true,
+    "localAuthenticity": 4,
+    "weather": {
+      "rainSuitable": false,
+      "hotDaySuitable": true,
+      "windSuitability": {
+        "maestrale": 4,
+        "scirocco": 1
+      }
+    },
+    "editorial": {
+      "whyWeRecommend": {
+        "it": "Da completare con il giudizio definitivo di Angelo e Viviana.",
+        "en": "To be completed with Angelo and Viviana's final judgement.",
+        "de": "Mit der endgültigen Einschätzung von Angelo und Viviana zu ergänzen."
+      }
+    },
+    "media": [],
+    "verification": {
+      "status": "unverified",
+      "notes": "Scheda dimostrativa: non usare ancora come fonte operativa."
+    }
+  }
+]
