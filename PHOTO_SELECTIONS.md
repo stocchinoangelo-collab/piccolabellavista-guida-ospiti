@@ -197,5 +197,13 @@ Distingue in modo rigoroso:
 - Licenza: CC BY 3.0.
 - Stato: `SCELTA_ESTETICA_CONFERMATA` + `APPROVATA_USO`.
 
+### Cala Brandinchi
+- Scelta utente: foto n.1.
+- Asset scelto: Wikimedia Commons `Cala Brandinchi - Cerdeña - panoramio.jpg`.
+- Autore: Ramon Espiña Fernandez.
+- Dimensioni originali: 3008 × 2000.
+- Licenza: CC BY-SA 3.0.
+- Stato: `SCELTA_ESTETICA_CONFERMATA` + `APPROVATA_USO`.
+
 ## Vincolo
 Nessuna sostituzione delle scelte confermate. I fallback restano temporanei.
