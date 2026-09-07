@@ -172,5 +172,13 @@ Distingue in modo rigoroso:
 - Licenza: CC BY-SA 4.0.
 - Stato: `SCELTA_ESTETICA_CONFERMATA` + `APPROVATA_USO`.
 
+### Is Arutas
+- Scelta utente: foto n.1.
+- Asset scelto: Wikimedia Commons `Is Aruttas Beach.jpg`.
+- Autore: William Kimmerle.
+- Dimensioni originali: 2412 × 1641.
+- Licenza: CC BY 4.0.
+- Stato: `SCELTA_ESTETICA_CONFERMATA` + `APPROVATA_USO`.
+
 ## Vincolo
 Nessuna sostituzione delle scelte confermate. I fallback restano temporanei.
