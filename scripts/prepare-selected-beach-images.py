@@ -18,6 +18,13 @@ FILES = {
     "tuerredda": "Isola Tuerredda.png",
     "porto-giunco": "Aerial view of the beach of Porto Giunco (Spiaggia di Porto Giunco) and the nearby lake Stagno di Notteri in Sardinia, Italy (48402731012).jpg",
     "punta-molentis": "Aerial view of Punta Molentis Beach in Sardinia, Italy (48399314582).jpg",
+    "simius": "Simius Beach - Villasimius.jpg",
+    "cala-sinzias": "Spiaggia - Cala Sinzias, Castiadas, Cagliari, Italia - 29 Maggio 2026 01.jpg",
+    "is-arutas": "Is Aruttas Beach.jpg",
+    "san-giovanni-sinis": "At Tharros, Sardinia 2024 010.jpg",
+    "la-pelosa": "Stintino, La Pelosa beach - panoramio (2).jpg",
+    "cala-brandinchi": "Cala Brandinchi - Cerdeña - panoramio.jpg",
+    "cala-luna": "Cala Luna.jpg",
 }
 
 
