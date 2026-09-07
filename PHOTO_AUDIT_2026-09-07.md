@@ -20,7 +20,7 @@ Attribuzione, link alla licenza e indicazione di conversione/ridimensionamento s
 
 ## Foto della casa
 
-Recuperati dalla PR #2 gli stessi quattro file JPG (547 × 672 px), verificati tramite SHA Git blob. Provenienza: materiale precedentemente fornito da Angelo, come dichiarato nella PR. Il nome del fotografo e un documento autonomo sui diritti non sono disponibili: non vengono inventati. Il registro separato è credits/house-photos.json.
+Recuperati dalla PR #2 gli stessi quattro file JPG (547 × 672 px), verificati tramite SHA Git blob. Provenienza: materiale precedentemente fornito da Angelo, come dichiarato nella PR. Angelo ha confermato direttamente il 7 settembre 2026 che le quattro foto sono state scattate da loro (Angelo e Viviana). Autorialità registrata collettivamente, senza attribuire il singolo scatto a uno dei due. Il loro utilizzo nella Guida Ospiti rientra nell’incarico conferito; non viene concessa né inventata una licenza aperta. Il punto sull’autorialità delle foto della casa è chiuso. Il registro separato è credits/house-photos.json.
 
 ## Foto remote
 

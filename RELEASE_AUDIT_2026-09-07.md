@@ -92,7 +92,7 @@ Confermare prima dell'uso ospiti le informazioni della casa e i dati che possono
 
 ### MEDIO — fotografie della casa
 
-I quattro file sono quelli già forniti da Angelo e conservati senza modifica. Mancano nome del fotografo e dichiarazione autonoma di titolarità/permesso. Nessuna licenza viene inventata.
+PUNTO CHIUSO — Il 7 settembre 2026 Angelo ha confermato che le quattro fotografie sono state scattate da loro, Angelo e Viviana. La conferma è registrata in credits/house-photos.json; uso limitato al progetto richiesto, senza attribuzione di licenze aperte. I file restano invariati.
 
 ## Fotografie territoriali
 
@@ -144,3 +144,8 @@ Integrati senza sovrascriverli i quattro commit successivi al consolidamento, fi
 `npm test` locale superato: suite precedenti più `tests/build.cjs`. Il test offline ora verifica anche HTML di login, risposta reindirizzata e rimozione della cache incompleta. `tests/build.cjs` verifica byte identici, presenza dell’intero precache ed esclusione dei documenti interni. Nessun test aggiunto sostituisce Safari, Android, installazione PWA o modalità aereo reali. Il workflow include il nuovo controllo, ma il suo esito remoto va verificato dopo il push.
 
 Fonti tecniche: [Cache API](https://developer.mozilla.org/en-US/docs/Web/API/Cache), [modalità cache delle richieste](https://developer.mozilla.org/en-US/docs/Web/API/Request/cache), [header Cloudflare Pages](https://developers.cloudflare.com/pages/configuration/headers/). Gli header non attivano autenticazione. Nessuna configurazione di hosting è stata applicata in questo intervento e nessun punteggio viene aumentato sulla sola base dei test.
+
+
+### Conferma autorialità fotografie della casa
+
+Angelo ha confermato direttamente «Noi» alla domanda sull’autore dei quattro scatti. Il requisito di conferma delle foto della casa è soddisfatto. Restano invariati i blocchi relativi a privacy, collaudo dispositivi e contenuti operativi, e le sospensioni per le fotografie dei locali.

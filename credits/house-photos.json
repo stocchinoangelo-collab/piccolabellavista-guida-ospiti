@@ -1,38 +1,54 @@
 [
   {
     "file": "img/casa/bagno.jpg",
-    "author": null,
+    "author": "Angelo e Viviana (attribuzione collettiva dichiarata da Angelo)",
     "providedBy": "Angelo (provenienza dichiarata nella PR #2)",
     "source": "https://github.com/stocchinoangelo-collab/piccolabellavista-guida-ospiti/blob/09e001e7dca406bfd2c15c03ffbfb5f01bdc950b/img/casa/bagno.jpg",
-    "license": null,
-    "status": "USER_SUPPLIED_AUTHORSHIP_NOT_DOCUMENTED",
-    "offline": "PRECACHED_DEVICE_TEST_PENDING"
+    "license": "Uso nella Guida Ospiti autorizzato nel contesto del progetto; nessuna licenza aperta concessa",
+    "status": "OWNER_AUTHORSHIP_CONFIRMED",
+    "offline": "PRECACHED_DEVICE_TEST_PENDING",
+    "confirmation": {
+      "date": "2026-09-07",
+      "source": "Conferma diretta di Angelo in conversazione: «Noi», alla domanda su chi abbia scattato le quattro fotografie della casa."
+    }
   },
   {
     "file": "img/casa/letto.jpg",
-    "author": null,
+    "author": "Angelo e Viviana (attribuzione collettiva dichiarata da Angelo)",
     "providedBy": "Angelo (provenienza dichiarata nella PR #2)",
     "source": "https://github.com/stocchinoangelo-collab/piccolabellavista-guida-ospiti/blob/09e001e7dca406bfd2c15c03ffbfb5f01bdc950b/img/casa/letto.jpg",
-    "license": null,
-    "status": "USER_SUPPLIED_AUTHORSHIP_NOT_DOCUMENTED",
-    "offline": "PRECACHED_DEVICE_TEST_PENDING"
+    "license": "Uso nella Guida Ospiti autorizzato nel contesto del progetto; nessuna licenza aperta concessa",
+    "status": "OWNER_AUTHORSHIP_CONFIRMED",
+    "offline": "PRECACHED_DEVICE_TEST_PENDING",
+    "confirmation": {
+      "date": "2026-09-07",
+      "source": "Conferma diretta di Angelo in conversazione: «Noi», alla domanda su chi abbia scattato le quattro fotografie della casa."
+    }
   },
   {
     "file": "img/casa/panoramica.jpg",
-    "author": null,
+    "author": "Angelo e Viviana (attribuzione collettiva dichiarata da Angelo)",
     "providedBy": "Angelo (provenienza dichiarata nella PR #2)",
     "source": "https://github.com/stocchinoangelo-collab/piccolabellavista-guida-ospiti/blob/09e001e7dca406bfd2c15c03ffbfb5f01bdc950b/img/casa/panoramica.jpg",
-    "license": null,
-    "status": "USER_SUPPLIED_AUTHORSHIP_NOT_DOCUMENTED",
-    "offline": "PRECACHED_DEVICE_TEST_PENDING"
+    "license": "Uso nella Guida Ospiti autorizzato nel contesto del progetto; nessuna licenza aperta concessa",
+    "status": "OWNER_AUTHORSHIP_CONFIRMED",
+    "offline": "PRECACHED_DEVICE_TEST_PENDING",
+    "confirmation": {
+      "date": "2026-09-07",
+      "source": "Conferma diretta di Angelo in conversazione: «Noi», alla domanda su chi abbia scattato le quattro fotografie della casa."
+    }
   },
   {
     "file": "img/casa/zona-pranzo.jpg",
-    "author": null,
+    "author": "Angelo e Viviana (attribuzione collettiva dichiarata da Angelo)",
     "providedBy": "Angelo (provenienza dichiarata nella PR #2)",
     "source": "https://github.com/stocchinoangelo-collab/piccolabellavista-guida-ospiti/blob/09e001e7dca406bfd2c15c03ffbfb5f01bdc950b/img/casa/zona-pranzo.jpg",
-    "license": null,
-    "status": "USER_SUPPLIED_AUTHORSHIP_NOT_DOCUMENTED",
-    "offline": "PRECACHED_DEVICE_TEST_PENDING"
+    "license": "Uso nella Guida Ospiti autorizzato nel contesto del progetto; nessuna licenza aperta concessa",
+    "status": "OWNER_AUTHORSHIP_CONFIRMED",
+    "offline": "PRECACHED_DEVICE_TEST_PENDING",
+    "confirmation": {
+      "date": "2026-09-07",
+      "source": "Conferma diretta di Angelo in conversazione: «Noi», alla domanda su chi abbia scattato le quattro fotografie della casa."
+    }
   }
 ]
