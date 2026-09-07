@@ -1,18 +1,44 @@
-const PREFIX="pbv-boutique:"+new URL(self.registration.scope).pathname+":";
-const CACHE=PREFIX+"v2";
-const LOCAL=["./","index.html","css/style.css","css/boutique.css","js/i18n.js","js/data.js","js/photos.js","js/app.js","manifest.webmanifest","icon.svg","icon-192.png","icon-512.png","img/icons/apple-touch-icon.png","img/casa/bagno.jpg","img/casa/letto.jpg","img/casa/panoramica.jpg","img/casa/zona-pranzo.jpg"];
-self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(LOCAL)).then(()=>self.skipWaiting())));
-self.addEventListener("activate",e=>e.waitUntil((async()=>{for(const key of await caches.keys())if(key.startsWith(PREFIX)&&key!==CACHE)await caches.delete(key);await self.clients.claim();})()));
-self.addEventListener("fetch",e=>{
- if(e.request.method!=="GET")return;
- const url=new URL(e.request.url),local=url.origin===self.location.origin;
- if(!local)return;
- if(!url.href.startsWith(self.registration.scope))return;
- e.respondWith((async()=>{try{const response=await fetch(e.request);
- if(response.ok&&!response.redirected&&response.type!=="opaqueredirect"){const cache=await caches.open(CACHE);await cache.put(e.request,response.clone());}
- return response;
- }catch{const cached=await caches.match(e.request);if(cached)return cached;
- if(e.request.mode==="navigate"){const page=await caches.match(new URL("index.html",self.registration.scope));if(page)return page;}
- return new Response("Offline",{status:503,headers:{"Content-Type":"text/plain"}});
- }})());
+/* Versioned app shell and local photography. Live services are never fabricated offline. */
+const PREFIX='pbv-guide-'+encodeURIComponent(new URL(self.registration.scope).pathname)+'-';
+const CACHE=PREFIX+'2026-09-07-consolidated-1';
+const CORE=['./','index.html','css/style.css','css/boutique.css','css/release.css','js/i18n.js','js/data.js','js/guide.js','js/photos.js','js/editorial.js','js/app.js','manifest.webmanifest','icon.svg','icons/icon-192.png','icons/icon-512.png','icons/maskable-512.png','credits/photos.json','img/casa/bagno.jpg','img/casa/letto.jpg','img/casa/panoramica.jpg','img/casa/zona-pranzo.jpg'];
+self.addEventListener('install',event=>{
+ event.waitUntil((async()=>{
+  const cache=await caches.open(CACHE);
+  await cache.addAll(CORE);
+  const manifest=await (await cache.match('credits/photos.json')).json();
+  const assets=[...new Set(manifest.flatMap(p=>[p.file,p.thumb].filter(Boolean)))];
+  await cache.addAll(assets);
+  await self.skipWaiting();
+ })());
+});
+self.addEventListener('activate',event=>{
+ event.waitUntil((async()=>{
+  await Promise.all((await caches.keys()).filter(k=>k.startsWith(PREFIX)&&k!==CACHE).map(k=>caches.delete(k)));
+  await self.clients.claim();
+  const clients=await self.clients.matchAll({type:'window'});
+  clients.forEach(client=>client.postMessage({type:'PBV_UPDATED',version:CACHE}));
+ })());
+});
+self.addEventListener('fetch',event=>{
+ const request=event.request,url=new URL(request.url);
+ if(request.method!=='GET'||url.origin!==self.location.origin)return;
+ const scope=new URL(self.registration.scope);
+ if(!url.pathname.startsWith(scope.pathname))return;
+ // Restrict caches to this guide; do not cache arbitrary files under a shared origin.
+ const relative=url.pathname.slice(scope.pathname.length);
+ const isApp=CORE.includes(relative)||relative===''||relative.startsWith('images/');
+ if(!isApp)return;
+ event.respondWith((async()=>{
+  const cache=await caches.open(CACHE);
+  const cached=await cache.match(request,{ignoreSearch:true});
+  if(cached)return cached;
+  try{
+   const response=await fetch(request);
+   if(response.ok&&!response.redirected&&response.type!=='opaqueredirect')await cache.put(request,response.clone());
+   return response;
+  }catch{
+   return new Response('Offline',{status:503,headers:{'Content-Type':'text/plain'}});
+  }
+ })());
 });

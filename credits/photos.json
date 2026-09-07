@@ -1,6 +1,5 @@
-/* Only verified local image assets. Selection targets are recorded separately. */
-const PHOTOS = {
-  "hero": {
+[
+  {
     "file": "images/cagliari-porto-smiley-toerist.webp",
     "width": 2400,
     "height": 1000,
@@ -14,9 +13,13 @@ const PHOTOS = {
     "license": "CC BY-SA 4.0",
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
     "source": "https://commons.wikimedia.org/wiki/File:Cagliari_haven_2018_1.jpg",
-    "status": "APPROVATA_USO_CANDIDATO_PRINCIPALE_NON_FINALE"
+    "status": "APPROVATA_USO_CANDIDATO_PRINCIPALE_NON_FINALE",
+    "id": "hero",
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/8/84/Cagliari_haven_2018_1.jpg",
+    "originalSha256": "60d540c67c14eddeb5c3ea4a22d63519af4667b095171aa74fc47b6b55ebd18c",
+    "verifiedAt": "2026-09-06"
   },
-  "porceddu": {
+  {
     "file": "images/enogastronomia/porceddu-sardo-japs88.webp",
     "width": 1600,
     "height": 1067,
@@ -31,9 +34,13 @@ const PHOTOS = {
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
     "source": "https://commons.wikimedia.org/wiki/File:Porcetto_sardo_1.jpg",
     "status": "APPROVATA_USO",
-    "thumb": "images/enogastronomia/porceddu-sardo-japs88-800.webp"
+    "thumb": "images/enogastronomia/porceddu-sardo-japs88-800.webp",
+    "id": "porceddu",
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/3/38/Porcetto_sardo_1.jpg",
+    "originalSha256": "a003e832ece823b9fc711407d097b482caa935a03d78a227d0afa5326313b7cc",
+    "verifiedAt": "2026-09-06"
   },
-  "fregola": {
+  {
     "file": "images/enogastronomia/fregola-frutti-di-mare-simon-legner.webp",
     "width": 1600,
     "height": 1067,
@@ -48,9 +55,13 @@ const PHOTOS = {
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
     "source": "https://commons.wikimedia.org/wiki/File:Fregola_ai_frutti_di_mare_(IMG_20260515_203730).jpg",
     "status": "APPROVATA_USO",
-    "thumb": "images/enogastronomia/fregola-frutti-di-mare-simon-legner-800.webp"
+    "thumb": "images/enogastronomia/fregola-frutti-di-mare-simon-legner-800.webp",
+    "id": "fregola",
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/5/56/Fregola_ai_frutti_di_mare_%28IMG_20260515_203730%29.jpg",
+    "originalSha256": "d2d4c5991ed07274f47b6cccf79296b9e695047ba2490e11dba8bfd4b8fe2017",
+    "verifiedAt": "2026-09-06"
   },
-  "malloreddus": {
+  {
     "file": "images/enogastronomia/malloreddus-marica-massaro.webp",
     "width": 1600,
     "height": 1067,
@@ -65,9 +76,13 @@ const PHOTOS = {
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
     "source": "https://commons.wikimedia.org/wiki/File:Malloreddus.jpg",
     "status": "APPROVATA_USO_FALLBACK",
-    "thumb": "images/enogastronomia/malloreddus-marica-massaro-800.webp"
+    "thumb": "images/enogastronomia/malloreddus-marica-massaro-800.webp",
+    "id": "malloreddus",
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Malloreddus.jpg",
+    "originalSha256": "936b29bb49fc8b466a6069bb3ae5bd5faa538d699d24247f608c44806dc13f2d",
+    "verifiedAt": "2026-09-06"
   },
-  "pane_carasau": {
+  {
     "file": "images/enogastronomia/pane-carasau-luigi-chiesa.webp",
     "width": 1500,
     "height": 1000,
@@ -82,9 +97,13 @@ const PHOTOS = {
     "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
     "source": "https://commons.wikimedia.org/wiki/File:Pane_carasau.jpg",
     "status": "APPROVATA_USO_FALLBACK",
-    "thumb": "images/enogastronomia/pane-carasau-luigi-chiesa-800.webp"
+    "thumb": "images/enogastronomia/pane-carasau-luigi-chiesa-800.webp",
+    "id": "pane_carasau",
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/e/ee/Pane_carasau.jpg",
+    "originalSha256": "173ca5d7d21e0c9ada57f72a4638d7f7885472f0a4becceb857441126c21eb38",
+    "verifiedAt": "2026-09-06"
   },
-  "seadas": {
+  {
     "file": "images/enogastronomia/seadas-terendo.webp",
     "width": 1600,
     "height": 1067,
@@ -99,9 +118,13 @@ const PHOTOS = {
     "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
     "source": "https://commons.wikimedia.org/wiki/File:Seadas.JPG",
     "status": "APPROVATA_USO",
-    "thumb": "images/enogastronomia/seadas-terendo-800.webp"
+    "thumb": "images/enogastronomia/seadas-terendo-800.webp",
+    "id": "seadas",
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Seadas.JPG",
+    "originalSha256": "61ead9ffe2394d05ea9b3b8e793a444f68c59b81e557bef0c176cfc9f44a6d53",
+    "verifiedAt": "2026-09-06"
   },
-  "pecorino": {
+  {
     "file": "images/enogastronomia/pecorino-sardo-jon-sullivan.webp",
     "width": 1280,
     "height": 853,
@@ -116,9 +139,13 @@ const PHOTOS = {
     "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
     "source": "https://commons.wikimedia.org/wiki/File:Pecorino_sardo_cheese.jpg",
     "status": "APPROVATA_USO",
-    "thumb": "images/enogastronomia/pecorino-sardo-jon-sullivan-800.webp"
+    "thumb": "images/enogastronomia/pecorino-sardo-jon-sullivan-800.webp",
+    "id": "pecorino",
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/7/79/Pecorino_sardo_cheese.jpg",
+    "originalSha256": "2eab509cdf7bedcfc7dbcd1fa24a1fb566cd8dd76e66ea43f629f03ce02c74d1",
+    "verifiedAt": "2026-09-06"
   },
-  "cannonau": {
+  {
     "file": "images/enogastronomia/cannonau-di-sardegna-agne27.webp",
     "width": 597,
     "height": 800,
@@ -132,9 +159,13 @@ const PHOTOS = {
     "license": "CC BY-SA 3.0",
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
     "source": "https://commons.wikimedia.org/wiki/File:Cannonau_di_Sardegna.jpg",
-    "status": "APPROVATA_USO"
+    "status": "APPROVATA_USO",
+    "id": "cannonau",
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/3/3d/Cannonau_di_Sardegna.jpg",
+    "originalSha256": "4cf66c40ce89e364b7688c23cd3f9beac41ef6acd7500a6b5e6677bf96a1f6e0",
+    "verifiedAt": "2026-09-06"
   },
-  "bottarga": {
+  {
     "file": "images/enogastronomia/bottarga-san-benedetto-freek-janssens.webp",
     "width": 1075,
     "height": 717,
@@ -149,9 +180,13 @@ const PHOTOS = {
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
     "source": "https://commons.wikimedia.org/wiki/File:Bottarga.png",
     "status": "APPROVATA_USO",
-    "thumb": "images/enogastronomia/bottarga-san-benedetto-freek-janssens-800.webp"
+    "thumb": "images/enogastronomia/bottarga-san-benedetto-freek-janssens-800.webp",
+    "id": "bottarga",
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5a/Bottarga.png",
+    "originalSha256": "fd1015125287c7a79dbcfdd23b167382ac24a0eb6c1e12a9f87afd336d8345ca",
+    "verifiedAt": "2026-09-06"
   },
-  "poetto": {
+  {
     "file": "images/poetto.webp",
     "width": 1600,
     "height": 1067,
@@ -166,9 +201,13 @@ const PHOTOS = {
     "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
     "source": "https://commons.wikimedia.org/wiki/File:Panoramic_view_of_Poetto_from_Sella_del_Diavolo.jpg",
     "status": "APPROVATA_USO",
-    "thumb": "images/poetto-800.webp"
+    "thumb": "images/poetto-800.webp",
+    "id": "poetto",
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/d/df/Panoramic_view_of_Poetto_from_Sella_del_Diavolo.jpg",
+    "originalSha256": "27d4343d3f1e63de6571567f6d7a361a74cd680698078a5c08d1641f2ddba5dd",
+    "verifiedAt": "2026-09-06"
   },
-  "bastione": {
+  {
     "file": "images/bastione.webp",
     "width": 1600,
     "height": 1067,
@@ -183,6 +222,10 @@ const PHOTOS = {
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
     "source": "https://commons.wikimedia.org/wiki/File:Bastione_di_San_Remy,_prospetto.jpg",
     "status": "APPROVATA_USO",
-    "thumb": "images/bastione-800.webp"
+    "thumb": "images/bastione-800.webp",
+    "id": "bastione",
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/b/be/Bastione_di_San_Remy%2C_prospetto.jpg",
+    "originalSha256": "169b633cff0de7fb11997b94c27a0f8ff410cb26836514f664864cb7e29f4048",
+    "verifiedAt": "2026-09-06"
   }
-};
+]

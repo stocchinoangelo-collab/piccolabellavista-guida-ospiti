@@ -1,0 +1,38 @@
+[
+  {
+    "file": "img/casa/bagno.jpg",
+    "author": null,
+    "providedBy": "Angelo (provenienza dichiarata nella PR #2)",
+    "source": "https://github.com/stocchinoangelo-collab/piccolabellavista-guida-ospiti/blob/09e001e7dca406bfd2c15c03ffbfb5f01bdc950b/img/casa/bagno.jpg",
+    "license": null,
+    "status": "USER_SUPPLIED_AUTHORSHIP_NOT_DOCUMENTED",
+    "offline": "PRECACHED_DEVICE_TEST_PENDING"
+  },
+  {
+    "file": "img/casa/letto.jpg",
+    "author": null,
+    "providedBy": "Angelo (provenienza dichiarata nella PR #2)",
+    "source": "https://github.com/stocchinoangelo-collab/piccolabellavista-guida-ospiti/blob/09e001e7dca406bfd2c15c03ffbfb5f01bdc950b/img/casa/letto.jpg",
+    "license": null,
+    "status": "USER_SUPPLIED_AUTHORSHIP_NOT_DOCUMENTED",
+    "offline": "PRECACHED_DEVICE_TEST_PENDING"
+  },
+  {
+    "file": "img/casa/panoramica.jpg",
+    "author": null,
+    "providedBy": "Angelo (provenienza dichiarata nella PR #2)",
+    "source": "https://github.com/stocchinoangelo-collab/piccolabellavista-guida-ospiti/blob/09e001e7dca406bfd2c15c03ffbfb5f01bdc950b/img/casa/panoramica.jpg",
+    "license": null,
+    "status": "USER_SUPPLIED_AUTHORSHIP_NOT_DOCUMENTED",
+    "offline": "PRECACHED_DEVICE_TEST_PENDING"
+  },
+  {
+    "file": "img/casa/zona-pranzo.jpg",
+    "author": null,
+    "providedBy": "Angelo (provenienza dichiarata nella PR #2)",
+    "source": "https://github.com/stocchinoangelo-collab/piccolabellavista-guida-ospiti/blob/09e001e7dca406bfd2c15c03ffbfb5f01bdc950b/img/casa/zona-pranzo.jpg",
+    "license": null,
+    "status": "USER_SUPPLIED_AUTHORSHIP_NOT_DOCUMENTED",
+    "offline": "PRECACHED_DEVICE_TEST_PENDING"
+  }
+]

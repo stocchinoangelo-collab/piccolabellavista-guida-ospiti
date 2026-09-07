@@ -1,23 +1,32 @@
 {
-  "name": "Piccolabellavista · Guida ospiti",
-  "short_name": "Piccolabellavista",
+  "name": "Piccolabellavista · Guida privata alla Sardegna",
+  "short_name": "PBV Guida",
+  "description": "Guida privata riservata agli ospiti di Piccolabellavista, Pirri/Cagliari.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#103c52",
+    "background_color": "#ffffff",
+  "theme_color": "#135777",
   "lang": "it",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "icon-512.png",
+      "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
-  ]
+  ],
+  "id": "./"
 }

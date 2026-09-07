@@ -1,1011 +1,501 @@
-/* Piccolabellavista — App Engine v3.1
-   Changelog rispetto a v3.0 (vedi CHANGELOG.md nel pacchetto per i dettagli):
-   - renderHome(): mancava "const c = DATA.casa;" -> ReferenceError ad ogni
-     caricamento della home. Aggiunta.
-   - parseHash(): non gestiva "?" nell'hash -> i filtri di "Dove mangiare"
-     mandavano l'utente alla Home invece di filtrare. Corretto.
-   - init()/openApp(): initWeather() e renderWhatsApp() erano definite ma
-     mai chiamate -> meteo bloccato su "Caricamento...", bottone WhatsApp
-     mai visibile. Ora vengono invocate.
-   - renderEventi(): le sagre con data nota solo a livello di mese (es.
-     "2026-09") sparivano dalla lista dopo il giorno 1 del mese, perché
-     trattate come un singolo istante. Ora coprono l'intero mese.
-   - renderMangiare(): prezzo/indirizzo/nota possono essere null (dato non
-     ancora verificato) invece di mostrare "[DA VERIFICARE]" agli ospiti:
-     i campi mancanti vengono ora nascosti invece di stampati a schermo.
-   - renderCasa(): l'etichetta della riga "Telefono" riusava per errore la
-     chiave i18n "contact" (mostrava "Contatti" due volte). Ora usa "phone".
-*/
-(function() {
-  'use strict';
+"use strict";
+/* Piccolabellavista · V1.2 finale — interfaccia e logica (contenuti in js/data.js)
+   Include: motore eventi CSV+fallback, hotfix audit V1.1.1, pgFonti() senza note interne. */
 
-  const $ = (s, c=document) => c.querySelector(s);
-  const $$ = (s, c=document) => [...c.querySelectorAll(s)];
+const $=s=>document.querySelector(s);
+const storage={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v){try{localStorage.setItem(k,v)}catch{}}};
+let LANG=storage.get("pbv_lang")||"it";
+if(!Object.hasOwn(I18N,LANG))LANG="it";
+document.documentElement.lang=LANG;
 
-  // Sceglie il testo nella lingua corrente da un campo bilingue {it, en}.
-  // Se il campo è una semplice stringa (vecchi contenuti), la restituisce così com'è.
-  // Il tedesco (de) non è ancora tradotto: usa l'italiano come riserva.
-  function L(field) {
-    if (field == null) return '';
-    if (typeof field === 'string' || typeof field === 'number') return field;
-    return field[currentLang] || field.it || Object.values(field)[0] || '';
-  }
+/* ---------- helpers ---------- */
+const L=o=>(o&&typeof o==="object")?(o[LANG]||t("translation_pending")):String(o==null?"":o);
+const t=k=>I18N[LANG]?.[k]||I18N[LANG]?.translation_pending||"";
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const stars=n=>{n=Math.max(0,Math.min(5,n|0));return "★".repeat(n)+"☆".repeat(5-n);};
+const fmtDrive=m=>m<60?(m+" "+t("minutes")):(Math.floor(m/60)+" h"+(m%60?(" "+(m%60)):""));
+const gmLink=c=>"https://www.google.com/maps/dir/?api=1&destination="+c[0]+","+c[1];
+const safeUrl=u=>{const s=String(u||"").trim();return /^https?:\/\//i.test(s)?s:"";};
+const windLabel=id=>({tramontana:"Tramontana",grecale:"Grecale",levante:"Levante",scirocco:"Scirocco",ostro:"Ostro",libeccio:"Libeccio",ponente:"Ponente",maestrale:"Maestrale"})[id]||id;
+const GLYPH={beach:"🌊",archeo:"🏺",storia:"📜",natura:"🌿",borgo:"🏘️",eno:"🍷"};
+
+const state={route:"home",filters:{cats:new Set(),maxDrive:999,crowd:0},apiWind:null,manualWind:null};
+
+/* =====================================================================
+   MOTORE EVENTI — CSV Google Sheet + fallback locale EVENTS
+   ===================================================================== */
+let EVENT_INDEX=[],csvEvents=[],eventSource="local",lastSync=null;
+const CSVCFG=()=>(typeof CONFIG!=="undefined"&&CONFIG.eventsCsv)?CONFIG.eventsCsv:{url:"",enabled:false};
+
+function startOfToday(){const d=new Date();d.setHours(0,0,0,0);return d;}
+
+function parseISOorEU(s){
+ if(!s)return null;s=String(s).trim();
+ let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+ if(m){const d=new Date(+m[1],+m[2]-1,+m[3]);return isNaN(d.getTime())?null:d;}
+ m=s.match(/^(\d{1,2})[\/.](\d{1,2})[\/.](\d{4})$/);
+ if(m){const d=new Date(+m[3],+m[2]-1,+m[1]);return isNaN(d.getTime())?null:d;}
+ return null;}
+
+function parseCSV(txt){
+ try{
+  txt=String(txt).replace(/^\uFEFF/,"");
+  const rows=[];let cur=[],val="",q=false;
+  for(let i=0;i<txt.length;i++){
+   const c=txt[i];
+   if(q){if(c==='"'){if(txt[i+1]==='"'){val+='"';i++;}else q=false;}else val+=c;}
+   else{
+    if(c==='"')q=true;
+    else if(c===","){cur.push(val);val="";}
+    else if(c==="\n"){cur.push(val);if(cur.length>1||cur[0].trim()!=="")rows.push(cur);cur=[];val="";}
+    else if(c!=="\r")val+=c;
+   }}
+  cur.push(val);if(cur.length>1||cur[0].trim()!=="")rows.push(cur);
+  if(!rows.length)return[];
+  const head=rows.shift().map(h=>h.trim().toLowerCase());
+  return rows.map(r=>{const o={};head.forEach((h,i)=>o[h]=String(r[i]==null?"":r[i]).trim());return o;});
+ }catch(e){return[];}}
+
+function havKm(a,b){
+ const R=6371,tr=x=>x*Math.PI/180;
+ const dLa=tr(b[0]-a[0]),dLo=tr(b[1]-a[1]);
+ const h=Math.sin(dLa/2)**2+Math.cos(tr(a[0]))*Math.cos(tr(b[0]))*Math.sin(dLo/2)**2;
+ return 2*R*Math.asin(Math.sqrt(h));}
+const estDrive=c=>{try{return Math.max(5,Math.round(havKm([CONFIG.home.lat,CONFIG.home.lng],c)*1.25/55*60/5)*5);}catch(e){return null;}};
+
+function csvToUnified(r){
+ if(!r.id&&!r.nome)return null;
+ const st=(r.stato||"").toLowerCase();
+ if(st.includes("annull")||st.includes("cancel"))return null;
+ const s=parseISOorEU(r.data_inizio),e2=parseISOorEU(r.data_fine);
+ const months=(r.mesi||r.months||"").split(/[;,]/).map(x=>parseInt(x.trim(),10)).filter(x=>x>=1&&x<=12);
+ if(!s&&!months.length)return null;
+ const desc=r.descrizione||"";
+ let coords=null;
+ if(r.latitudine&&r.longitudine){
+  const la=parseFloat(String(r.latitudine).replace(",",".")),lo=parseFloat(String(r.longitudine).replace(",","."));
+  if(!isNaN(la)&&!isNaN(lo)&&Math.abs(la)<=90&&Math.abs(lo)<=180)coords=[la,lo];}
+ return{
+  id:String(r.id||"csv-"+String(r.nome||"x").toLowerCase().replace(/\W+/g,"-")),
+  name:{it:r.nome,en:r.nome,de:r.nome},
+  city:[r.comune,r.provincia].filter(Boolean).join(" · "),
+  start:s,end:e2&&e2>s?e2:s,recurring:!s,months:months.length?months:null,
+  dateNoteObj:null,cat:(r.categoria||"evento"),
+  distMin:coords?estDrive(coords):null,
+  coords,
+  d:{it:r.lingua_it||desc,en:r.lingua_en||"",de:r.lingua_de||""},
+  url:safeUrl(r.url_ufficiale),checked:r.checked||"",
+  stato:(st&&st!=="confermato"&&st!=="confirmed")?st:"",source:"csv"};
+}
+
+function staticToUnified(e){
+ return Object.assign({},e,{start:null,end:null,recurring:true,dateNoteObj:e.dateNote||null,coords:null,stato:"",source:"local"});
+}
+
+function buildEventIndex(){
+ const cfg=CSVCFG(),useCsv=eventSource==="csv"&&csvEvents.length>0;
+ let base=useCsv?(cfg.mode==="replace"?[]:EVENTS.map(staticToUnified)):EVENTS.map(staticToUnified);
+ if(useCsv){
+  const map=new Map(base.map(x=>[x.id,x]));
+  for(const c of csvEvents)map.set(c.id,c);
+  base=[...map.values()];
+ }
+ EVENT_INDEX=base.filter(x=>x.start||x.recurring);
+}
+
+async function loadEvents(){
+ const cfg=CSVCFG();
+ if(!cfg.enabled||!cfg.url)return;
+ try{
+  const ctrl=new AbortController();const tm=setTimeout(()=>ctrl.abort(),6000);
+  const res=await fetch(cfg.url,{cache:"no-store",signal:ctrl.signal});
+  clearTimeout(tm);
+  if(!res.ok)throw new Error("http "+res.status);
+  const txt=await res.text();
+  const list=parseCSV(txt).map(csvToUnified).filter(Boolean);
+  if(!list.length)throw new Error("no valid rows");
+  csvEvents=list;eventSource="csv";lastSync=new Date();
+  buildEventIndex();
+  if(document.readyState==="complete"&&(state.route==="home"||state.route==="eventi"))render(true);
+ }catch(e){eventSource="local";}
+}
+
+/* ---------- finestre temporali ---------- */
+const evStartIn=x=>x.start?Math.round((x.start-startOfToday())/864e5):Infinity;
+const evOngoing=x=>!!x.start&&x.start<=startOfToday()&&(x.end||x.start)>=startOfToday();
+const evVisible=x=>!x.start||(x.end||x.start)>=startOfToday();
+const evSorter=(a,b)=>{
+ const da=a.start?a.start.getTime():9e15,db=b.start?b.start.getTime():9e15;
+ return da-db||String(a.id).localeCompare(String(b.id));};
+function recNextMonthDays(x){
+ if(!x.months||!x.months.length)return 999;
+ const cm=new Date().getMonth()+1;
+ return Math.min(...x.months.map(m=>m===cm?0:(((m-cm)+12)%12)*30));}
+const nextFixedIn=n=>EVENT_INDEX.filter(x=>(x.start&&evStartIn(x)>=0&&evStartIn(x)<=n)||evOngoing(x)).sort(evSorter);
+function upcomingFixed(n){
+ const dated=EVENT_INDEX.filter(x=>x.start&&evStartIn(x)>=0).sort(evSorter).slice(0,n);
+ if(dated.length>=n)return dated;
+ return dated.concat(EVENT_INDEX.filter(x=>!x.start&&evVisible(x))
+  .sort((a,b)=>recNextMonthDays(a)-recNextMonthDays(b)).slice(0,n-dated.length));}
+function monthOverlap(x){
+ const now=new Date(),cm=now.getMonth(),cy=now.getFullYear();
+ if(!x.start)return !!(x.months&&x.months.includes(cm+1));
+ return x.start<=new Date(cy,cm+1,0)&&(x.end||x.start)>=new Date(cy,cm,1);}
+const monthEvents=()=>EVENT_INDEX.filter(monthOverlap).sort(evSorter);
+
+function fmtRange(s,e){
+ try{
+  const loc={it:"it-IT",en:"en-GB",de:"de-DE"}[LANG]||"it-IT";
+  const ee=e||s,fY=new Intl.DateTimeFormat(loc,{year:"numeric"}),
+        fDM=new Intl.DateTimeFormat(loc,{day:"numeric",month:"short"}),
+        fD=new Intl.DateTimeFormat(loc,{day:"numeric"});
+  const yr=fY.format(ee);
+  if(s.getTime()===ee.getTime())return fDM.format(s)+" "+yr;
+  const sm=s.getMonth()===ee.getMonth()&&s.getFullYear()===ee.getFullYear();
+  return sm?fD.format(s)+"–"+fDM.format(ee)+" "+yr:fDM.format(s)+" – "+fDM.format(ee)+" "+yr;
+ }catch(err){return "";}}
+
+/* ---------- vento ---------- */
+function degToWind(d){let best=WINDS[0][0],bd=360;for(const[id,deg]of WINDS){let x=Math.abs(deg-d);if(x>180)x=360-x;if(x<bd){bd=x;best=id}}return best}
+async function fetchWind(){
+ try{
+  const u="https://api.open-meteo.com/v1/forecast?latitude="+CONFIG.home.lat+"&longitude="+CONFIG.home.lng+"&daily=weather_code,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,temperature_2m_max&timezone=Europe%2FRome&forecast_days=1";
+  const response=await fetch(u,{cache:"no-store",signal:AbortSignal.timeout(6000)});
+  if(!response.ok)throw new Error("Weather unavailable");
+  const j=await response.json();
+  if(!j.daily||!["wind_speed_10m_max","wind_gusts_10m_max","wind_direction_10m_dominant","temperature_2m_max","weather_code"].every(k=>Number.isFinite(j.daily[k]?.[0])))throw new Error("Invalid weather response");
+  state.apiWind={speed:Math.round(j.daily.wind_speed_10m_max[0]),gust:Math.round(j.daily.wind_gusts_10m_max[0]),
+   dir:degToWind(j.daily.wind_direction_10m_dominant[0]),temp:Math.round(j.daily.temperature_2m_max[0]),code:j.daily.weather_code[0]};
+ }catch(e){state.apiWind=null}
+}
+const WX=c=>c===0?"wx_clear":c<3?"wx_partly":c===3?"wx_cloudy":(c===45||c===48)?"wx_fog":(c>=71&&c<=77)||c===85||c===86?"wx_snow":c>=95?"wx_storm":"wx_rain";
+const season=()=>{const m=new Date().getMonth();return m<=1||m===11?"winter":m<=4?"spring":m<=7?"summer":"autumn"};
+function nearbyBeaches(w){return windRanking(w).filter(b=>havKm([CONFIG.home.lat,CONFIG.home.lng],b.coords)<=75&&b.driveMin<=90);}
+function windRanking(w){return BEACHES.slice().sort((a,b)=>((b.wind[w]||3)-(a.wind[w]||3))||(a.driveMin-b.driveMin)||(a.crowd-b.crowd));}
+const activeWind=()=>state.manualWind||(state.apiWind&&state.apiWind.dir);
+
+/* ---------- filtri ---------- */
+function commonOk(p){
+ if(state.filters.maxDrive!==999&&p.driveMin>state.filters.maxDrive)return false;
+ if(state.filters.crowd===1&&p.crowd>3)return false;
+ if(state.filters.crowd===2&&p.crowd>2)return false;
+ if(state.filters.crowd===3&&!(p.tags&&p.tags.includes("hidden")))return false;
+ return true;}
+const PAGE_DOMAIN={spiagge:["spiaggia","mare"],perle:["archeo","storia","natura","borgo","eno","hidden"],borghi:["borgo"],natura:["natura"],storia:["archeo","storia"]};
+
+function filterBar(){
+ const CATS=["spiaggia","mare","archeo","storia","natura","borgo","eno","sagra","eventi","hidden"];
+ const f=state.filters;
+ return '<details class="filters"'+((f.cats.size||f.maxDrive!==999||f.crowd)?" open":"")+'><summary>⚙️ '+esc(t("f_title"))+"</summary>"+
+ '<div class="fgroup"><h4>'+esc(t("f_what"))+'</h4><div class="pills">'+CATS.map(c=>'<label class="pill"><input type="checkbox" data-f="cat" value="'+c+'" '+(f.cats.has(c)?"checked":"")+'><span>'+esc(t("cat_"+c))+"</span></label>").join("")+"</div></div>"+
+ '<div class="fgroup"><h4>'+esc(t("f_drive"))+'</h4><div class="pills">'+[[30,"d_30"],[60,"d_60"],[90,"d_90"],[120,"d_120"],[999,"d_all"]].map(x=>'<label class="pill"><input type="radio" name="fd" data-f="drive" value="'+x[0]+'" '+(f.maxDrive===x[0]?"checked":"")+'><span>'+esc(t(x[1]))+"</span></label>").join("")+"</div></div>"+
+ '<div class="fgroup"><h4>'+esc(t("f_crowd"))+'</h4><div class="pills">'+[[0,"c_any"],[1,"c_low"],[2,"c_quiet"],[3,"c_hidden"]].map(x=>'<label class="pill"><input type="radio" name="fc" data-f="crowd" value="'+x[0]+'" '+(f.crowd===x[0]?"checked":"")+'><span>'+esc(t(x[1]))+"</span></label>").join("")+"</div></div></details>";
+}
+function domainNotice(route){
+ const dom=PAGE_DOMAIN[route];if(!dom)return "";
+ const c=state.filters.cats;if(!c.size)return "";
+ if(dom.some(x=>c.has(x)))return "";
+ return '<div class="notice warn">'+esc(t("f_no_match"))+' <button class="chip" data-reset>✕ '+esc(t("f_reset"))+"</button></div>";
+}
+
+/* ---------- blocchi riutilizzabili ---------- */
+const ART=(id,g)=>photoMarkup(id);
 
 
-  // State
-  let currentSection = 'home';
-  let beachFilter = 'all';
-  let scrollLockCount = 0;
+function card(p,kind){
+ const badges=[];
+ if(kind==="beach")badges.push('<span class="badge sea">🏖️ '+esc(t("cat_spiaggia"))+"</span>");
+ else if(GLYPH[kind])badges.push('<span class="badge">'+GLYPH[kind]+" "+esc(t("cat_"+kind))+"</span>");
+ if(p.tags&&p.tags.includes("hidden"))badges.push('<span class="badge sea">💎 '+esc(t("cat_hidden"))+"</span>");
+ const sub=kind==="beach"?esc(L(p.type)):esc(L(p.place));
+ return '<article class="card">'+ART(p.id,GLYPH[kind]||"🌊")+
+ '<div class="card__body"><h3><button class="card-title" type="button" data-open="'+esc(p.id)+'">'+esc(p.name)+'</button></h3><div class="meta"><span>🚗 ~'+fmtDrive(p.driveMin)+"</span><span>👥 "+p.crowd+"/5</span></div>"+
+ '<div style="display:flex;gap:.35rem;flex-wrap:wrap">'+badges.join("")+"</div>"+
+ '<p style="font-size:.82rem;color:var(--ink-soft)">'+sub+"</p>"+
+ '<p style="font-size:.9rem">'+esc(L(p.desc||p.why))+"</p>"+
+ '<div class="card__foot"><a class="btn btn--map btn--sm" target="_blank" rel="noopener" href="'+gmLink(p.coords)+'">📍 '+esc(t("how"))+"</a></div></div></article>";
+}
+const grid=(arr,kind)=>!arr.length?'<p class="empty-state">'+esc(t('empty_results'))+'</p>':'<div class="grid">'+arr.map(p=>card(p,kind==="auto"?(p._beach?"beach":p.cats[0]):kind)).join("")+"</div>";
 
-  // DOM refs
-  const gate = $('#gate');
-  const gatePass = $('#gate-pass');
-  const gateBtn = $('#gate-btn');
-  const gateErr = $('#gate-err');
-  const app = $('#app');
-  const view = $('#view');
-  const menu = $('#menu');
-  const scrim = $('#scrim');
-  const burger = $('#burger');
-  const menuClose = $('#menu-close');
-  const menuList = $('#menu-list');
-  const sheet = $('#sheet');
-  const sheetBackdrop = $('#sheet-backdrop');
-  const sheetX = $('#sheet-x');
-  const sheetContent = $('#sheet-content');
-  const bottomNav = $('#bottom-nav');
+function gemStoryCard(g){
+ const kv=[["📍",L(g.place)],["⏱️","🚗 ~"+fmtDrive(g.driveMin)+" · 👥 "+g.crowd+"/5"],["🏛️",L(g.why)],["📜",L(g.curio)],["👀",L(g.see)],["🍷",L(g.taste)],["⭐",L(g.rec)]];
+ return '<article class="card"><div class="card__body">'+
+ '<h3><button class="card-title" type="button" data-open="'+esc(g.id)+'">'+esc(g.name)+'</button></h3>'+
+ '<dl class="kv">'+kv.map(x=>"<dt>"+x[0]+"</dt><dd>"+esc(x[1])+"</dd>").join("")+"</dl>"+
+ '<div class="card__foot"><a class="btn btn--map btn--sm" target="_blank" rel="noopener" href="'+gmLink(g.coords)+'">📍 '+esc(t("how"))+"</a>"+
+ (g.link?'<a class="btn btn--ghost btn--sm" target="_blank" rel="noopener" href="'+safeUrl(g.link)+'">🔗 '+esc(t("src_site"))+"</a>":"")+
+ "</div></div></article>";}
 
-  // ===== SAFE STORAGE =====
-  function safeGet(key) {
-    try { return localStorage.getItem(key); } catch (e) { return null; }
-  }
-  function safeSet(key, val) {
-    try { localStorage.setItem(key, val); } catch (e) {}
-  }
+/* ---------- pagine ---------- */
+async function renderToday(){
+ const box=$("#today-box");if(!box)return;
+ const w=activeWind();
+ let head=w?
+  '<div class="notice">🌬️ <b>'+esc(t("wind_today"))+": "+windLabel(w)+"</b>"+
+  (!state.manualWind&&state.apiWind?" ("+state.apiWind.speed+" km/h, max "+state.apiWind.temp+" °C)":"")+
+  "<br><small>"+esc(t(state.manualWind?"wind_manual_source":"wind_src"))+" · "+esc(t("wind_orient"))+": "+esc(t("wind_note"))+"</small></div>":
+  '<div class="notice warn">'+esc(t("today_manual"))+'</div><div class="windpick">'+
+  WINDS.map(x=>'<label class="pill"><input type="radio" name="mw" value="'+x[0]+'"><span>'+windLabel(x[0])+"</span></label>").join("")+"</div>";
+ const picks=[];
+ picks.push(["🌊 "+t("today_beach"),nearbyBeaches(w||"")[0]||BEACHES.find(b=>b.id==="poetto"),false]);
+ const cult=GEMS.filter(g=>(g.cats.includes("archeo")||g.cats.includes("storia"))&&g.driveMin<=75).sort((a,b)=>a.crowd-b.crowd||a.driveMin-b.driveMin)[0];
+ if(cult)picks.push(["🏺 "+t("today_culture"),cult,false]);
+ const green=GEMS.filter(g=>(g.cats.includes("natura")||g.cats.includes("borgo"))&&g.driveMin<=50).sort((a,b)=>a.driveMin-b.driveMin)[0];
+ if(green)picks.push(["🌿 "+t("today_green"),green,false]);
+ const ev=nextFixedIn(7).find(x=>x.source==="csv");
+ if(ev)picks.push(["🎭 "+t("today_event"),ev,true]);
+ box.innerHTML=head+'<div class="grid">'+picks.map(p=>{
+  const x=p[1],isEv=p[2];
+  const dateTxt=isEv?(x.dateNoteObj?L(x.dateNoteObj):(x.start?fmtRange(x.start,x.end):"")):"";
+  const meta=isEv?'<div class="meta"><span>📌 '+esc(x.city||"")+"</span>"+(dateTxt?"<span>🗓️ "+esc(dateTxt)+"</span>":"")+"</div>"
+   :'<div class="meta"><span>🚗 ~'+fmtDrive(x.driveMin)+"</span><span>👥 "+x.crowd+"/5</span></div>";
+  const txt='<p style="font-size:.87rem;color:var(--ink-soft)">'+esc(isEv?(L(x.d)||(x.dateNoteObj?L(x.dateNoteObj):"")):(L(x.desc||x.why)))+"</p>";
+  const u=isEv?safeUrl(x.url):"";
+  const btn=isEv?
+   (u?'<a class="btn btn--ghost btn--sm" target="_blank" rel="noopener" href="'+esc(u)+'">🔗 '+esc(t("src_site"))+"</a>":"")
+   :'<a class="btn btn--map btn--sm" target="_blank" rel="noopener" href="'+gmLink(x.coords)+'">'+esc(t("take_me"))+"</a>";
+  const warn=isEv?'<small style="color:var(--terra-dk);font-size:.72rem">'+esc(t("ev_check"))+"</small>":"";
+  return '<article class="card"><div class="card__body"><span class="badge sea">'+esc(p[0])+"</span><h3>"+esc(isEv?L(x.name):x.name)+"</h3>"+meta+txt+
+   '<div class="card__foot">'+btn+warn+"</div></div></article>";}).join("")+
+  '<p class="sub" style="margin-top:.9rem">'+esc(t("season_"+season()))+"</p>";
+ box.querySelectorAll('[name="mw"]').forEach(r=>r.addEventListener("change",()=>{state.manualWind=r.value;render();}));
+}
 
-  // Access is enforced by the private host.
-  function openApp(){app.classList.remove('hidden');renderRoute();renderWhatsApp();}
-  const esc=value=>String(value??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  const imageTag=(src,alt)=>src?'<img src="'+esc(src)+'" alt="'+esc(alt)+'" loading="lazy" decoding="async">':'';
-  // ===== ROUTING =====
-  function parseHash() {
-    const h = location.hash.replace('#', '') || 'home';
-    // Divide sia su "/" (sotto-percorsi) sia su "?" (query string, es.
-    // "mangiare?type=fish"): senza lo split su "?" l'intera stringa non
-    // corrisponde a nessuna sezione e si finisce sempre in Home.
-    return h.split(/[/?]/)[0] || 'home';
-  }
+function pgSpiagge(){
+ const c=state.filters.cats,dom=PAGE_DOMAIN.spiagge;
+ let items=BEACHES.filter(commonOk);
+ let extra="";
+ if(c.size&&!dom.some(x=>c.has(x)))extra='<div class="notice warn">'+esc(t("f_no_match"))+' <button class="chip" data-reset>✕ '+esc(t("f_reset"))+'</button> · <a href="#eventi">'+esc(t("cat_sagra"))+" / "+esc(t("cat_eventi"))+" →</a></div>";
+ return '<section class="hero"><span class="kicker">'+BEACHES.length+" · "+esc(t("wind_orient"))+"</span>"+
+ '<h1 class="sec">🏖️ '+esc(t("nav_spiagge"))+'</h1><p class="sub">'+esc(t("wind_note"))+"</p></section>"+
+ '<p class="sub">'+esc(t("drive_note"))+"</p>"+filterBar()+extra+grid(items,"beach")+additionalBeachLinks();
+}
+function pgVento(){
+ const sel=activeWind(),ranked=sel?nearbyBeaches(sel):null;
+ return '<section class="hero"><span class="kicker">🌬️</span><h1 class="sec">'+esc(t("vento_page_t"))+'</h1><p class="sub">'+esc(t("vento_page_s"))+"</p>"+
+ '<div class="notice">'+(state.apiWind?"<b>"+esc(t("wind_today"))+":</b> "+windLabel(state.apiWind.dir)+" · "+state.apiWind.speed+" km/h ("+esc(t("gusts"))+" "+state.apiWind.gust+") · "+state.apiWind.temp+" °C<br><small>"+esc(t("wind_src"))+"</small>":esc(t("today_manual")))+"</div></section>"+
+ '<div class="windpick">'+WINDS.map(x=>'<label class="pill"><input type="radio" name="vw" value="'+x[0]+'" '+(sel===x[0]?"checked":"")+'><span>'+windLabel(x[0])+"</span></label>").join("")+"</div>"+
+ (ranked?'<h2 class="sec" style="margin:1.2rem 0 1rem">🏆 '+esc(t("vento_results"))+"</h2>"+grid(ranked.slice(0,6),"beach")+
+ '<div class="notice"><b>'+esc(t("wind_orient"))+"</b><div class=\"windrow\" style=\"margin-top:.5rem\">"+
+ ranked.slice(0,6).map(b=>"<span><b>"+esc(b.name)+"</b> <span class=\"stars\">"+stars(b.wind[sel]||3)+"</span></span>").join("")+
+ '</div><small style="color:var(--ink-soft)">'+esc(t("wind_note"))+"</small></div>"
+ :'<div class="notice warn">'+esc(t("vento_none"))+"</div>");
+}
+function gemListPage(fn,title,sub,route){
+ let items=GEMS.filter(fn).filter(commonOk);
+ const c=state.filters.cats,relevant=["archeo","storia","natura","borgo","eno"].filter(x=>c.has(x));
+ if(relevant.length)items=items.filter(g=>relevant.some(x=>g.cats.includes(x)));
+ return '<section class="hero"><span class="kicker">💎</span><h1 class="sec">'+esc(title)+'</h1><p class="sub">'+esc(sub)+"</p></section>"+domainNotice(route)+filterBar()+
+ '<div class="grid">'+items.map(gemStoryCard).join("")+"</div>";}
+/* ---------- EVENTI ---------- */
+function evStatusBadge(e){
+ if(!e.stato)return "";
+ const map={"da_verificare":"st_check","da verificare":"st_check","posticipato":"st_postponed"};
+ const k=map[e.stato];
+ return '<span class="badge st-warn">'+esc(k?t(k):e.stato)+"</span>";}
+function evCard(e){
+ const dateTxt=e.dateNoteObj?L(e.dateNoteObj):(e.start?fmtRange(e.start,e.end):"");
+ const ongoing=evOngoing(e)?' <span class="badge st-ok">'+esc(t("ev_ongoing"))+"</span>":"";
+ const u=safeUrl(e.url);
+ return '<article class="ev"><div class="ev__top"><h3>'+esc(L(e.name))+ongoing+"</h3>"+
+ (dateTxt?'<span class="ev__date">'+esc(dateTxt)+"</span>":"")+"</div>"+
+ (e.d&&L(e.d)?"<p>"+esc(L(e.d))+"</p>":"")+
+ '<div class="ev__meta">'+
+ (e.city?'<span>📌 '+esc(e.city)+"</span>":"")+
+ (e.distMin?'<span>🚗 ~'+fmtDrive(e.distMin)+"</span>":"")+
+ (e.cat?'<span>#'+esc(e.cat)+"</span>":"")+
+ evStatusBadge(e)+
+ (e.checked?'<span class="chk">✅ '+esc(t("ev_last_check"))+": "+esc(e.checked)+"</span>":"")+
+ (u?'<a target="_blank" rel="noopener" href="'+esc(u)+'">🔗 '+esc(t("src_site"))+"</a>":"")+
+ (e.coords?'<a target="_blank" rel="noopener" href="'+gmLink(e.coords)+'">📍 '+esc(t("how"))+"</a>":"")+
+ "</div>"+
+ (e.source==="local"?'<p style="font-size:.76rem;color:var(--terra-dk);margin-top:.4rem">'+esc(t("ev_check"))+"</p>":"")+
+ "</article>";}
 
-  function renderRoute() {
-    const sec = parseHash();
-    currentSection = sec;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    updateNav();
+function updStamp(){
+ if(eventSource==="csv"&&lastSync){
+  const loc={it:"it-IT",en:"en-GB",de:"de-DE"}[LANG];
+  let s='<div class="upd">🔄 '+esc(t("ev_updated"))+" "+lastSync.toLocaleDateString(loc)+" · "+
+   lastSync.toLocaleTimeString(loc,{hour:"2-digit",minute:"2-digit"})+"</div>";
+  const sn=CSVCFG().sourceName;
+  if(sn&&L(sn))s+='<div class="upd">✅ '+esc(t("ev_source"))+": "+esc(L(sn))+"</div>";
+  return s;}
+ return '<div class="upd">🔄 '+esc(t("ev_verified"))+" "+esc(L(CONFIG.lastChecked))+"<br><small>"+esc(t("ev_local_list"))+"</small></div>";}
 
-    switch (sec) {
-      case 'home': renderHome(); break;
-      case 'spiagge': renderSpiagge(); break;
-      case 'cagliari': renderCagliari(); break;
-      case 'mangiare': renderMangiare(); break;
-      case 'enogastronomia': renderEnogastronomia(); break;
-      case 'casa': renderCasa(); break;
-      case 'muoversi': renderMuoversi(); break;
-      case 'info': renderInfo(); break;
-      case 'vento': renderVento(); break;
-      case 'fonti': renderFonti(); break;
-      case 'eventi': renderEventi(); break;
-      default: renderHome();
-    }
-    applyTranslations();
-    initLazyImages();
-    document.body.dataset.section=sec;
-    if(currentLang==='de')view.insertAdjacentHTML('afterbegin','<p class="language-note">Einige ausführliche Beschreibungen sind derzeit auf Italienisch verfügbar.</p>');
-  }
+function pgEventi(){
+ const confirmed=EVENT_INDEX.filter(e=>e.source==="csv"&&e.start&&evVisible(e)&&!e.stato);
+ const traditions=EVENTS.filter(e=>e.id!=="timeinjazz").map(staticToUnified);
+ return pageHeading("nav_eventi","events_intro")+
+ '<section class="blk"><h2 class="sec">'+esc(t("confirmed_events"))+'</h2>'+
+ (confirmed.length?confirmed.sort(evSorter).map(evCard).join(""):'<p class="sub">'+esc(t("no_confirmed_events"))+'</p>')+'</section>'+
+ '<section class="blk"><h2 class="sec">'+esc(t("traditions"))+'</h2><p class="sub">'+esc(t("traditions_note"))+'</p>'+traditions.map(evCard).join("")+'</section>';
+}
 
-  window.addEventListener('hashchange', renderRoute);
+/* ---------- resto ---------- */
+function pgItinerari(){
+ const w=activeWind();
+ let auto="";
+ if(w){
+  const top=nearbyBeaches(w)[0];
+  const near=GEMS.filter(g=>(g.cats.includes("borgo")||g.cats.includes("natura"))&&havKm(top.coords,g.coords)<=30).sort((a,b)=>a.crowd-b.crowd||Math.abs(a.driveMin-top.driveMin)-Math.abs(b.driveMin-top.driveMin))[0];
+  auto='<article class="itin"><h3 class="sec">🌬️ '+esc(t("itin_auto"))+" ("+windLabel(w)+')</h3><p class="sub" style="margin-top:.2rem">'+esc(t("itin_auto_gen"))+"</p><ol>"+
+  '<li><b>'+esc(t("ph_morning"))+'</b><span>'+esc(top.name)+" — "+esc(t("wind_prot"))+" "+windLabel(w)+': <span class="stars">'+stars(top.wind[w]||3)+"</span></span></li>"+
+  '<li><b>'+esc(t("ph_lunch"))+"</b><span>"+esc(t("itin_eat"))+"</span></li>"+
+  '<li><b>'+esc(t("ph_afternoon"))+"</b><span>"+esc(near?near.name:"")+"</span></li>"+
+  '<li><b>'+esc(t("ph_sunset"))+"</b><span>"+esc(t("itin_view"))+"</span></li></ol>"+
+  '<div style="margin-top:.8rem"><a class="btn btn--map btn--sm" target="_blank" rel="noopener" href="'+gmLink(top.coords)+'">'+esc(t("take_me"))+"</a></div></article>";}
+ return '<section class="hero"><span class="kicker">🚗</span><h1 class="sec">'+esc(t("itin_t"))+'</h1><p class="sub">'+esc(t("itin_s"))+"</p></section>"+auto+
+ ITINS.filter(i=>!i.auto).map(i=>'<article class="itin"><h3 class="sec">'+i.ic+" "+esc(L(i.name))+"</h3><ol>"+
+ i.steps.map(st=>"<li><b>"+esc(L(st[0]))+"</b><span>"+esc(L(st[1]))+"</span></li>").join("")+"</ol></article>").join("");}
+function pgMappa(){return '<section class="hero"><span class="kicker">📍</span><h1 class="sec">'+esc(t("map_t"))+'</h1><p class="sub">'+esc(t("map_s"))+"</p></section>"+
+ '<iframe title="map" style="width:100%;height:min(60vh,420px);border:0;border-radius:var(--r)" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=Pirri%2C%20Cagliari&z=11&output=embed"></iframe>'+
+ '<section class="blk"><h2 class="sec">'+esc(t("idx_beaches"))+'</h2><div class="tl__links">'+BEACHES.map(p=>'<a class="chip" target="_blank" rel="noopener" href="'+gmLink(p.coords)+'">'+esc(p.name)+" ↗</a>").join("")+"</div>"+
+ '<h2 class="sec" style="margin-top:1.4rem">'+esc(t("idx_places"))+'</h2><div class="tl__links">'+GEMS.map(p=>'<a class="chip" target="_blank" rel="noopener" href="'+gmLink(p.coords)+'">'+esc(p.name)+" ↗</a>").join("")+"</div></section>";}
 
-  // ===== NAVIGATION =====
-  function updateNav() {
-    $$('.bottom-nav__item').forEach(el => {
-      el.classList.toggle('active', el.dataset.section === currentSection);
-    });
-    $$('.menu__list a').forEach(el => {
-      el.classList.toggle('active', el.getAttribute('href') === '#' + currentSection);
-    });
-  }
+/* Fonti: solo contenuti per l'ospite — nessuna nota di manutenzione interna (R5b) */
+/* ---------- scheda dettaglio ---------- */
+function openSheet(id){
+ const b=BEACHES.find(x=>x.id===id)||GEMS.find(x=>x.id===id);
+ if(!b)return;
+ const isB=!b.cats;
+ let html=ART(b.id,isB?"beach":(GLYPH[b.cats[0]]||"💎"));
+ html+="<h2 id=\"sheet-title\" style=\"font-family:var(--serif);margin-top:1rem\">"+esc(b.name)+"</h2>";
+ html+='<p class="sub">'+(isB?esc(L(b.type))+" · "+esc(b.facing):esc(L(b.place)))+" · 🚗 ~"+fmtDrive(b.driveMin)+(b.driveKm?(" · ≈"+b.driveKm+" km"):"")+" · 👥 "+b.crowd+"/5</p>";
+ if(isB){
+  html+='<div class="notice"><b>'+esc(t("wind_orient"))+'</b><div class="windrow" style="margin-top:.5rem">'+
+  WINDS.map(x=>"<span><b>"+windLabel(x[0])+'</b> <span class="stars">'+stars(b.wind[x[0]])+"</span></span>").join("")+"</div></div>";
+  const rows=[[t("type_lbl"),L(b.type)],[t("period_lbl"),b.best],[t("parking"),L(b.parking)],[t("services"),L(b.services)],[t("access"),L(b.access)],[t("food_lbl"),L(b.food)],[t("trails"),L(b.trails)],[t("facing"),b.facing]];
+  html+='<dl class="kv">'+rows.map(r=>"<dt>"+esc(r[0])+"</dt><dd>"+esc(r[1])+"</dd>").join("")+"</dl>";
+  html+='<p style="font-size:.95rem">'+esc(L(b.desc))+"</p>";
+  html+='<p style="margin-top:.6rem"><b>✅ '+esc(t("when_go"))+":</b> "+esc(L(b.go))+"<br><b>⛔ "+esc(t("when_avoid"))+":</b> "+esc(L(b.avoid))+"</p>";
+  if(b.id==="pelosa")html+='<div class="notice">'+esc(t("check_access"))+'</div>';
+ }else{
+  html+='<dl class="kv"><dt>'+esc(t("dist_lbl"))+"</dt><dd>🚗 ~"+fmtDrive(b.driveMin)+"</dd></dl>";
+  html+='<dl class="kv">'+[["🏛️",L(b.why)],["📜",L(b.curio)],["👀",L(b.see)],["🍷",L(b.taste)],["⭐",L(b.rec)]].map(r=>"<dt>"+r[0]+"</dt><dd>"+esc(r[1])+"</dd>").join("")+"</dl>";
+ }
+ html+='<div class="notice" style="font-size:.8rem;margin-top:1rem">⏱️ '+esc(t("drive_note"))+"</div>";
+ html+='<div style="display:flex;gap:.6rem;margin-top:1.2rem;flex-wrap:wrap">'+
+ '<a class="btn btn--map" target="_blank" rel="noopener" href="'+gmLink(b.coords)+'">'+esc(t("take_me"))+"</a>"+
+ (b.link?'<a class="btn btn--ghost" target="_blank" rel="noopener" href="'+safeUrl(b.link)+'">🔗 '+esc(t("src_site"))+"</a>":"")+"</div>";
+ $("#sheet-content").innerHTML=html;
+ sheetReturnFocus=document.activeElement; $("#sheet").classList.add("open");document.body.style.overflow="hidden";setBackgroundInert(true);$("#sheet-x").focus();}
+let sheetReturnFocus=null;
+function closeSheet(){const wasOpen=$("#sheet").classList.contains("open");$("#sheet").classList.remove("open");document.body.style.overflow="";setBackgroundInert(false);if(wasOpen&&sheetReturnFocus?.isConnected)sheetReturnFocus.focus();}
 
-  function buildMenu() {
-    const items = [
-      { sec: 'home', label: 'nav_home', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>' },
-      { sec: 'spiagge', label: 'nav_spiagge', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h20"/><path d="M6 16l4-8 4 4 4-6"/></svg>' },
-      { sec: 'cagliari', label: 'nav_cagliari', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>' },
-      { sec: 'mangiare', label: 'nav_mangiare', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>' },
-      { sec: 'enogastronomia', label: 'nav_eno', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>' },
-      { sec: 'eventi', label: 'nav_eventi', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z"/></svg>' },
-      { sec: 'casa', label: 'quick_casa', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>' },
-      { sec: 'muoversi', label: 'quick_muoversi', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2v20"/><path d="M2 12h20"/></svg>' },
-      { sec: 'vento', label: 'quick_vento', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>' },
-      { sec: 'info', label: 'quick_info', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>' },
-    ];
-    // FIX v3.1: data-i18n solo sullo span del testo, mai sul <a> che contiene SVG
-    menuList.innerHTML = items.map(it => `
-      <li><a href="#${it.sec}">${it.icon}<span data-i18n="${it.label}">${t(it.label)}</span></a></li>
-    `).join('');
-    $$('.menu__list a').forEach(a => {
-      a.addEventListener('click', () => closeMenu());
-    });
-  }
-
-  // Menu
-  function openMenu() {
-    menu.setAttribute('aria-hidden', 'false');
-    menu.removeAttribute('inert');
-    scrim.classList.add('active');
-    burger.setAttribute('aria-expanded', 'true');
-    lockScroll();
-    menuClose.focus();
-  }
-  function closeMenu() {
-    menu.setAttribute('aria-hidden', 'true');
-    menu.setAttribute('inert', '');
-    scrim.classList.remove('active');
-    burger.setAttribute('aria-expanded', 'false');
-    unlockScroll();
-    burger.focus();
-  }
-  burger.addEventListener('click', openMenu);
-  menuClose.addEventListener('click', closeMenu);
-  scrim.addEventListener('click', closeMenu);
-
-  $('#bottom-more').addEventListener('click', openMenu);
-
-  // ===== SCROLL LOCK =====
-  function lockScroll() {
-    scrollLockCount++;
-    if (scrollLockCount === 1) document.body.style.overflow = 'hidden';
-  }
-  function unlockScroll() {
-    scrollLockCount = Math.max(0, scrollLockCount - 1);
-    if (scrollLockCount === 0) document.body.style.overflow = '';
-  }
-
-  // ===== SHEET =====
-  let sheetReturnFocus=null;
-  function openSheet(html) {
-    sheetReturnFocus=document.activeElement;
-    sheetContent.innerHTML = html;
-    sheet.setAttribute('aria-hidden', 'false');
-    lockScroll();
-    initLazyImages();
-    setTimeout(() => sheetX.focus(), 50);
-  }
-  function closeSheet() {
-    sheet.setAttribute('aria-hidden', 'true');
-    unlockScroll();
-    if(sheetReturnFocus?.isConnected)sheetReturnFocus.focus();
-  }
-  sheetBackdrop.addEventListener('click', closeSheet);
-  sheetX.addEventListener('click', closeSheet);
-
-  // ===== LAZY IMAGES =====
-  function initLazyImages() {
-    $$('.card__media,.editorial-item__media,.beach-card__media,.rest-card__thumb,.event-card__media,.archeo-card__media').forEach(el=>{if(!el.querySelector('img'))el.classList.add('no-photo');});
-
-    $$('img[loading="lazy"]').forEach(img => {
-      if (img.dataset.lazyInit) return;
-      img.dataset.lazyInit = '1';
-      if (img.complete && img.naturalWidth > 0) {
-        img.classList.add('loaded');
-      } else {
-        img.onload = () => img.classList.add('loaded');
-        img.onerror = () => {img.classList.add('error');img.hidden=true;img.parentElement.classList.add('no-photo');};
-        // Rete di sicurezza: alcuni browser (specie su connessioni lente
-        // o in modalità risparmio dati) ritardano indefinitamente l'evento
-        // "onload" per le immagini lazy ("Load events are deferred").
-        // Se dopo 1,5 secondi l'immagine non ha ancora ricevuto una risposta,
-        // la mostriamo comunque, invece di lasciarla invisibile per sempre.
-        setTimeout(() => {
-          if (!img.classList.contains('loaded') && !img.classList.contains('error')) {
-            img.classList.add('loaded');
-          }
-        }, 1500);
-      }
-    });
-  }
-
-  // ===== SCROLL EFFECTS =====
-  let lastScroll = 0;
-  window.addEventListener('scroll', () => {
-    const y = window.scrollY;
-    $('.topbar').classList.toggle('topbar--scrolled', y > 10);
-    lastScroll = y;
-  }, { passive: true });
-
-  // ===== KEYBOARD =====
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      if (sheet.getAttribute('aria-hidden') === 'false') {
-        closeSheet();
-      } else if (menu.getAttribute('aria-hidden') === 'false') {
-        closeMenu();
-      }
-    }
+/* ---------- router ---------- */
+const ROUTES={home:pgHome,cagliari:pgCagliari,casa:pgCasa,mangiare:pgMangiare,aperitivi:pgAperitivi,senzaauto:pgSenzaAuto,utili:pgUtili,spiagge:pgSpiagge,vento:pgVento,storia:pgStoria,sapori:pgSapori,eventi:pgEventi,itinerari:pgItinerari,mappa:pgMappa,fonti:pgFonti,
+ perle:()=>gemListPage(()=>true,t("perle_t"),t("perle_s"),"perle"),
+ borghi:()=>gemListPage(g=>g.cats.includes("borgo"),t("borgo_t"),t("borgo_s"),"borghi"),
+ natura:()=>gemListPage(g=>g.cats.includes("natura"),t("nat_t"),t("nat_s"),"natura")};
+const ALIASES={enogastronomia:"sapori",muoversi:"senzaauto",info:"utili"};
+function resolveRoute(hash){const name=String(hash||"").replace(/^#/,"").split("?")[0];return ALIASES[name]||(Object.hasOwn(ROUTES,name)?name:"home");}
+function render(keepScroll){
+ const y=window.scrollY;
+ const focused=document.activeElement;const filterFocus=focused?.dataset?.f?{kind:focused.dataset.f,value:focused.value}:null;
+ $("#menu").innerHTML=Object.keys(ROUTES).map(r=>'<a href="#'+r+'" class="'+(state.route===r?"on":"")+'">'+esc(t("nav_"+r))+"</a>").join("");
+ renderBottomNav();
+ closeSheet();
+ const fn=ROUTES[state.route]||pgHome;
+ $("#view").innerHTML=fn();
+ bindGlobal($("#view"));
+ const explore=$("[data-explore]");if(explore)explore.addEventListener("click",e=>{e.preventDefault();$("#esplora").scrollIntoView({behavior:window.matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"});});
+ if(state.route==="home")renderToday();
+ window.scrollTo({top:keepScroll?y:0});
+ if(keepScroll&&filterFocus){const input=[...document.querySelectorAll("[data-f]")].find(x=>x.dataset.f===filterFocus.kind&&x.value===filterFocus.value);if(input){input.closest("details").open=true;input.focus({preventScroll:true});}}
+}
+function bindGlobal(root){
+ root.querySelectorAll("[data-f]").forEach(inp=>inp.addEventListener("change",()=>{
+  const f=state.filters;
+  if(inp.dataset.f==="cat"){inp.checked?f.cats.add(inp.value):f.cats.delete(inp.value);}
+  if(inp.dataset.f==="drive")f.maxDrive=+inp.value;
+  if(inp.dataset.f==="crowd")f.crowd=+inp.value;
+  render(true);}));
+ root.querySelectorAll("[data-reset]").forEach(b=>b.addEventListener("click",()=>{state.filters={cats:new Set(),maxDrive:999,crowd:0};render(true);}));
+ root.querySelectorAll('[name="vw"]').forEach(r=>r.addEventListener("change",()=>{state.manualWind=r.value;render();}));
+ root.querySelectorAll("[data-open]").forEach(el=>{
+  el.addEventListener("click",e=>{if(e.target.closest("a"))return;openSheet(el.dataset.open);});
   });
+}
 
-  // ===== RENDERERS =====
-
-  function renderHome() {
-    const c = DATA.casa; // FIX v3.1: mancava, causava ReferenceError ad ogni renderHome()
-    view.innerHTML = `
-      <section class="section">
-        <div class="hero">
-          <div class="hero__media">
-            <img src="img/casa/letto.jpg" alt="Camera di Piccolabellavista" fetchpriority="high">
-          </div>
-          <div class="hero__content">
-            <p class="hero__pretitle">PIRRI · CAGLIARI · SARDEGNA</p>
-            <h1 class="hero__title" data-i18n="home_welcome">Benvenuti</h1>
-            <p class="hero__subtitle" data-i18n="home_subtitle">La vostra guida personale</p>
-            <div class="hero__cta">
-              <button class="btn btn--primary btn--pill" onclick="location.hash='spiagge'" data-i18n="home_cta">Scopri la guida</button>
-              <button class="btn btn--ghost btn--pill" onclick="location.hash='casa'" data-i18n="home_secondary">La casa</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="quick-grid">
-          <a href="#vento" class="quick-item" id="meteo-widget">
-            <div class="quick-item__icon">🌤️</div>
-            <span class="quick-item__label" data-i18n="weather">Meteo Cagliari</span>
-            <span class="quick-item__sublabel" style="font-size:10px;color:var(--color-stone-muted);margin-top:2px;">${t('weather_loading')}</span>
-          </a>
-          <a href="#casa" class="quick-item">
-            <div class="quick-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
-            <span class="quick-item__label" data-i18n="quick_casa">La casa</span>
-          </a>
-          <a href="#spiagge" class="quick-item">
-            <div class="quick-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M6 16l4-8 4 4 4-6"/><path d="M12 20V10"/></svg></div>
-            <span class="quick-item__label" data-i18n="quick_spiagge">Spiagge</span>
-          </a>
-          <a href="#mangiare" class="quick-item">
-            <div class="quick-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></div>
-            <span class="quick-item__label" data-i18n="quick_mangiare">Dove mangiare</span>
-          </a>
-          <a href="#enogastronomia" class="quick-item">
-            <div class="quick-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg></div>
-            <span class="quick-item__label" data-i18n="quick_eno">Enogastronomia</span>
-          </a>
-          <a href="#cagliari" class="quick-item">
-            <div class="quick-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></div>
-            <span class="quick-item__label" data-i18n="quick_cagliari">Cagliari</span>
-          </a>
-          <a href="#muoversi" class="quick-item">
-            <div class="quick-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2v20"/><path d="M2 12h20"/></svg></div>
-            <span class="quick-item__label" data-i18n="quick_muoversi">Come muoversi</span>
-          </a>
-          <a href="#vento" class="quick-item">
-            <div class="quick-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg></div>
-            <span class="quick-item__label" data-i18n="quick_vento">Spiagge e vento</span>
-          </a>
-          <a href="#info" class="quick-item">
-            <div class="quick-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
-            <span class="quick-item__label" data-i18n="quick_info">Informazioni</span>
-          </a>
-        </div>
-        ${c.mapEmbed ? `
-        <h3 class="heading-sm" style="margin:24px 0 12px;" data-i18n="whereWeAre">Dove siamo</h3>
-        <div class="map-card" style="margin-bottom:24px;">
-          <iframe class="map-card__frame" src="${c.mapEmbed}" allowfullscreen="" loading="lazy"></iframe>
-          <a href="https://maps.google.com/?q=${c.coordinates.lat},${c.coordinates.lng}" target="_blank" rel="noopener noreferrer" class="map-card__link" data-i18n="openMap">Apri in Google Maps →</a>
-        </div>` : ''}
-      </section>
-    `;
-    initWeather(); // FIX v3.1: era definita ma mai chiamata, il widget restava bloccato su "Caricamento..."
-  }
-
-  function renderSpiagge() {
-    const filters = [
-      { key: 'all', label: 'beach_filter_all' },
-      { key: 'calm', label: 'beach_filter_calm' },
-      { key: 'wind', label: 'beach_filter_wind' },
-      { key: 'family', label: 'beach_filter_family' },
-      { key: 'snorkel', label: 'beach_filter_snorkel' },
-      { key: 'sunset', label: 'beach_filter_sunset' },
-      { key: 'wild', label: 'beach_filter_wild' },
-    ];
-
-    const filtered = beachFilter === 'all'
-      ? DATA.spiagge
-      : DATA.spiagge.filter(b => b.tags.includes(beachFilter));
-
-    view.innerHTML = `
-      <section class="section">
-        <div class="beach-hero">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Poetto_beach.jpg/1280px-Poetto_beach.jpg" alt="Spiagge" loading="lazy">
-          <div class="beach-hero__content">
-            <p class="heading-sm" style="color:rgba(255,255,255,0.7);margin-bottom:4px;" data-i18n="beach_today">Oggi dove andare?</p>
-            <h1 class="beach-hero__title" data-i18n="beach_title">Spiagge</h1>
-          </div>
-        </div>
-
-        <div class="chip-group">
-          ${filters.map(f => `
-            <button class="chip ${beachFilter === f.key ? 'active' : ''}" data-filter="${f.key}">
-              ${t(f.label)}
-            </button>
-          `).join('')}
-        </div>
-
-        <div class="beach-list">
-          ${filtered.map(b => `
-            <article class="beach-card" onclick="App.openBeach('${b.id}')">
-              <div class="beach-card__media">
-                ${imageTag(b.image,b.name)}
-                <div class="beach-card__badges">
-                  ${b.tags.map(tag => `<span class="badge">${t('tag_' + tag) || tag}</span>`).join('')}
-                </div>
-                ${b.imageCredit ? `<span class="media-credit">📷 ${b.imageCredit}</span>` : ''}
-              </div>
-              <div class="beach-card__body">
-                <h3 class="beach-card__title">${b.name}</h3>
-                <div class="beach-card__meta">
-                  <span>📍 ${b.distance} ${t('beach_distance')}</span>
-                  <span>🚗 ${b.time} ${t('beach_time')}</span>
-                </div>
-                <p class="body" style="margin-bottom:12px;">${L(b.desc)}</p>
-                <div class="beach-card__tags">
-                  <span class="beach-card__tag">${L(b.type)}</span>
-                  <span class="beach-card__tag">${L(b.wind)}</span>
-                </div>
-                <div class="beach-card__actions">
-                  <button class="btn btn--primary btn--small" onclick="event.stopPropagation(); window.open('${b.map}')">${t('beach_map')}</button>
-                  <button class="btn btn--secondary btn--small" onclick="event.stopPropagation(); App.openBeach('${b.id}')">Dettagli</button>
-                </div>
-              </div>
-            </article>
-          `).join('')}
-        </div>
-      </section>
-    `;
-
-    $$('.chip[data-filter]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        beachFilter = btn.dataset.filter;
-        renderSpiagge();
-      });
-    });
-  }
-
-  function renderCagliari() {
-    view.innerHTML = `
-      <section class="section">
-        <div class="section__header">
-          <p class="heading-sm" data-i18n="cagliari_subtitle">La città tra mare e storia</p>
-          <h1 class="display-lg" data-i18n="cagliari_title">Cagliari</h1>
-        </div>
-        <div class="editorial-grid">
-          ${DATA.cagliari.map(item => `
-            <article class="editorial-item">
-              <div class="editorial-item__media">
-                ${imageTag(item.image,L(item.title))}
-                ${item.imageCredit ? `<span class="media-credit">📷 ${item.imageCredit}</span>` : ''}
-              </div>
-              <div class="editorial-item__body">
-                <span class="editorial-item__label">${L(item.label)}</span>
-                <h3 class="editorial-item__title">${L(item.title)}</h3>
-                <p class="editorial-item__text">${L(item.text)}</p>
-              </div>
-            </article>
-          `).join('')}
-        </div>
-      </section>
-    `;
-  }
-
-  function renderMangiare() {
-    const types = ['all', 'sardinian', 'fish', 'pizza', 'cheap', 'aperitivo', 'breakfast', 'special'];
-    const typeLabels = {
-      all: 'beach_filter_all',
-      sardinian: 'eat_sardinian',
-      fish: 'eat_fish',
-      pizza: 'eat_pizza',
-      cheap: 'eat_cheap',
-      aperitivo: 'eat_aperitivo',
-      breakfast: 'eat_breakfast',
-      special: 'eat_special'
-    };
-
-    const currentType = new URLSearchParams(location.hash.split('?')[1] || '').get('type') || 'all';
-    const filtered = currentType === 'all'
-      ? DATA.mangiare
-      : DATA.mangiare.filter(r => r.type === currentType);
-
-    view.innerHTML = `
-      <section class="section">
-        <div class="section__header">
-          <p class="heading-sm" data-i18n="eat_subtitle">Selezione personale dell'host</p>
-          <h1 class="display-lg" data-i18n="eat_title">Dove mangiare</h1>
-        </div>
-        <div class="chip-group" style="margin-bottom:20px;">
-          ${types.map(tp => `
-            <button class="chip ${currentType === tp ? 'active' : ''}" onclick="location.hash='mangiare?type=${tp}'">
-              ${t(typeLabels[tp])}
-            </button>
-          `).join('')}
-        </div>
-        <div class="rest-list">
-          ${filtered.map(r => {
-            // FIX v3.1: prezzo/indirizzo non ancora verificati sono `null` nei dati
-            // (non più la stringa "[DA VERIFICARE]"): nascondiamo il campo invece
-            // di mostrare agli ospiti un appunto di lavoro interno.
-            const metaParts = [r.price, r.address].filter(Boolean);
-            const note = L(r.note);
-            return `
-            <button class="rest-card" onclick="window.open('${r.map}')">
-              <div class="rest-card__thumb">
-                ${imageTag(r.image,r.name)}
-              </div>
-              <div class="rest-card__body">
-                <span class="rest-card__type">${L(r.typeLabel)}</span>
-                <h3 class="rest-card__title">${r.name}</h3>
-                ${note ? `<p class="rest-card__note">${note}</p>` : ''}
-                ${metaParts.length ? `<div style="display:flex;gap:8px;margin-top:4px;font-size:12px;color:var(--color-stone-muted);">${metaParts.map(p => `<span>${p}</span>`).join('<span>·</span>')}</div>` : ''}
-              </div>
-            </button>
-          `; }).join('')}
-        </div>
-      </section>
-    `;
-  }
-
-  function renderEnogastronomia() {
-    view.innerHTML = `
-      <section class="section">
-        <div class="section__header">
-          <p class="heading-sm" data-i18n="eno_subtitle">I sapori autentici</p>
-          <h1 class="display-lg" data-i18n="eno_title">Enogastronomia</h1>
-        </div>
-        <div class="editorial-grid">
-          ${DATA.enogastronomia.map(item => `
-            <article class="card" style="margin-bottom:16px;">
-              <div class="card__media" style="aspect-ratio:16/10;">
-                ${imageTag(item.image,L(item.title))}
-              </div>
-              <div class="card__body">
-                <h3 class="card__title">${L(item.title)}</h3>
-                <p class="card__text">${L(item.text)}</p>
-              </div>
-            </article>
-          `).join('')}
-        </div>
-      </section>
-    `;
-  }
-
-  function renderCasa() {
-    const c = DATA.casa;
-    view.innerHTML = `
-      <section class="section">
-        <div class="section__header">
-          <p class="heading-sm" data-i18n="casa_subtitle">Il vostro rifugio</p>
-          <h1 class="display-lg" data-i18n="casa_title">La casa</h1>
-        </div>
-        <div class="card" style="margin-bottom:24px;">
-          <div class="card__media" style="aspect-ratio:16/10;">
-            ${imageTag(c.image,"La casa")}
-          </div>
-          <div class="card__body">
-            <p class="body-lg">${L(c.description)}</p>
-          </div>
-        </div>
-
-        ${c.gallery ? `
-        <div class="casa-gallery" style="margin-bottom:24px;">
-          ${c.gallery.map(g => `
-            <div class="casa-gallery__item">
-              ${imageTag(g.image,L(g.caption))}
-              <span class="casa-gallery__caption">${L(g.caption)}</span>
-            </div>
-          `).join('')}
-        </div>` : ''}
-
-        <div class="wifi-note"><h3 class="heading-sm">Wi-Fi</h3><p>${t("wifi_help")}</p></div>
-        <h3 class="heading-sm" style="margin-bottom:12px;" data-i18n="services">Servizi</h3>
-        <div class="quick-grid" style="margin-bottom:24px;">
-          ${c.services.map(s => `
-            <div class="quick-item" style="padding:12px;">
-              <div class="quick-item__icon" style="font-size:24px;width:auto;height:auto;background:transparent;">${s.icon}</div>
-              <span class="quick-item__label" style="font-size:12px;">${L(s.label)}</span>
-            </div>
-          `).join('')}
-        </div>
-
-        <h3 class="heading-sm" style="margin-bottom:12px;" data-i18n="rules">Regole</h3>
-        <div class="info-list" style="margin-bottom:24px;">
-          ${c.rules.map(r => `
-            <div class="info-item">
-              <div class="info-item__icon" style="font-size:14px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-              <div class="info-item__body">
-                <div class="info-item__value">${L(r)}</div>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-
-        <h3 class="heading-sm" style="margin-bottom:12px;" data-i18n="contact">Contatti</h3>
-        <div class="info-list">
-          <a href="tel:${c.phone}" class="info-item">
-            <div class="info-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
-            <div class="info-item__body">
-              <div class="info-item__label" data-i18n="phone">Telefono</div>
-              <div class="info-item__value">${c.phone}</div>
-            </div>
-          </a>
-          <a href="mailto:${c.email}" class="info-item">
-            <div class="info-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
-            <div class="info-item__body">
-              <div class="info-item__label">Email</div>
-              <div class="info-item__value">${c.email}</div>
-            </div>
-          </a>
-        </div>
-      </section>
-    `;
-  }
-
-  function renderMuoversi() {
-    const m = DATA.muoversi;
-    view.innerHTML = `
-      <section class="section">
-        <div class="section__header">
-          <p class="heading-sm" data-i18n="move_subtitle">Trasporti e consigli</p>
-          <h1 class="display-lg" data-i18n="move_title">Come muoversi</h1>
-        </div>
-        <div class="card" style="margin-bottom:24px;">
-          <div class="card__media" style="aspect-ratio:16/10;">
-            ${imageTag(m.image,"Come muoversi")}
-          </div>
-        </div>
-        <div class="info-list">
-          ${m.items.map(i => `
-            <div class="info-item" style="align-items:flex-start;padding:16px;">
-              <div class="info-item__icon" style="font-size:20px;width:44px;height:44px;">${i.icon}</div>
-              <div class="info-item__body">
-                <div class="info-item__label">${L(i.title)}</div>
-                <div class="info-item__value">${L(i.desc)}</div>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      </section>
-    `;
-  }
-
-  function renderInfo() {
-    view.innerHTML = `
-      <section class="section">
-        <div class="section__header">
-          <p class="heading-sm" data-i18n="info_subtitle">Tutto ciò che serve sapere</p>
-          <h1 class="display-lg" data-i18n="info_title">Informazioni utili</h1>
-        </div>
-        <div class="info-list">
-          ${DATA.info.items.map(i => `
-            <div class="info-item" style="align-items:flex-start;padding:16px;">
-              <div class="info-item__icon" style="font-size:20px;width:44px;height:44px;">${i.icon}</div>
-              <div class="info-item__body">
-                <div class="info-item__label">${L(i.title)}</div>
-                <div class="info-item__value">${L(i.value)}</div>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      </section>
-    `;
-  }
-
-  function renderVento() {
-    const v = DATA.vento;
-    view.innerHTML = `
-      <section class="section">
-        <div class="section__header">
-          <p class="heading-sm" data-i18n="wind_subtitle">Scegli in base alla giornata</p>
-          <h1 class="display-lg" data-i18n="wind_title">Spiagge e vento</h1>
-        </div>
-        <div class="card" style="margin-bottom:24px;">
-          <div class="card__media" style="aspect-ratio:16/10;">
-            ${imageTag(v.image,"Vento")}
-          </div>
-          <div class="card__body">
-            <p class="body-lg">${L(v.description)}</p>
-          </div>
-        </div>
-        <div class="info-list">
-          ${v.winds.map(w => `
-            <div class="info-item" style="align-items:flex-start;padding:16px;">
-              <div class="info-item__icon" style="font-size:20px;width:44px;height:44px;">${w.icon}</div>
-              <div class="info-item__body">
-                <div class="info-item__label">${w.name} <span style="color:var(--color-stone-muted);font-weight:400;">(${w.dir})</span></div>
-                <div class="info-item__value">${L(w.effect)}</div>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      </section>
-    `;
-  }
-
-  function renderFonti() {
-    view.innerHTML = `
-      <section class="section">
-        <div class="section__header">
-          <h1 class="display-lg" data-i18n="nav_fonti">Fonti</h1>
-        </div>
-        <div class="card">
-          <div class="card__body">
-            <p class="body-lg" style="margin-bottom:16px;">${L(DATA.fonti.text)}</p>
-            <ul style="display:flex;flex-direction:column;gap:8px;font-size:14px;color:var(--color-stone-light);">
-              ${DATA.fonti.credits.map(c => `<li>• ${L(c)}</li>`).join('')}
-            </ul>
-          </div>
-        </div>
-      </section>
-    `;
-    const items=[...DATA.spiagge,...DATA.cagliari,...DATA.archeologia].filter(x=>x.image&&x.imageCredit);
-    const seen=new Set();
-    const rows=items.filter(x=>{if(seen.has(x.image))return false;seen.add(x.image);return true;}).map(x=>{
-      const photo=PHOTOS[x.id]||(x.id==='mare'?PHOTOS.poetto:null);
-      const source=photo?.source||x.image.replace('/wiki/Special:FilePath/','/wiki/File:');
-      const license=x.imageCredit.match(/CC BY(-SA)? (\d\.\d)/);
-      const licenseURL=license?'https://creativecommons.org/licenses/by'+(license[1]?'-sa':'')+'/'+license[2]+'/':'';
-      return '<p><a href="'+esc(source)+'" target="_blank" rel="noopener">'+esc(x.name||L(x.title))+'</a> — '+esc(x.imageCredit)+(licenseURL?' · <a href="'+licenseURL+'" target="_blank" rel="noopener">Creative Commons</a>':'')+'</p>';
-    }).join('');
-    view.insertAdjacentHTML('beforeend','<section class="photo-credits"><h2 class="display-md">'+(currentLang==='it'?'Crediti fotografici':currentLang==='de'?'Bildnachweise':'Photo credits')+'</h2>'+rows+'</section>');
-  }
-
-  // ===== BEACH DETAIL SHEET =====
-  function openBeach(id) {
-    const b = DATA.spiagge.find(x => x.id === id);
-    if (!b) return;
-    openSheet(`
-      ${imageTag(b.image,b.name)}
-      ${b.imageCredit ? `<p class="caption" style="margin:-8px 0 12px;color:var(--color-stone-muted);">📷 ${b.imageCredit}</p>` : ''}
-      <h2 class="display-md">${b.name}</h2>
-      <div class="beach-card__meta" style="margin-bottom:16px;">
-        <span>📍 ${b.distance} ${t('beach_distance')}</span>
-        <span>🚗 ${b.time} ${t('beach_time')}</span>
-      </div>
-      <p class="body">${L(b.desc)}</p>
-      <div class="info-list">
-        <div class="info-item">
-          <div class="info-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M6 16l4-8 4 4 4-6"/><path d="M12 20V10"/></svg></div>
-          <div class="info-item__body">
-            <div class="info-item__label">Tipo</div>
-            <div class="info-item__value">${L(b.type)}</div>
-          </div>
-        </div>
-        <div class="info-item">
-          <div class="info-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg></div>
-          <div class="info-item__body">
-            <div class="info-item__label">${t('beach_wind')}</div>
-            <div class="info-item__value">${L(b.wind)}</div>
-          </div>
-        </div>
-        <div class="info-item">
-          <div class="info-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
-          <div class="info-item__body">
-            <div class="info-item__label">Ideale per</div>
-            <div class="info-item__value">${L(b.ideal)}</div>
-          </div>
-        </div>
-        <div class="info-item">
-          <div class="info-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div>
-          <div class="info-item__body">
-            <div class="info-item__label">Servizi</div>
-            <div class="info-item__value">${L(b.services)}</div>
-          </div>
-        </div>
-      </div>
-      <div style="margin-top:24px;">
-        <a href="${b.map}" target="_blank" rel="noopener noreferrer" class="btn btn--primary btn--full">${t('beach_map')}</a>
-      </div>
-    `);
-  }
-
-  // ===== EVENTI / SAGRE / ARCHEOLOGIA =====
-  let eventiFilter = 'all';
-
-  function formatDate(iso) {
-    const [y, m, d] = iso.split('-');
-    return `${d}/${m}/${y}`;
-  }
-
-  function renderEventi() {
-    const filters = [
-      { key: 'all', label: 'eventi_filter_all' },
-      { key: 'cultura', label: 'eventi_filter_cultura' },
-      { key: 'musica', label: 'eventi_filter_musica' },
-      { key: 'famiglie', label: 'eventi_filter_famiglie' },
-      { key: 'eno', label: 'eventi_filter_eno' },
-      { key: 'feste', label: 'eventi_filter_sagre' },
-      { key: 'archeo', label: 'eventi_filter_archeo' },
-    ];
-
-    const now = new Date();
-    const weekEnd = new Date(now); weekEnd.setDate(weekEnd.getDate() + 7);
-
-    let allItems = [];
-    DATA.eventi.forEach(e => {
-      allItems.push({ type: 'evento', sortDate: new Date(e.dateStart), endDate: new Date(e.dateEnd), data: e });
-    });
-    DATA.sagre.forEach(s => {
-      let sortDate, endDate;
-      if (s.date.length === 7) {
-        // FIX v3.1: una data nota solo a livello di mese ("2026-09") veniva
-        // trattata come un singolo istante (il giorno 1), e quindi spariva
-        // dalla lista non appena il giorno 1 del mese era passato. Ora copre
-        // l'intero mese, così resta visibile finché il mese non è finito.
-        const [y, mo] = s.date.split('-').map(Number);
-        sortDate = new Date(y, mo - 1, 1);
-        endDate = new Date(y, mo, 0);
-      } else {
-        sortDate = endDate = new Date(s.date);
-      }
-      allItems.push({ type: 'sagra', sortDate, endDate, data: s });
-    });
-
-    if (eventiFilter !== 'all' && eventiFilter !== 'archeo') {
-      const catMap = { eno: 'enogastronomia', feste: 'feste', cultura: 'cultura', musica: 'musica', famiglie: 'famiglie' };
-      const wanted = catMap[eventiFilter];
-      allItems = allItems.filter(it => it.data.category === wanted || (it.data.tags && it.data.tags.includes(wanted)));
-    }
-
-    const showEventsSagre = eventiFilter !== 'archeo';
-    const showArcheo = eventiFilter === 'all' || eventiFilter === 'archeo';
-
-    allItems.sort((a, b) => a.sortDate - b.sortDate);
-    const oggi = allItems.filter(it => it.sortDate <= now && it.endDate >= now);
-    const settimana = allItems.filter(it => it.sortDate > now && it.sortDate <= weekEnd);
-    const prossimi = allItems.filter(it => it.sortDate > weekEnd);
-
-    let html = `
-      <section class="section">
-        <div class="section__header">
-          <p class="heading-sm" data-i18n="eventi_subtitle">Eventi, sagre, archeologia e cultura</p>
-          <h1 class="display-lg" data-i18n="eventi_title">Cosa succede in questi giorni?</h1>
-        </div>
-        <div class="chip-group" style="margin-bottom:20px;">
-          ${filters.map(f => `
-            <button class="chip ${eventiFilter === f.key ? 'active' : ''}" data-efilter="${f.key}">${t(f.label)}</button>
-          `).join('')}
-        </div>
-    `;
-
-    if (showEventsSagre) {
-      if (!allItems.length) {
-        html += `<p class="body" style="text-align:center;padding:24px 0;color:var(--color-stone-muted);" data-i18n="eventi_vuoto">Nessun evento in questa categoria per il periodo selezionato.</p>`;
-      } else {
-        if (oggi.length) html += sectionBlock('eventi_oggi', 'Oggi', oggi);
-        if (settimana.length) html += sectionBlock('eventi_settimana', 'Questa settimana', settimana);
-        if (prossimi.length) html += sectionBlock('eventi_prossimamente', 'Prossimamente', prossimi);
-      }
-    }
-
-    if (showArcheo) {
-      html += `
-        <h2 class="heading-sm" style="margin:32px 0 16px;" data-i18n="eventi_archeologia">Archeologia</h2>
-        <div class="archeo-list">
-          ${DATA.archeologia.map(a => `
-            <article class="archeo-card" onclick="App.openArcheo('${a.id}')">
-              <div class="archeo-card__media">${a.image ? `${imageTag(a.image,a.name)}` : ''}</div>
-              <div class="archeo-card__body">
-                <span class="archeo-card__period">${L(a.period)}</span>
-                <h3 class="archeo-card__title">${a.name}</h3>
-                <div class="archeo-card__meta"><span>📍 ${L(a.distance)}</span><span>⏱️ ${L(a.visitTime)}</span></div>
-                <span class="archeo-card__price">${L(a.price)}</span>
-              </div>
-            </article>
-          `).join('')}
-        </div>
-      `;
-    }
-
-    html += `</section>`;
-    view.innerHTML = html;
-
-    $$('.chip[data-efilter]').forEach(btn => {
-      btn.addEventListener('click', () => { eventiFilter = btn.dataset.efilter; renderEventi(); });
-    });
-  }
-
-  function sectionBlock(i18nKey, fallbackLabel, items) {
-    return `
-      <h2 class="heading-sm" style="margin:24px 0 12px;" data-i18n="${i18nKey}">${fallbackLabel}</h2>
-      <div class="event-list">${items.map(eventCard).join('')}</div>
-    `;
-  }
-
-  function eventCard(it) {
-    const d = it.data;
-    const dateStr = d.dateStart
-      ? (d.dateStart === d.dateEnd ? formatDate(d.dateStart) : `${formatDate(d.dateStart)} → ${formatDate(d.dateEnd)}`)
-      : L(d.dateNote);
-    const approx = d.dateApprox ? ' (~)' : '';
-    return `
-      <article class="event-card" onclick="App.openEvento('${it.type}', '${d.id}')">
-        <div class="event-card__media">
-          ${imageTag(d.image,d.name)}
-          <div class="event-card__badge">${it.type === 'sagra' ? 'Sagra' : 'Evento'}</div>
-        </div>
-        <div class="event-card__body">
-          <div class="event-card__date">📅 ${dateStr}${approx}</div>
-          <h3 class="event-card__title">${d.name}</h3>
-          <div class="event-card__meta">
-            <span>📍 ${d.location}, ${d.comune}</span>
-            ${d.time ? `<span>🕐 ${d.time}</span>` : ''}
-          </div>
-          <div style="display:flex;gap:8px;align-items:center;">
-            <span class="event-card__price">${L(d.price)}</span>
-          </div>
-        </div>
-      </article>
-    `;
-  }
-
-  function openEvento(type, id) {
-    const pool = type === 'sagra' ? DATA.sagre : DATA.eventi;
-    const e = pool.find(x => x.id === id);
-    if (!e) return;
-    const dateStr = e.dateStart
-      ? (e.dateStart === e.dateEnd ? formatDate(e.dateStart) : `${formatDate(e.dateStart)} → ${formatDate(e.dateEnd)}`)
-      : (L(e.dateNote) || formatDate(e.date));
-    const approx = e.dateApprox ? ' <span style="color:var(--color-stone-muted);font-size:13px;">(data indicativa)</span>' : '';
-    openSheet(`
-      ${imageTag(e.image,e.name)}
-      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
-        <span class="badge badge--ocean">${type === 'sagra' ? 'Sagra' : 'Evento'}</span>
-        ${(e.tags || []).map(tag => `<span class="badge">${tag}</span>`).join('')}
-      </div>
-      <h2 class="display-md">${e.name}</h2>
-      <div class="info-list" style="margin:16px 0;">
-        <div class="info-item"><div class="info-item__icon">📅</div><div class="info-item__body">
-          <div class="info-item__label" data-i18n="eventi_data">Data</div><div class="info-item__value">${dateStr}${approx}</div>
-        </div></div>
-        ${e.time ? `<div class="info-item"><div class="info-item__icon">🕐</div><div class="info-item__body">
-          <div class="info-item__label" data-i18n="eventi_orario">Orario</div><div class="info-item__value">${e.time}</div>
-        </div></div>` : ''}
-        <div class="info-item"><div class="info-item__icon">📍</div><div class="info-item__body">
-          <div class="info-item__label" data-i18n="eventi_luogo">Luogo</div><div class="info-item__value">${e.location}, ${e.comune}</div>
-        </div></div>
-        <div class="info-item"><div class="info-item__icon">💶</div><div class="info-item__body">
-          <div class="info-item__label" data-i18n="eventi_prezzo">Prezzo</div><div class="info-item__value">${L(e.price)}</div>
-        </div></div>
-      </div>
-      <p class="body">${e.description}</p>
-      <div style="margin-top:20px;display:flex;gap:8px;flex-direction:column;">
-        ${e.website ? `<a href="${e.website}" target="_blank" rel="noopener noreferrer" class="btn btn--primary btn--full" data-i18n="eventi_sito">Sito ufficiale</a>` : ''}
-        <a href="${e.map}" target="_blank" rel="noopener noreferrer" class="btn btn--secondary btn--full">${t('beach_map')}</a>
-      </div>
-      <p class="caption" style="margin-top:16px;">Fonte: ${e.source} · Verificato: ${e.verified}</p>
-    `);
-  }
-
-  function openArcheo(id) {
-    const a = DATA.archeologia.find(x => x.id === id);
-    if (!a) return;
-    openSheet(`
-      ${a.image ? `${imageTag(a.image,a.name)}` : ''}
-      ${a.imageCredit ? `<p class="caption" style="margin:4px 0 12px;color:var(--color-stone-muted);">📷 ${a.imageCredit}</p>` : ''}
-      <h2 class="display-md">${a.name}</h2>
-      <div class="info-list" style="margin:16px 0;">
-        <div class="info-item"><div class="info-item__icon">🏛️</div><div class="info-item__body">
-          <div class="info-item__label" data-i18n="eventi_periodo">Periodo storico</div><div class="info-item__value">${L(a.period)}</div>
-        </div></div>
-        <div class="info-item"><div class="info-item__icon">📍</div><div class="info-item__body">
-          <div class="info-item__label" data-i18n="eventi_distanza">Distanza</div><div class="info-item__value">${L(a.distance)}</div>
-        </div></div>
-        <div class="info-item"><div class="info-item__icon">⏱️</div><div class="info-item__body">
-          <div class="info-item__label" data-i18n="eventi_tempo">Tempo di visita</div><div class="info-item__value">${L(a.visitTime)}</div>
-        </div></div>
-        <div class="info-item"><div class="info-item__icon">🕐</div><div class="info-item__body">
-          <div class="info-item__label" data-i18n="eventi_orari">Orari</div><div class="info-item__value">${L(a.hours)}</div>
-        </div></div>
-        <div class="info-item"><div class="info-item__icon">💶</div><div class="info-item__body">
-          <div class="info-item__label" data-i18n="eventi_prezzo">Prezzo</div><div class="info-item__value">${L(a.price)}</div>
-        </div></div>
-        <div class="info-item"><div class="info-item__icon">📋</div><div class="info-item__body">
-          <div class="info-item__label" data-i18n="eventi_prenotazione">Prenotazione</div><div class="info-item__value">${L(a.booking)}</div>
-        </div></div>
-      </div>
-      <h3 class="heading-sm" style="margin:20px 0 8px;" data-i18n="eventi_perche">Perché visitarlo</h3>
-      <p class="body">${a.whyVisit}</p>
-      <div style="margin-top:20px;display:flex;gap:8px;flex-direction:column;">
-        ${a.website ? `<a href="${a.website}" target="_blank" rel="noopener noreferrer" class="btn btn--primary btn--full" data-i18n="eventi_sito">Sito ufficiale</a>` : ''}
-        <a href="${a.map}" target="_blank" rel="noopener noreferrer" class="btn btn--secondary btn--full">${t('beach_map')}</a>
-      </div>
-      <p class="caption" style="margin-top:16px;">Fonte: ${a.source} · Verificato: ${a.verified}</p>
-    `);
-  }
-
-  // ===== INIT =====
-
-  /* === WIDGET METEO === */
-  function initWeather() {
-    const widget = document.getElementById('meteo-widget');
-    if (!widget) return;
-    widget.querySelector('.quick-item__sublabel').textContent = t('weather_loading');
-    fetch('https://api.open-meteo.com/v1/forecast?latitude=39.2238&longitude=9.1217&current_weather=true&windspeed_unit=kmh',{signal:AbortSignal.timeout(6000),cache:'no-store'})
-      .then(r => {if(!r.ok)throw Error('Weather unavailable');return r.json();})
-      .then(d => {
-        const w = d.current_weather;
-        const temp = Math.round(w.temperature);
-        const wind = Math.round(w.windspeed);
-        const dir = windDirection(w.winddirection);
-        const sub = widget.querySelector('.quick-item__sublabel');
-        if (sub) sub.innerHTML = `🌡️ ${temp}° · 💨 ${wind} km/h · ${dir}`;
-        const label = widget.querySelector('.quick-item__label');
-        if (label) label.textContent = t('weather');
-      })
-      .catch(() => {
-        const sub = widget.querySelector('.quick-item__sublabel');
-        if (sub) sub.textContent = t('weather_unavailable');
-      });
-  }
-
-  function windDirection(deg) {
-    const dirs = ['N','NE','E','SE','S','SW','W','NW'];
-    const it = ['N','NE','E','SE','S','SO','O','NO'];
-    const de = ['N','NO','O','SO','S','SW','W','NW'];
-    const idx = Math.round(deg / 45) % 8;
-    if (currentLang === 'it') return it[idx];
-    if (currentLang === 'de') return de[idx];
-    return dirs[idx];
-  }
-
-  /* === WHATSAPP FLOAT === */
-  function renderWhatsApp() {
-    if (document.getElementById('whatsapp-float')) return;
-    const btn = document.createElement('a');
-    btn.id = 'whatsapp-float';
-    btn.href = 'https://wa.me/393931104422?text=' + encodeURIComponent(
-      currentLang === 'it' ? 'Ciao Angelo, sono ospite di Piccolabellavista' :
-      (currentLang === 'de' ? 'Hallo Angelo, ich bin Gast bei Piccolabellavista' :
-      'Hi Angelo, I\'m a guest at Piccolabellavista')
-    );
-    btn.target = '_blank';
-    btn.rel = 'noopener noreferrer';
-    btn.setAttribute('aria-label', currentLang === 'it' ? 'Scrivi su WhatsApp' : 'Write on WhatsApp');
-    btn.innerHTML = `<svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`;
-    document.body.appendChild(btn);
-  }
-
-  function init() {
-    buildMenu();
-    openApp();
-  }
-
-  // Expose
-  window.App = {
-    renderCurrent: renderRoute,
-    openBeach,
-    openEvento,
-    openArcheo,
-    openSheet,
-    closeSheet
-  };
-
-  function updateConnection(){const el=document.getElementById('offline-note');if(el){el.hidden=navigator.onLine;el.textContent=t('offline_note');}}
-  window.addEventListener('online',()=>{updateConnection();initWeather();});
-  window.addEventListener('offline',updateConnection);
-  document.addEventListener('keydown',e=>{
-    if(e.key!=='Tab')return;
-    const active=sheet.getAttribute('aria-hidden')==='false'?sheet:menu.getAttribute('aria-hidden')==='false'?menu:null;
-    if(!active)return;
-    const els=[...active.querySelectorAll('a[href],button,input,[tabindex="0"]')].filter(el=>!el.disabled);
-    if(!els.length)return;
-    const first=els[0],last=els[els.length-1];
-    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
-    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
-  });
-  init();
-  updateConnection();
+/* ---------- testi statici ---------- */
+function applyStaticTexts(){
+ document.querySelectorAll("[data-i18n]").forEach(el=>{el.textContent=t(el.dataset.i18n);});
+ document.title=t("doc_title"); $("#menu").setAttribute("aria-label",t("navigation")); $("#sheet").setAttribute("aria-label",t("open_card")); $("#sheet-x").setAttribute("aria-label",t("close")); $("#burger").setAttribute("aria-label",t("navigation")); document.querySelectorAll(".langs button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.lang===LANG));}
+/* ---------- init ---------- */
+(async function init(){
+ applyStaticTexts();
+ const lb=document.querySelector('.langs button[data-lang="'+LANG+'"]');if(lb)lb.classList.add("on");
+ await Promise.resolve(); // Let the event bindings below initialise before the first render.
+ buildEventIndex();
+ loadEvents();
+ fetchWind().then(()=>{if(state.route==="home")renderToday();});
+ state.route=resolveRoute(location.hash);
+ render();
+ setupOffline();
 })();
+
+window.addEventListener("hashchange",()=>{const hash=location.hash.slice(1);if(hash==="view"||hash==="esplora")return;closeMenu(false);state.route=resolveRoute(hash);render();$("#view").focus({preventScroll:true});});
+document.querySelectorAll(".langs button").forEach(b=>b.addEventListener("click",()=>{
+ LANG=b.dataset.lang;storage.set("pbv_lang",LANG);document.documentElement.lang=LANG;
+ document.querySelectorAll(".langs button").forEach(x=>x.classList.toggle("on",x===b));
+ applyStaticTexts();render();showConnectionStatus();}));
+const burger=$("#burger"),menu=$("#menu"),scrim=$("#scrim");
+const mobileMenu=()=>window.matchMedia("(max-width:719px)").matches;
+function setBackgroundInert(inert){
+ for(const selector of [".topbar","#view",".foot","#bottom-nav"])$(selector).inert=inert;
+ menu.inert=inert||(mobileMenu()&&!menu.classList.contains("open"));
+}
+function closeMenu(restore=true){
+ const open=menu.classList.contains("open");menu.classList.remove("open");scrim.classList.remove("open");
+ burger.setAttribute("aria-expanded","false");document.body.style.overflow="";setBackgroundInert(false);
+ if(open&&restore)burger.focus();
+}
+function openMenu(){
+ menu.classList.add("open");scrim.classList.add("open");burger.setAttribute("aria-expanded","true");
+ if(mobileMenu()){setBackgroundInert(true);menu.inert=false;document.body.style.overflow="hidden";}
+ menu.querySelector("a")?.focus();
+}
+burger.addEventListener("click",()=>menu.classList.contains("open")?closeMenu():openMenu());
+scrim.addEventListener("click",()=>closeMenu());
+menu.addEventListener("click",e=>{if(e.target.closest("a"))closeMenu(false);});
+$("#sheet-x").addEventListener("click",closeSheet);
+$("#sheet-backdrop").addEventListener("click",closeSheet);
+function syncMenu(){if(!mobileMenu())closeMenu(false);else menu.inert=!menu.classList.contains("open");}
+syncMenu();window.addEventListener("resize",syncMenu);
+document.addEventListener("keydown",e=>{
+ if(e.key==="Escape"){if($("#sheet").classList.contains("open"))closeSheet();else closeMenu();}
+ const dialog=$("#sheet.open")||(mobileMenu()&&menu.classList.contains("open")?menu:null);
+ if(e.key!=="Tab"||!dialog)return;
+ const items=[...dialog.querySelectorAll('a[href],button,input,[tabindex="0"]')].filter(el=>el.offsetParent!==null);
+ const first=items[0],last=items.at(-1);if(!first)return;
+ if(e.shiftKey&&(document.activeElement===first||!dialog.contains(document.activeElement))){e.preventDefault();last.focus();}
+ if(!e.shiftKey&&(document.activeElement===last||!dialog.contains(document.activeElement))){e.preventDefault();first.focus();}
+});
+function renderBottomNav(){
+ const links=[["home","nav_home"],["spiagge","nav_spiagge"],["mangiare","nav_mangiare"],["casa","nav_casa"]];
+ $("#bottom-nav").setAttribute("aria-label",t("quick_navigation"));
+ $("#bottom-nav").innerHTML=links.map(([route,key])=>'<a href="#'+route+'"'+(state.route===route?' aria-current="page"':'')+'>'+esc(t(key))+'</a>').join("")+'<button type="button" id="bottom-more" aria-controls="menu">'+esc(t("nav_more"))+'</button>';
+ $("#bottom-more").addEventListener("click",openMenu);
+ for(const a of menu.querySelectorAll("a")){if(a.hash==="#"+state.route)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current");}
+}
+let offlineState="offline_preparing";
+function showConnectionStatus(){const el=$("#connection-status");el.hidden=false;el.textContent=t(navigator.onLine?offlineState:(navigator.serviceWorker?.controller?"offline_active":"offline_unavailable"));}
+async function setupOffline(){
+ showConnectionStatus();
+ if(!("serviceWorker" in navigator)){offlineState="offline_unavailable";showConnectionStatus();return;}
+ try{
+  await navigator.serviceWorker.register("./sw.js",{scope:"./",updateViaCache:"none"});
+  await navigator.serviceWorker.ready;
+  if(navigator.serviceWorker.controller)offlineState="offline_ready";
+  showConnectionStatus();
+ }catch{offlineState="offline_unavailable";showConnectionStatus();}
+}
+window.addEventListener("offline",()=>{state.apiWind=null;showConnectionStatus();if(["home","vento"].includes(state.route))render();});
+window.addEventListener("online",()=>{showConnectionStatus();fetchWind().then(()=>{if(["home","vento"].includes(state.route))render();});});
+if("serviceWorker" in navigator){
+ const hadController=!!navigator.serviceWorker.controller;let reloading=false;
+ navigator.serviceWorker.addEventListener("controllerchange",()=>{
+  offlineState="offline_ready";showConnectionStatus();
+  if(hadController&&!reloading){reloading=true;location.reload();}
+ });
+}
