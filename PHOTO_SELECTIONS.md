@@ -189,5 +189,13 @@ Distingue in modo rigoroso:
 - Soggetto: spiaggia e torre di San Giovanni di Sinis.
 - Stato: `SCELTA_ESTETICA_CONFERMATA` + `APPROVATA_USO`.
 
+### La Pelosa
+- Scelta utente: foto n.1.
+- Asset scelto: Wikimedia Commons `Stintino, La Pelosa beach - panoramio (2).jpg`.
+- Autore: goldpicasa.
+- Dimensioni originali: 1600 × 1065.
+- Licenza: CC BY 3.0.
+- Stato: `SCELTA_ESTETICA_CONFERMATA` + `APPROVATA_USO`.
+
 ## Vincolo
 Nessuna sostituzione delle scelte confermate. I fallback restano temporanei.
