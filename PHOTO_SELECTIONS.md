@@ -164,5 +164,13 @@ Distingue in modo rigoroso:
 - Licenza: CC BY-SA 4.0.
 - Stato: `SCELTA_ESTETICA_CONFERMATA` + `APPROVATA_USO`.
 
+### Cala Sinzias
+- Scelta utente: foto n.1.
+- Asset scelto: Wikimedia Commons `Spiaggia - Cala Sinzias, Castiadas, Cagliari, Italia - 29 Maggio 2026 01.jpg`.
+- Autore: Giorgio Galeotti.
+- Dimensioni originali: 8319 × 5546.
+- Licenza: CC BY-SA 4.0.
+- Stato: `SCELTA_ESTETICA_CONFERMATA` + `APPROVATA_USO`.
+
 ## Vincolo
 Nessuna sostituzione delle scelte confermate. I fallback restano temporanei.
