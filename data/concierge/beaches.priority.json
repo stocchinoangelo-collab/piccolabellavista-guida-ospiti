@@ -12,34 +12,11 @@
     },
     "tags": ["urban", "services", "easy"],
     "location": {"area": "Cagliari"},
-    "mobility": {
-      "carRequired": false,
-      "publicTransportFriendly": true,
-      "walkingFriendly": false
-    },
-    "editorial": {
-      "whyWeRecommend": {
-        "it": "È il mare più semplice da vivere senza organizzare una giornata intera.",
-        "en": "It is the easiest beach option when guests do not want to plan a full day.",
-        "de": "Die einfachste Strandoption, wenn Gäste keinen ganzen Tag planen möchten."
-      }
-    },
-    "operationalClaims": [
-      {
-        "key": "services",
-        "value": {"it": "Lungomare con stabilimenti balneari, diving center, scuole di vela e altri servizi turistici."},
-        "validFrom": "2026-09-08",
-        "volatility": "medium",
-        "source": "https://cagliariturismo.comune.cagliari.it/it/vivicagliari/spiaggia-del-poetto",
-        "checkedAt": "2026-09-08"
-      }
-    ],
-    "verification": {
-      "status": "verified",
-      "checkedAt": "2026-09-08",
-      "source": "Comune di Cagliari / Cagliari Turismo",
-      "notes": "Descrizione generale e presenza di servizi verificate. Tempi di percorrenza, parcheggi specifici e condizioni meteo restano dinamici."
-    }
+    "mobility": {"carRequired": false, "publicTransportFriendly": true, "walkingFriendly": false},
+    "editorial": {"whyWeRecommend": {"it": "È il mare più semplice da vivere senza organizzare una giornata intera.", "en": "It is the easiest beach option when guests do not want to plan a full day.", "de": "Die einfachste Strandoption, wenn Gäste keinen ganzen Tag planen möchten."}},
+    "media": [{"src": "images/poetto.webp", "rightsStatus": "verified"}],
+    "operationalClaims": [{"key": "services", "value": {"it": "Lungomare con stabilimenti balneari, diving center, scuole di vela e altri servizi turistici."}, "validFrom": "2026-09-08", "volatility": "medium", "source": "https://cagliariturismo.comune.cagliari.it/it/vivicagliari/spiaggia-del-poetto", "checkedAt": "2026-09-08"}],
+    "verification": {"status": "verified", "checkedAt": "2026-09-08", "source": "Comune di Cagliari / Cagliari Turismo", "notes": "Descrizione generale e presenza di servizi verificate. Tempi di percorrenza, parcheggi specifici e condizioni meteo restano dinamici."}
   },
   {
     "id": "mari_pintau",
@@ -47,74 +24,28 @@
     "status": "active",
     "access": "guest",
     "name": "Mari Pintau",
-    "summary": {
-      "it": "Caletta della costa di Quartu, molto adatta alle giornate di mare fuori città.",
-      "en": "A Quartu coast cove suited to a beach day outside the city.",
-      "de": "Eine Bucht an der Küste von Quartu für einen Strandtag außerhalb der Stadt."
-    },
+    "summary": {"it": "Caletta della costa di Quartu, molto adatta alle giornate di mare fuori città.", "en": "A Quartu coast cove suited to a beach day outside the city.", "de": "Eine Bucht an der Küste von Quartu für einen Strandtag außerhalb der Stadt."},
     "tags": ["quartu", "seasonal-transport"],
     "location": {"area": "Quartu Sant'Elena"},
-    "mobility": {
-      "carRequired": false,
-      "publicTransportFriendly": true,
-      "walkingFriendly": false
-    },
-    "editorial": {
-      "whyWeRecommend": {
-        "it": "È una delle nostre scelte quando si vuole un mare più scenografico del Poetto senza spingersi troppo lontano.",
-        "en": "One of our choices for a more scenic sea than Poetto without going too far.",
-        "de": "Eine unserer Empfehlungen für eine landschaftlich reizvollere Küste als Poetto, ohne zu weit zu fahren."
-      }
-    },
-    "operationalClaims": [
-      {
-        "key": "summer_bus_2026",
-        "value": {"it": "Servizio CTM diretto da via Beethoven verso Mari Pintau attivo dal 4 luglio al 13 settembre 2026; partenze ogni ora, con alcune corse che proseguono verso Geremeas."},
-        "validFrom": "2026-07-04",
-        "validUntil": "2026-09-13",
-        "volatility": "high",
-        "source": "https://www.comune.quartu.ca.it/novita/comunicato-stampa/via-al-servizio-sperimentale-di-trasporto-pubblico-locale-verso-le-spiagge%2C-da-via-beethoven-a-geremeas-in-bus",
-        "checkedAt": "2026-09-08"
-      }
-    ],
-    "verification": {
-      "status": "verified",
-      "checkedAt": "2026-09-08",
-      "source": "Comune di Quartu Sant'Elena",
-      "notes": "Verificato il servizio stagionale 2026. Parcheggi, accessi puntuali e servizi in spiaggia richiedono verifica separata."
-    }
+    "mobility": {"carRequired": false, "publicTransportFriendly": true, "walkingFriendly": false},
+    "editorial": {"whyWeRecommend": {"it": "È una delle nostre scelte quando si vuole un mare più scenografico del Poetto senza spingersi troppo lontano.", "en": "One of our choices for a more scenic sea than Poetto without going too far.", "de": "Eine unserer Empfehlungen für eine landschaftlich reizvollere Küste als Poetto, ohne zu weit zu fahren."}},
+    "media": [{"src": "images/beaches/mari-pintau.webp", "rightsStatus": "verified"}],
+    "operationalClaims": [{"key": "summer_bus_2026", "value": {"it": "Servizio CTM diretto da via Beethoven verso Mari Pintau attivo dal 4 luglio al 13 settembre 2026; partenze ogni ora, con alcune corse che proseguono verso Geremeas."}, "validFrom": "2026-07-04", "validUntil": "2026-09-13", "volatility": "high", "source": "https://www.comune.quartu.ca.it/novita/comunicato-stampa/via-al-servizio-sperimentale-di-trasporto-pubblico-locale-verso-le-spiagge%2C-da-via-beethoven-a-geremeas-in-bus", "checkedAt": "2026-09-08"}],
+    "verification": {"status": "verified", "checkedAt": "2026-09-08", "source": "Comune di Quartu Sant'Elena", "notes": "Verificato il servizio stagionale 2026. Parcheggi, accessi puntuali e servizi in spiaggia richiedono verifica separata."}
   },
   {
     "id": "chia",
     "type": "beach",
     "status": "draft",
     "access": "guest",
-    "name": "Chia",
-    "summary": {
-      "it": "Area costiera di Domus de Maria con più spiagge, dune e torri costiere.",
-      "en": "Coastal area of Domus de Maria with several beaches, dunes and coastal towers.",
-      "de": "Küstengebiet von Domus de Maria mit mehreren Stränden, Dünen und Küstentürmen."
-    },
-    "tags": ["south-coast", "multi-beach-area"],
+    "name": "Chia / Su Giudeu",
+    "summary": {"it": "Area costiera di Domus de Maria con spiagge e dune; la foto selezionata rappresenta Su Giudeu.", "en": "Coastal area of Domus de Maria with beaches and dunes; the selected image represents Su Giudeu.", "de": "Küstengebiet von Domus de Maria mit Stränden und Dünen; das ausgewählte Bild zeigt Su Giudeu."},
+    "tags": ["south-coast", "su-giudeu"],
     "location": {"area": "Chia, Domus de Maria"},
-    "mobility": {
-      "carRequired": true,
-      "publicTransportFriendly": false,
-      "walkingFriendly": false
-    },
-    "editorial": {
-      "whyWeRecommend": {
-        "it": "È una delle giornate mare più complete a sud di Cagliari, con possibilità di combinare spiaggia e passeggiata panoramica.",
-        "en": "One of the most complete beach-day areas south of Cagliari, combining sea and panoramic walks.",
-        "de": "Eines der vielseitigsten Strandgebiete südlich von Cagliari, mit Meer und Aussichtsspaziergängen."
-      }
-    },
-    "verification": {
-      "status": "review_due",
-      "checkedAt": "2026-09-08",
-      "source": "Comune di Domus de Maria",
-      "notes": "L'area e la viabilità locale sono confermate, ma le tariffe/parcheggi costieri 2026 non sono state promosse nel dataset senza una fonte operativa specifica recuperata in questa sessione."
-    }
+    "mobility": {"carRequired": true, "publicTransportFriendly": false, "walkingFriendly": false},
+    "editorial": {"whyWeRecommend": {"it": "È una delle giornate mare più complete a sud di Cagliari, con possibilità di combinare spiaggia e passeggiata panoramica.", "en": "One of the most complete beach-day areas south of Cagliari, combining sea and panoramic walks.", "de": "Eines der vielseitigsten Strandgebiete südlich von Cagliari, mit Meer und Aussichtsspaziergängen."}},
+    "media": [{"src": "images/beaches/chia-su-giudeu.webp", "rightsStatus": "verified"}],
+    "verification": {"status": "review_due", "checkedAt": "2026-09-08", "source": "Comune di Domus de Maria", "notes": "Foto e diritti verificati. Tariffe, parcheggi e regole operative stagionali restano da verificare separatamente prima della pubblicazione come fatti correnti."}
   },
   {
     "id": "tuerredda",
@@ -122,62 +53,40 @@
     "status": "draft",
     "access": "guest",
     "name": "Tuerredda",
-    "summary": {
-      "it": "Baia molto scenografica della costa sud-occidentale.",
-      "en": "A highly scenic bay on the south-west coast.",
-      "de": "Eine besonders schöne Bucht an der Südwestküste."
-    },
+    "summary": {"it": "Baia molto scenografica della costa sud-occidentale.", "en": "A highly scenic bay on the south-west coast.", "de": "Eine besonders schöne Bucht an der Südwestküste."},
     "tags": ["south-west", "high-demand"],
-    "location": {"area": "Tuerredda"},
-    "mobility": {
-      "carRequired": true,
-      "publicTransportFriendly": false,
-      "walkingFriendly": false
-    },
-    "editorial": {
-      "whyWeRecommend": {
-        "it": "È una spiaggia da consigliare quando l'ospite vuole dedicare un'intera giornata al mare e accetta di organizzarsi in anticipo.",
-        "en": "A beach for guests willing to dedicate a full day and plan ahead.",
-        "de": "Ein Strand für Gäste, die einen ganzen Tag einplanen und sich vorher organisieren möchten."
-      }
-    },
-    "verification": {
-      "status": "review_due",
-      "checkedAt": "2026-09-08",
-      "source": "Da aggiornare con fonte comunale/gestore operativo",
-      "notes": "Non pubblicare ancora numero chiuso, prenotazione, tariffe o orari come fatti certi finché non viene recuperata una fonte operativa 2026."
-    }
+    "location": {"area": "Tuerredda, Teulada"},
+    "mobility": {"carRequired": true, "publicTransportFriendly": false, "walkingFriendly": false},
+    "editorial": {"whyWeRecommend": {"it": "È una spiaggia da consigliare quando l'ospite vuole dedicare un'intera giornata al mare e accetta di organizzarsi in anticipo.", "en": "A beach for guests willing to dedicate a full day and plan ahead.", "de": "Ein Strand für Gäste, die einen ganzen Tag einplanen und sich vorher organisieren möchten."}},
+    "media": [{"src": "images/beaches/tuerredda.webp", "rightsStatus": "verified"}],
+    "verification": {"status": "review_due", "checkedAt": "2026-09-08", "source": "Da aggiornare con fonte comunale/gestore operativo", "notes": "Foto e diritti verificati. Non pubblicare ancora numero chiuso, prenotazione, tariffe o orari come fatti certi finché non viene recuperata una fonte operativa corrente."}
   },
   {
-    "id": "villasimius_area",
+    "id": "porto_giunco",
     "type": "beach",
     "status": "draft",
     "access": "guest",
-    "name": "Area Villasimius",
-    "summary": {
-      "it": "Area mare con spiagge come Porto Giunco, Simius e Punta Molentis.",
-      "en": "Beach area including Porto Giunco, Simius and Punta Molentis.",
-      "de": "Strandgebiet mit Porto Giunco, Simius und Punta Molentis."
-    },
-    "tags": ["villasimius", "multi-beach-area"],
+    "name": "Porto Giunco",
+    "summary": {"it": "Spiaggia di Villasimius con il caratteristico stagno di Notteri alle spalle.", "en": "Villasimius beach backed by the distinctive Stagno di Notteri.", "de": "Strand bei Villasimius mit dem charakteristischen Stagno di Notteri im Hinterland."},
+    "tags": ["villasimius", "notteri"],
     "location": {"area": "Villasimius"},
-    "mobility": {
-      "carRequired": true,
-      "publicTransportFriendly": false,
-      "walkingFriendly": false
-    },
-    "editorial": {
-      "whyWeRecommend": {
-        "it": "È una delle aree più forti per una giornata mare completa, ma la scelta della spiaggia va adattata a vento, affollamento e regole stagionali.",
-        "en": "One of the strongest areas for a full beach day, but the specific beach should depend on wind, crowding and seasonal rules.",
-        "de": "Eines der besten Gebiete für einen ganzen Strandtag; die konkrete Wahl sollte sich nach Wind, Andrang und saisonalen Regeln richten."
-      }
-    },
-    "verification": {
-      "status": "review_due",
-      "checkedAt": "2026-09-08",
-      "source": "Da aggiornare con Comune di Villasimius / gestori ufficiali",
-      "notes": "Non promuovere accessi contingentati, parcheggi o prenotazioni 2026 finché non sono verificati con fonte operativa corrente."
-    }
+    "mobility": {"carRequired": true, "publicTransportFriendly": false, "walkingFriendly": false},
+    "editorial": {"whyWeRecommend": {"it": "La scegliamo quando l'ospite vuole una giornata mare molto scenografica e riconoscibile, con spiaggia e paesaggio lagunare nello stesso contesto.", "en": "A strong choice for guests seeking a scenic, distinctive beach day with both sea and lagoon landscape.", "de": "Eine starke Wahl für Gäste, die einen besonders landschaftlichen Strandtag mit Meer und Lagune suchen."}},
+    "media": [{"src": "images/beaches/porto-giunco.webp", "rightsStatus": "verified"}],
+    "verification": {"status": "review_due", "checkedAt": "2026-09-08", "source": "Da aggiornare con Comune di Villasimius / gestori ufficiali", "notes": "Foto e diritti verificati. Accessi, parcheggi, eventuali prenotazioni e regole stagionali richiedono fonte operativa corrente."}
+  },
+  {
+    "id": "punta_molentis",
+    "type": "beach",
+    "status": "draft",
+    "access": "guest",
+    "name": "Punta Molentis",
+    "summary": {"it": "Baia di Villasimius molto riconoscibile per la forma della costa, il mare turchese e le rocce.", "en": "A distinctive Villasimius bay known for its coastline shape, turquoise sea and rocks.", "de": "Eine markante Bucht bei Villasimius mit charakteristischer Küstenform, türkisfarbenem Meer und Felsen."},
+    "tags": ["villasimius", "scenic", "high-demand"],
+    "location": {"area": "Villasimius"},
+    "mobility": {"carRequired": true, "publicTransportFriendly": false, "walkingFriendly": false},
+    "editorial": {"whyWeRecommend": {"it": "È una delle spiagge più fotogeniche dell'area; va però consigliata solo dopo aver controllato le regole di accesso della stagione corrente.", "en": "One of the area's most photogenic beaches, but current-season access rules should be checked before recommending it operationally.", "de": "Einer der fotogensten Strände der Region; vor einer konkreten Empfehlung sollten jedoch die aktuellen saisonalen Zugangsregeln geprüft werden."}},
+    "media": [{"src": "images/beaches/punta-molentis.webp", "rightsStatus": "verified"}],
+    "verification": {"status": "review_due", "checkedAt": "2026-09-08", "source": "Da aggiornare con Comune di Villasimius / gestori ufficiali", "notes": "Foto e diritti verificati. Non promuovere numero chiuso, prenotazioni, parcheggi o tariffe senza verifica operativa corrente."}
   }
 ]
