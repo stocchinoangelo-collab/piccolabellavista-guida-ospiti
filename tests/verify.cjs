@@ -28,7 +28,7 @@ for(const lang of ['it','en','de']){
  assert(venues.includes(run("t('photo_context')")));
  assert(!/QuantoBasta|Cala Regina|Porto Sa Ruxi/i.test(pages.map(x=>x[1]).join('')));
  const home=run('pgHome()');
- for(const key of ['need_today','need_food','need_sea','need_help'])assert(home.includes(run(`t('${key}')`)));
+ for(const key of ['need_today','need_food','need_sea','need_help'])assert(home.includes(run(`esc(t('${key}'))`)));
  for(const key of ['photo_placeholder','local_selection','all_sections'])assert(run(`Object.hasOwn(I18N[LANG],'${key}')`));
 }
 assert.equal(run('EVENT_INDEX.filter(e=>e.start).length'),0,'Never promote recurring traditions to confirmed future dates');
@@ -64,6 +64,10 @@ const manifest=JSON.parse(read('manifest.webmanifest'));for(const icon of manife
  buckets.set('unrelated-cache',new Map());buckets.set('pbv-guide-other-scope-old',new Map());buckets.set('pbv-v15',new Map());
  handlers.activate({waitUntil:p=>job=p});await job;assert(claimed);assert(deleted.includes('pbv-v15'));assert(buckets.has('unrelated-cache'));assert(buckets.has('pbv-guide-other-scope-old'));
  for(const file of ['index.html','js/app.js',photos[0].file]){let reply;handlers.fetch({request:new Request(scope+file),respondWith:p=>reply=p});const response=await reply;assert.equal(response.status,200);assert((await response.arrayBuffer()).byteLength>0)}
+ online=true;
+ let liveReply;handlers.fetch({request:new Request(scope+'images/online-probe.webp'),respondWith:p=>liveReply=p});assert.equal(await (await liveReply).text(),'live','Network returns after offline');
+ online=false;
+ let savedReply;handlers.fetch({request:new Request(scope+'images/online-probe.webp'),respondWith:p=>savedReply=p});assert.equal(await (await savedReply).text(),'live','Successful network response is retained');
  let intercepted=false;handlers.fetch({request:new Request('https://api.open-meteo.com/x'),respondWith:()=>intercepted=true});assert.equal(intercepted,false);
  console.log(`PASS: ${renders} route/language renders; licensed local photos (runtime and precache); 8 foods; 9 venues; 7 transit destinations; manifest/local paths; gate reject/accept; SW install/activate/offline/isolation.`);
 })().catch(e=>{console.error(e);process.exitCode=1});

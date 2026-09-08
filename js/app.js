@@ -387,7 +387,7 @@ function render(keepScroll){
  const y=window.scrollY;
  const primary=['home','itinerari','mangiare','spiagge','senzaauto','utili'];
  const menuLink=r=>'<a href="#'+r+'"'+(state.route===r?' class="on" aria-current="page"':'')+'>'+esc(t('nav_'+r))+'</a>';
- $("#menu").innerHTML=primary.map(menuLink).join('')+'<details class="menu-more"'+(!primary.includes(state.route)?' open':'')+'><summary>'+esc(t('all_sections'))+'</summary><div class="menu-secondary">'+Object.keys(ROUTES).filter(r=>!primary.includes(r)).map(menuLink).join('')+'</div></details>';
+ $("#menu").innerHTML='<button class="menu-close btn btn--ghost" data-menu-close>'+esc(t('close'))+' ×</button>'+primary.map(menuLink).join('')+'<details class="menu-more"'+(!primary.includes(state.route)?' open':'')+'><summary>'+esc(t('all_sections'))+'</summary><div class="menu-secondary">'+Object.keys(ROUTES).filter(r=>!primary.includes(r)).map(menuLink).join('')+'</div></details>';
  closeSheet();
  const fn=ROUTES[state.route]||pgHome;
  $("#view").innerHTML=fn();
@@ -453,7 +453,7 @@ document.querySelectorAll(".langs button").forEach(b=>b.addEventListener("click"
 const burger=$("#burger"),menu=$("#menu"),scrim=$("#scrim");
 burger.addEventListener("click",()=>{menu.classList.toggle("open");scrim.classList.toggle("open");menu.inert=!menu.classList.contains("open");burger.setAttribute("aria-expanded",menu.classList.contains("open"));});
 scrim.addEventListener("click",()=>{menu.classList.remove("open");scrim.classList.remove("open");burger.setAttribute("aria-expanded","false");menu.inert=window.matchMedia("(max-width:719px)").matches;});
-menu.addEventListener("click",e=>{if(e.target.closest("a")){menu.classList.remove("open");scrim.classList.remove("open");burger.setAttribute("aria-expanded","false");menu.inert=window.matchMedia("(max-width:719px)").matches;}});
+menu.addEventListener("click",e=>{if(e.target.closest("a,[data-menu-close]")){menu.classList.remove("open");scrim.classList.remove("open");burger.setAttribute("aria-expanded","false");menu.inert=window.matchMedia("(max-width:719px)").matches;}});
 $("#sheet-x").addEventListener("click",closeSheet);
 $("#sheet-backdrop").addEventListener("click",closeSheet);
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeSheet();});
@@ -462,12 +462,12 @@ function syncMenu(){menu.inert=window.matchMedia("(max-width:719px)").matches&&!
 syncMenu();window.addEventListener("resize",syncMenu);
 document.addEventListener("keydown",e=>{
  if(e.key==="Escape"&&menu.classList.contains("open")){menu.classList.remove("open");scrim.classList.remove("open");burger.setAttribute("aria-expanded","false");syncMenu();burger.focus();}
- const dialog=$("#sheet.open")||$("#gate:not(.hidden)");
+ const dialog=$("#sheet.open")||$("#gate:not(.hidden)")||(window.matchMedia("(max-width:719px)").matches&&$("#menu.open"));
  if(e.key!=="Tab"||!dialog)return;
- const focusable=[...dialog.querySelectorAll('a[href],button,input,[tabindex="0"]')].filter(el=>el.offsetParent!==null);
+ const focusable=[...dialog.querySelectorAll('a[href],button,input,summary,[tabindex="0"]')].filter(el=>el.offsetParent!==null);
  const first=focusable[0],last=focusable.at(-1);
- if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
- if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+ if(e.shiftKey&&(document.activeElement===first||!dialog.contains(document.activeElement))){e.preventDefault();last.focus();}
+ if(!e.shiftKey&&(document.activeElement===last||!dialog.contains(document.activeElement))){e.preventDefault();first.focus();}
 });
 
 if("serviceWorker" in navigator){const hadController=!!navigator.serviceWorker.controller;let reloading=false;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(hadController&&!reloading){reloading=true;location.reload();}});}
