@@ -7,10 +7,10 @@ Base: `3cba9cb422bc732699337676d4d84be30caff856`.
 
 ## Commit tematici
 
-- `3eb395b` — audit scritto prima delle modifiche al codice.
-- `65491d9` — homepage per bisogni, navigazione principale ridotta, tema caldo, didascalie e placeholder IT/EN/DE.
-- `3f8cae7` — controlli sui fallback autorizzati e versione cache. Durante questo passo rilevato un errore nel nuovo test (confronto testo non escapato); corretto nel commit seguente.
-- `f1965cb` — chiusura menu mobile, contenimento focus, confronto HTML escapato e test ritorno rete.
+- `181e896` — audit scritto prima delle modifiche al codice.
+- `aa77bcb` — homepage per bisogni, navigazione principale ridotta, tema caldo, didascalie e placeholder IT/EN/DE.
+- `dba6d71` — controlli sui fallback autorizzati e versione cache. Durante questo passo rilevato un errore nel nuovo test (confronto testo non escapato); corretto nel commit seguente.
+- `f2f462a` — chiusura menu mobile, contenimento focus, confronto HTML escapato e test ritorno rete.
 - Il commit di questo report contiene soltanto documentazione QA.
 
 ## Prima / dopo e motivazioni
@@ -64,3 +64,7 @@ Il tentativo iniziale con Playwright locale non è partito: eseguibile Chromium 
 ## Invariati
 
 **main non modificato.** Nessun merge, deploy, modifica Cloudflare/Zero Trust o workflow. Invariati `css/style.css`, manifest e icone, `js/data.js`, `js/guide.js`, `js/photos.js`, tutti gli asset, registri diritti/crediti/scelte fotografiche, JSON Concierge e modello contenuti, indirizzi e contatti, politica cache e gate. Nessuna credenziale introdotta, nessuna pubblicazione in produzione.
+
+## Salvataggio remoto
+
+Commit tematici trasferiti tramite il connettore GitHub autenticato dopo il fallimento del push terminale per credenziali assenti. I riferimenti sopra sono i commit remoti. Aggiornato esclusivamente concierge/redesign-v2 con fast-forward, senza force. Nessun merge o deploy richiesto.
