@@ -47,3 +47,5 @@ Verifica: 8 settembre 2026. Tutte le derivate WebP conservano la licenza della f
 - cala_luna: Sven Jungnickel — [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) — [Fonte originale](https://commons.wikimedia.org/wiki/File:Cala_Luna.jpg). Asset: `images/beaches/cala-luna.webp`.
 
 - bastione: Elisa.Mnn — [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) — [Fonte originale](https://commons.wikimedia.org/wiki/File:Bastione_di_San_Remy,_prospetto.jpg). Asset: `images/bastione.webp`.
+
+- calamosca_context: Cristiano Cani — [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) — [Fonte originale](https://commons.wikimedia.org/wiki/File:Torre_e_faro_di_Calamosca.jpg). Asset: `images/restaurants/calamosca-context-cristiano-cani.webp`. Fallback ambientale, non foto del locale.

@@ -122,4 +122,23 @@ const PHOTOS = {
     "alt":{"it":"Bastione di Saint Remy a Cagliari","en":"Bastione di Saint Remy in Cagliari","de":"Bastione di Saint Remy in Cagliari"},
     "author":"Elisa.Mnn","license":"CC BY-SA 4.0","licenseUrl":"https://creativecommons.org/licenses/by-sa/4.0/","source":"https://commons.wikimedia.org/wiki/File:Bastione_di_San_Remy,_prospetto.jpg","status":"APPROVATA_USO","thumb":"images/bastione-800.webp"
   }
+  ,
+  "calamosca_context": {
+    "file":"images/restaurants/calamosca-context-cristiano-cani.webp",
+    "width":2589,
+    "height":1359,
+    "position":"50% 50%",
+    "alt":{
+      "it":"Torre e faro di Calamosca sul promontorio di Capo Sant’Elia",
+      "en":"Calamosca tower and lighthouse on the Capo Sant’Elia headland",
+      "de":"Turm und Leuchtturm von Calamosca am Kap Sant’Elia"
+    },
+    "author":"Cristiano Cani",
+    "license":"CC BY 2.0",
+    "licenseUrl":"https://creativecommons.org/licenses/by/2.0/",
+    "source":"https://commons.wikimedia.org/wiki/File:Torre_e_faro_di_Calamosca.jpg",
+    "status":"APPROVATA_USO_FALLBACK_AMBIENTALE",
+    "thumb":"images/restaurants/calamosca-context-cristiano-cani-800.webp"
+  }
+
 };
