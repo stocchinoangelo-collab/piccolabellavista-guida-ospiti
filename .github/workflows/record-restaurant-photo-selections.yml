@@ -1,0 +1,36 @@
+name: Record restaurant photo selections
+
+on:
+  push:
+    branches:
+      - foundation/concierge-content-model
+    paths:
+      - scripts/record-restaurant-photo-selections.py
+      - .github/workflows/record-restaurant-photo-selections.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: foundation/concierge-content-model
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/record-restaurant-photo-selections.py
+      - name: Commit PHOTO_SELECTIONS.md
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add PHOTO_SELECTIONS.md
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "Record confirmed restaurant photo selections"
+            git push
+          fi
