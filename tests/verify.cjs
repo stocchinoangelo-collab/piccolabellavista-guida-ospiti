@@ -23,7 +23,13 @@ for(const lang of ['it','en','de']){
  assert(run('pgAperitivi()').includes('Biffi American Bar'));
  assert.equal(run('GUIDE.transit.length'),7);
  assert(run('pgSenzaAuto()').includes('Piazza Nazzari'));
- assert(!run('pgMangiare()+pgAperitivi()').includes('<img'));
+ const venues=run('pgMangiare()+pgAperitivi()');
+ for(const m of venues.matchAll(/<img[^>]+src="([^"]+)"/g))assert(['images/bastione.webp','images/restaurants/calamosca-context-cristiano-cani.webp'].includes(m[1]),'Only approved context photographs in venues');
+ assert(venues.includes(run("t('photo_context')")));
+ assert(!/QuantoBasta|Cala Regina|Porto Sa Ruxi/i.test(pages.map(x=>x[1]).join('')));
+ const home=run('pgHome()');
+ for(const key of ['need_today','need_food','need_sea','need_help'])assert(home.includes(run(`t('${key}')`)));
+ for(const key of ['photo_placeholder','local_selection','all_sections'])assert(run(`Object.hasOwn(I18N[LANG],'${key}')`));
 }
 assert.equal(run('EVENT_INDEX.filter(e=>e.start).length'),0,'Never promote recurring traditions to confirmed future dates');
 assert.equal(run('csvToUnified({id:"x",nome:"Cancelled",data_inizio:"2026-10-01",stato:"annullato"})'),null);
@@ -31,7 +37,10 @@ assert.equal(run('safeUrl("javascript:alert(1)")'),'');
 ctx.escapeInput='<script>"&';assert.equal(run("esc(escapeInput)"),'&lt;script&gt;&quot;&amp;');
 const photos=JSON.parse(read('credits/photos.json'));
 for(const p of photos){assert(fs.statSync(path.join(root,p.file)).size>1000);assert(p.author&&p.license&&p.source&&p.licenseUrl);assert(!p.status.includes('PENDING'));if(p.thumb)assert(fs.existsSync(path.join(root,p.thumb)));}
-assert.equal(photos.length,11);
+assert(photos.length>=11); // Existing precache registry; runtime coverage checked separately below.
+const runtimePhotos=run('Object.values(PHOTOS).filter(p=>p.file)');
+for(const p of runtimePhotos){assert(p.status.startsWith('APPROVATA_USO'));assert(fs.existsSync(path.join(root,p.file)));assert(p.author&&p.license&&p.source);}
+
 for(const m of read('index.html').matchAll(/(?:src|href)="([^"]+)"/g)){if(!/^(https?:|#)/.test(m[1]))assert(fs.existsSync(path.join(root,m[1])),m[1]);}
 const manifest=JSON.parse(read('manifest.webmanifest'));for(const icon of manifest.icons)assert(fs.existsSync(path.join(root,icon.src)));assert.equal(manifest.display,'standalone');
 // Test service-worker lifecycle and offline responses with the real worker code.
@@ -56,5 +65,5 @@ const manifest=JSON.parse(read('manifest.webmanifest'));for(const icon of manife
  handlers.activate({waitUntil:p=>job=p});await job;assert(claimed);assert(deleted.includes('pbv-v15'));assert(buckets.has('unrelated-cache'));assert(buckets.has('pbv-guide-other-scope-old'));
  for(const file of ['index.html','js/app.js',photos[0].file]){let reply;handlers.fetch({request:new Request(scope+file),respondWith:p=>reply=p});const response=await reply;assert.equal(response.status,200);assert((await response.arrayBuffer()).byteLength>0)}
  let intercepted=false;handlers.fetch({request:new Request('https://api.open-meteo.com/x'),respondWith:()=>intercepted=true});assert.equal(intercepted,false);
- console.log(`PASS: ${renders} route/language renders; 11 licensed photos; 8 foods; 9 venues; 7 transit destinations; manifest/local paths; gate reject/accept; SW install/activate/offline/isolation.`);
+ console.log(`PASS: ${renders} route/language renders; licensed local photos (runtime and precache); 8 foods; 9 venues; 7 transit destinations; manifest/local paths; gate reject/accept; SW install/activate/offline/isolation.`);
 })().catch(e=>{console.error(e);process.exitCode=1});
