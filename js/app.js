@@ -364,7 +364,7 @@ function openSheet(id){
   html+='<dl class="kv">'+rows.map(r=>"<dt>"+esc(r[0])+"</dt><dd>"+esc(r[1])+"</dd>").join("")+"</dl>";
   html+='<p style="font-size:.95rem">'+esc(L(b.desc))+"</p>";
   html+='<p style="margin-top:.6rem"><b>✅ '+esc(t("when_go"))+":</b> "+esc(L(b.go))+"<br><b>⛔ "+esc(t("when_avoid"))+":</b> "+esc(L(b.avoid))+"</p>";
-  if(b.id==="pelosa")html+='<div class="notice">'+esc(t("check_access"))+'</div>';
+  if(["pelosa","la_pelosa","cala_brandinchi","tuerredda","punta_molentis","porto_giunco"].includes(b.id))html+='<div class="notice">'+esc(t("check_access"))+'</div>';
  }else{
   html+='<dl class="kv"><dt>'+esc(t("dist_lbl"))+"</dt><dd>🚗 ~"+fmtDrive(b.driveMin)+"</dd></dl>";
   html+='<dl class="kv">'+[["🏛️",L(b.why)],["📜",L(b.curio)],["👀",L(b.see)],["🍷",L(b.taste)],["⭐",L(b.rec)]].map(r=>"<dt>"+r[0]+"</dt><dd>"+esc(r[1])+"</dd>").join("")+"</dl>";
@@ -385,12 +385,14 @@ const ROUTES={home:pgHome,casa:pgCasa,mangiare:pgMangiare,aperitivi:pgAperitivi,
  natura:()=>gemListPage(g=>g.cats.includes("natura"),t("nat_t"),t("nat_s"),"natura")};
 function render(keepScroll){
  const y=window.scrollY;
- $("#menu").innerHTML=Object.keys(ROUTES).map(r=>'<a href="#'+r+'" class="'+(state.route===r?"on":"")+'">'+esc(t("nav_"+r))+"</a>").join("");
+ const primary=['home','itinerari','mangiare','spiagge','senzaauto','utili'];
+ const menuLink=r=>'<a href="#'+r+'"'+(state.route===r?' class="on" aria-current="page"':'')+'>'+esc(t('nav_'+r))+'</a>';
+ $("#menu").innerHTML=primary.map(menuLink).join('')+'<details class="menu-more"'+(!primary.includes(state.route)?' open':'')+'><summary>'+esc(t('all_sections'))+'</summary><div class="menu-secondary">'+Object.keys(ROUTES).filter(r=>!primary.includes(r)).map(menuLink).join('')+'</div></details>';
  closeSheet();
  const fn=ROUTES[state.route]||pgHome;
  $("#view").innerHTML=fn();
  bindGlobal($("#view"));
- const explore=$("[data-explore]");if(explore)explore.addEventListener("click",e=>{e.preventDefault();$("#esplora").scrollIntoView({behavior:"smooth"});});
+ const explore=$("[data-explore]");if(explore)explore.addEventListener("click",e=>{e.preventDefault();$("#esplora").scrollIntoView({behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});});
  hydrateArts($("#view"));
  if(state.route==="home")renderToday();
  window.scrollTo({top:keepScroll?y:0});

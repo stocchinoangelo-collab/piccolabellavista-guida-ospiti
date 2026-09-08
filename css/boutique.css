@@ -93,7 +93,7 @@ h2.sec{font-size:clamp(1.5rem,3vw,2rem);font-weight:400;line-height:1.25;display
 /* Legal photo placeholder for venues without an approved image. This is a graphic component, not a photograph. */
 .venue-photo-placeholder{aspect-ratio:3/2;display:flex;align-items:flex-end;position:relative;overflow:hidden;border-radius:6px;background:linear-gradient(145deg,#f4efe6 0%,#e9eef0 58%,#d7e4e8 100%);border:1px solid #d6dfe2;padding:20px;color:var(--ink)}
 .venue-photo-placeholder::before{content:'';position:absolute;inset:18px 18px auto auto;width:72px;height:72px;border:1px solid rgba(19,87,119,.2);border-radius:50%}
-.venue-photo-placeholder::after{content:'Piccolabellavista · selezione locale';font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--sea);position:relative;z-index:1}
+.venue-photo-placeholder::after{content:none;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--sea);position:relative;z-index:1}
 .venue-photo-placeholder[data-tone='sea']{background:linear-gradient(145deg,#f5f0e6 0%,#dfeaec 55%,#bfd4db 100%)}
 .venue-photo-placeholder[data-tone='stone']{background:linear-gradient(145deg,#f3eee5 0%,#e9e0d3 55%,#d8cec0 100%)}
 .venue-photo-placeholder[data-tone='evening']{background:linear-gradient(145deg,#f2e8dc 0%,#e5d4c1 45%,#c8d5da 100%)}
@@ -101,3 +101,35 @@ h2.sec{font-size:clamp(1.5rem,3vw,2rem);font-weight:400;line-height:1.25;display
 @media(max-width:1000px){.discovery-grid{grid-template-columns:repeat(2,1fr)}.food-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.home-hero{min-height:580px;padding:32px}.hero-copy h1{font-size:2.8rem}}
 @media(max-width:719px){main{padding:0 18px 48px}.topbar{padding:10px 12px;gap:4px;min-height:66px}.brand{font-size:1.05rem;letter-spacing:-.04em}.langs button{min-width:36px;padding:6px}.hero{padding:32px 0 24px}.home-hero{margin-top:16px;min-height:570px;padding:28px 22px}.hero-copy h1{font-size:2.3rem;max-width:17ch}.hero-copy p{font-size:.94rem}.home-hero>.hero-photo{object-position:64% 40%!important}.home-hero::after{background:linear-gradient(0deg,rgba(5,27,42,.93),rgba(5,27,42,.55) 52%,rgba(5,27,42,.03) 80%)}.home-hero .kicker{font-size:.68rem;letter-spacing:.08em}.edition{font-size:.65rem;letter-spacing:.06em}.menu{padding-top:28px}.menu a{font-size:1rem}section.blk{margin-top:38px}.discovery-grid{gap:14px}.discovery h3{font-size:1.3rem}.discovery p{font-size:.875rem}.discovery .ordinal{margin-bottom:9px}.taste-preview{grid-template-columns:1fr;padding:24px;gap:24px}.taste-preview .sec{font-size:1.55rem}.food-grid,.house-layout{grid-template-columns:1fr}.card__body{padding:23px}.venue .card__body{min-height:0;padding:22px 22px 24px}.venue h2{font-size:1.6rem}.venue .card__foot{margin-top:8px}.itin li{display:block}.itin li b{display:block}.notice{padding:18px}.grid{gap:20px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* Concierge: guest needs take precedence over the catalogue. */
+:root{--bg:#faf7f0;--sand:#efe5d5;--line:#dfd8ca;--terra:#9a492d;--terra-dk:#75351f}
+.topbar,.menu{background:var(--bg)}
+.home-hero{min-height:420px;padding:36px 42px}
+.hero-copy h1{font-size:clamp(2rem,3.6vw,3.2rem)}
+.home-hero::after{background:linear-gradient(90deg,rgba(5,27,42,.88),rgba(5,27,42,.42))}
+.concierge-today,.concierge-help{display:grid;grid-template-columns:1.4fr 1fr;gap:24px;padding:30px;background:var(--sand);border-radius:8px;align-items:center}
+.concierge-today .ordinal,.concierge-food .ordinal,.concierge-help .ordinal{color:var(--terra-dk)}
+.context-links{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.concierge-food{display:grid;grid-template-columns:1fr 1.15fr;gap:36px;align-items:center}
+.concierge-food>.photo{border-radius:8px}
+.concierge-places{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.concierge-help{background:#eee8dc}
+.today-details>summary,.menu-more>summary{cursor:pointer;min-height:44px;padding:10px 14px;color:var(--sea);font-weight:600}
+.menu-more{position:relative}.menu-more[open]{flex-basis:100%}.menu-secondary{display:flex;flex-wrap:wrap;gap:4px}
+.media-caption{padding:8px 18px;font-size:.8rem;color:var(--ink-soft)}
+.venue-photo-placeholder span{font-size:.75rem;letter-spacing:.08em;color:var(--ink)}
+.venue .card__body{min-height:0}
+.btn--primary:hover{color:#fff;background:var(--terra-dk)}
+.home-hero .btn--primary:hover{color:var(--ink);background:var(--sand)}
+#esplora{scroll-margin-top:90px}
+@media(max-width:719px){
+ .home-hero{min-height:370px;padding:26px 22px}.hero-copy h1{font-size:2rem;max-width:20ch}
+ .home-hero::after{background:linear-gradient(0deg,rgba(5,27,42,.94),rgba(5,27,42,.5))}
+ .concierge-today,.concierge-food,.concierge-help{grid-template-columns:1fr;gap:20px}
+ .concierge-today,.concierge-help{padding:24px}
+ .concierge-places{grid-template-columns:1fr;gap:18px}.concierge-places .photo{aspect-ratio:2/1}
+ .concierge-food>.photo{aspect-ratio:2/1}.langs button{min-width:40px;min-height:44px}
+ .menu-secondary{display:block}.menu-more>summary{font-size:1rem}
+ .brand{font-size:1rem}.context-links>*{max-width:100%}
+}

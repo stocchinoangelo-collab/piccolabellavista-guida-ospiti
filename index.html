@@ -14,11 +14,7 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/boutique.css">
-<style>
-/* Venue cards now include photography/fallback media: avoid legacy text-only card height. */
-.venue .card__body{min-height:220px}
-@media(max-width:719px){.venue .card__body{min-height:0}}
-</style>
+
 </head>
 <body>
 <a class="skip" href="#view" data-i18n="skip_content"></a>
@@ -34,7 +30,7 @@
   </div>
 </div>
 <header class="topbar">
-  <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <button class="burger" id="burger" aria-label="Menu" aria-expanded="false" aria-controls="menu"><span></span><span></span><span></span></button>
   <a class="brand" href="#home">Piccola<span>bella</span>vista</a>
   <div class="langs" role="group" aria-label="Lingua / Language / Sprache">
     <button data-lang="it" aria-label="Italiano">IT</button>
