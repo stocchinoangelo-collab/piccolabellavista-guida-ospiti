@@ -1,6 +1,6 @@
 /* Versioned app shell and local photography. Live services are never fabricated offline. */
 const PREFIX='pbv-guide-'+encodeURIComponent(new URL(self.registration.scope).pathname)+'-';
-const CACHE=PREFIX+'2026-09-06-1';
+const CACHE=PREFIX+'2026-09-08-1';
 const CORE=['./','index.html','css/style.css','css/boutique.css','js/i18n.js','js/data.js','js/guide.js','js/photos.js','js/editorial.js','js/app.js','manifest.webmanifest','icon.svg','icons/icon-192.png','icons/icon-512.png','icons/maskable-512.png','credits/photos.json'];
 self.addEventListener('install',event=>{
  event.waitUntil((async()=>{
