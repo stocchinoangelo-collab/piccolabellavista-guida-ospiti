@@ -364,7 +364,7 @@ function openSheet(id){
   html+='<dl class="kv">'+rows.map(r=>"<dt>"+esc(r[0])+"</dt><dd>"+esc(r[1])+"</dd>").join("")+"</dl>";
   html+='<p style="font-size:.95rem">'+esc(L(b.desc))+"</p>";
   html+='<p style="margin-top:.6rem"><b>✅ '+esc(t("when_go"))+":</b> "+esc(L(b.go))+"<br><b>⛔ "+esc(t("when_avoid"))+":</b> "+esc(L(b.avoid))+"</p>";
-  if(["pelosa","la_pelosa","cala_brandinchi","tuerredda","punta_molentis","porto_giunco"].includes(b.id))html+='<div class="notice">'+esc(t("check_access"))+'</div>';
+  if(["pelosa","brandinchi","tuerredda","molentis","porto_giunco"].includes(b.id))html+='<div class="notice">'+esc(t("check_access"))+'</div>';
  }else{
   html+='<dl class="kv"><dt>'+esc(t("dist_lbl"))+"</dt><dd>🚗 ~"+fmtDrive(b.driveMin)+"</dd></dl>";
   html+='<dl class="kv">'+[["🏛️",L(b.why)],["📜",L(b.curio)],["👀",L(b.see)],["🍷",L(b.taste)],["⭐",L(b.rec)]].map(r=>"<dt>"+r[0]+"</dt><dd>"+esc(r[1])+"</dd>").join("")+"</dl>";

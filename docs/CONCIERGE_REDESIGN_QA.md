@@ -68,3 +68,38 @@ Il tentativo iniziale con Playwright locale non è partito: eseguibile Chromium 
 ## Salvataggio remoto
 
 Commit tematici trasferiti tramite il connettore GitHub autenticato dopo il fallimento del push terminale per credenziali assenti. I riferimenti sopra sono i commit remoti. Aggiornato esclusivamente concierge/redesign-v2 con fast-forward, senza force. Nessun merge o deploy richiesto.
+
+## Seconda verifica completa — richiesta «verifica tutto»
+
+Base remota verificata tramite API GitHub: `b64125febca7265471902cf7bf2301c6a471c3cc` sul branch richiesto. Confronto locale/remoto: codice identico, unica differenza iniziale nel report (hash commit aggiornati dopo trasferimento API). Checkout locale riallineato al remoto senza merge, nessun lavoro utente pendente.
+
+### Difetti trovati e corretti
+
+- **Quattro foto selezionate non comparivano.** Le schede usano `molentis`, `sinzias`, `pelosa`, `brandinchi`; il registro foto usa `punta_molentis`, `cala_sinzias`, `la_pelosa`, `cala_brandinchi`. Aggiunto mapping nel renderer; asset, crediti, diritti e dati originali invariati. Ora tutte le 13 spiagge con foto selezionata rendono la rispettiva immagine. Costa Rei resta senza immagine: non esiste una scelta approvata nel registro runtime e non viene inventata.
+- **Avviso stagionale assente su due spiagge.** La condizione introdotta nella prima passata usava identificativi errati per Punta Molentis e Cala Brandinchi. Ora l'avviso è verificato nelle schede di La Pelosa, Cala Brandinchi, Tuerredda, Punta Molentis e Porto Giunco, in IT/EN/DE.
+- **Copertura test insufficiente.** I 51 render precedenti controllavano le immagini presenti, senza rilevare quelle mancanti. Aggiunti 42 render di schede spiaggia (14 × 3 lingue), presenza delle 13 immagini selezionate, avvisi delle cinque spiagge e risoluzione dei link hash delle pagine. Questi controlli avrebbero rilevato i difetti precedenti.
+- Versione worker incrementata a `2026-09-08-concierge-v2-qa2`, senza cambiare la politica cache.
+
+### Prove supplementari
+
+| Controllo | Risultato |
+|---|---|
+| `node tests/verify.cjs` | PASS: 51 render pagina + 42 render dettaglio, route hash, foto selezionate, avvisi, manifest e simulazioni SW/gate |
+| Sintassi di tutti i sorgenti e script | PASS: 10 file JS/MJS/CJS, 5 script Python |
+| JSON e manifest | PASS sintattico: 7 file; validatore completo JSON Schema non disponibile, non dichiarata conformità completa allo schema |
+| Decodifica immagini | PASS: 49 WebP/PNG, nessun file corrotto |
+| Dizionari | Nessuna chiave IT mancante/vuota in EN/DE; non equivale a revisione madrelingua |
+| Diritti locali | Tutti i 9 record locali conservano `PENDING_PERMISSION`; renderer usa solo placeholder o i due contesti autorizzati |
+| Credenziali | Nessuna corrispondenza dei pattern di chiavi private e token GitHub controllati nel testo modificato; non è una certificazione universale |
+| Registri foto | 24 foto runtime, 11 nel precache; le 13 altre rimangono subordinate alla prima richiesta online |
+| `git diff --check` | PASS |
+
+### Cosa NON è diventato verde
+
+- Test reali a 360/390/412/768/1280 px, overflow, leggibilità DE, tastiera, menu/sheet, contrasto sul rendering, console browser, screenshot e installazione/aggiornamento PWA: **non verificati**. L'ambiente browser disponibile aveva rifiutato l'anteprima locale; non effettuato un deploy o creato URL alternativi per aggirare il blocco.
+- Revoca Access e cache-first: **blocco privacy ancora aperto**, nessuna modifica autorizzativa introdotta.
+- Note operative storiche: per esempio La Pelosa contiene ancora un intervallo stagionale di prenotazione obbligatoria nel dato originale. L'avviso aggiunto invita al controllo, ma **non verifica né aggiorna quel dato**. Serve revisione delle informazioni variabili prima di promuoverle a contenuto attuale.
+- Nome PWA nel manifest ancora “Guida privata alla Sardegna”: incongruenza editoriale minore con il titolo Concierge, manifest lasciato invariato per questa verifica.
+- Nessun controllo live completo dei link esterni o dello stato Cloudflare eseguito.
+
+**Esito aggiornato: candidata migliorata e verificata più a fondo, ancora NON pronta per merge o produzione. main non modificato; nessun merge, modifica Cloudflare/Zero Trust o deploy eseguito.**

@@ -19,6 +19,20 @@ for(const lang of ['it','en','de']){
   for(const m of html.matchAll(/<img\b[^>]*>/g))assert(/width="\d+"/.test(m[0])&&/height="\d+"/.test(m[0])&&/alt="[^"]+"/.test(m[0]));
   renders++;
  }
+ // Exercise every beach detail, not just top-level page string generation.
+ const sheetNodes={'#sheet-content':{innerHTML:''},'#sheet':{classList:{add(){}}},'#sheet-x':{focus(){}}};
+ ctx.document.querySelector=q=>sheetNodes[q];ctx.document.body={style:{}};
+ const beachIds=run('BEACHES.map(b=>b.id)');
+ for(const id of beachIds){
+  run(`openSheet('${id}')`);
+  const detail=sheetNodes['#sheet-content'].innerHTML;
+  assert(!detail.includes('undefined'),`${lang}/${id} detail undefined`);
+  if(id!=='costa_rei')assert(detail.includes('<img'),`${lang}/${id} approved beach image missing`);
+  if(['pelosa','brandinchi','tuerredda','molentis','porto_giunco'].includes(id))assert(detail.includes(run("esc(t('check_access'))")),`${lang}/${id} seasonal warning missing`);
+ }
+ for(const [route,html] of pages){
+  for(const m of html.matchAll(/href="#([^"\s]+)"/g))assert(run(`Object.hasOwn(ROUTES,'${m[1]}')`)||['esplora','view'].includes(m[1]),`${route}: unknown hash ${m[1]}`);
+ }
  assert.equal(run('FOOD.length'),8);assert.equal(run('GUIDE.restaurants.length'),5);assert.equal(run('GUIDE.aperitivi.length'),4);
  assert(run('pgAperitivi()').includes('Biffi American Bar'));
  assert.equal(run('GUIDE.transit.length'),7);
@@ -69,5 +83,5 @@ const manifest=JSON.parse(read('manifest.webmanifest'));for(const icon of manife
  online=false;
  let savedReply;handlers.fetch({request:new Request(scope+'images/online-probe.webp'),respondWith:p=>savedReply=p});assert.equal(await (await savedReply).text(),'live','Successful network response is retained');
  let intercepted=false;handlers.fetch({request:new Request('https://api.open-meteo.com/x'),respondWith:()=>intercepted=true});assert.equal(intercepted,false);
- console.log(`PASS: ${renders} route/language renders; licensed local photos (runtime and precache); 8 foods; 9 venues; 7 transit destinations; manifest/local paths; gate reject/accept; SW install/activate/offline/isolation.`);
+ console.log(`PASS: ${renders} route/language renders; 42 beach detail renders; 13 selected beach photos linked; licensed local photos (runtime and precache); 8 foods; 9 venues; 7 transit destinations; manifest/local paths; gate reject/accept; SW install/activate/offline/isolation.`);
 })().catch(e=>{console.error(e);process.exitCode=1});

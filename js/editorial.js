@@ -3,8 +3,9 @@ function pageHeading(title,sub){return '<section class="hero page-heading"><span
 function mapSearch(query){return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query);}
 function transitLink(query){return 'https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent(CONFIG.home.address)+'&destination='+encodeURIComponent(query)+'&travelmode=transit';}
 function externalLink(url,label,cls='btn btn--ghost'){return '<a class="'+cls+'" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">'+esc(label)+'</a>';}
+const PHOTO_ALIASES={molentis:'punta_molentis',sinzias:'cala_sinzias',pelosa:'la_pelosa',brandinchi:'cala_brandinchi'};
 function photoMarkup(id,hero=false){
- const p=PHOTOS[id];
+ const p=PHOTOS[PHOTO_ALIASES[id]||id];
  if(!p?.file)return '';
  return '<img class="photo'+(hero?' hero-photo':'')+'" src="'+esc(p.file)+'"'+(p.thumb&&!hero?' srcset="'+esc(p.thumb)+' 800w, '+esc(p.file)+' '+p.width+'w" sizes="(max-width:719px) 100vw, (max-width:1100px) 50vw, 33vw"':'')+' alt="'+esc(L(p.alt))+'" width="'+p.width+'" height="'+p.height+'" loading="'+(hero?'eager':'lazy')+'" decoding="async"'+(hero?' fetchpriority="high"':'')+' style="object-position:'+esc(p.position||'50% 50%')+'">';
 }
