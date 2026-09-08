@@ -8,6 +8,27 @@ function photoMarkup(id,hero=false){
  if(!p?.file)return '';
  return '<img class="photo'+(hero?' hero-photo':'')+'" src="'+esc(p.file)+'"'+(p.thumb&&!hero?' srcset="'+esc(p.thumb)+' 800w, '+esc(p.file)+' '+p.width+'w" sizes="(max-width:719px) 100vw, (max-width:1100px) 50vw, 33vw"':'')+' alt="'+esc(L(p.alt))+'" width="'+p.width+'" height="'+p.height+'" loading="'+(hero?'eager':'lazy')+'" decoding="async"'+(hero?' fetchpriority="high"':'')+' style="object-position:'+esc(p.position||'50% 50%')+'">';
 }
+
+/* Venue imagery: preserve selected photos in PHOTO_SELECTIONS.md, but render only approved local assets.
+   Context fallbacks must never be presented as photographs of the venue itself. */
+const VENUE_MEDIA={
+ antico_caffe:{photo:'bastione',tone:'stone'},
+ terrazze:{photo:'calamosca_context',tone:'sea'},
+ paillote:{tone:'sea'},
+ libarium:{tone:'evening'},
+ biffi:{tone:'stone'},
+ su_cumbidu:{tone:'stone'},
+ antica_cagliari:{tone:'stone'},
+ sa_piola:{tone:'stone'},
+ gallo_oro:{tone:'evening'}
+};
+function venueMedia(v){
+ const cfg=VENUE_MEDIA[v.id]||{tone:'stone'};
+ const p=cfg.photo&&PHOTOS[cfg.photo];
+ if(p?.file&&String(p.status||'').startsWith('APPROVATA_USO'))return photoMarkup(cfg.photo);
+ return '<div class="venue-photo-placeholder" data-tone="'+esc(cfg.tone||'stone')+'" aria-hidden="true"></div>';
+}
+
 function pgHome(){
  const tiles=[['spiagge','nav_spiagge','beach_teaser','poetto'],['mangiare','nav_mangiare','food_teaser','porceddu'],['storia','nav_storia','history_teaser','bastione'],['senzaauto','nav_senzaauto','mobility_teaser',null]];
  return '<section class="hero home-hero">'+photoMarkup('hero',true)+'<div class="hero-copy"><span class="kicker">'+esc(t('guide_kicker'))+'</span><h1>'+esc(t('hero_title'))+'</h1><p>'+esc(t('hero_sub'))+'</p><a class="btn btn--primary" href="#esplora" data-explore>'+esc(t('discover'))+'</a></div></section>'+
@@ -15,7 +36,7 @@ function pgHome(){
  '<section class="blk taste-preview"><div><span class="kicker">'+esc(t('nav_sapori'))+'</span><h2 class="sec">'+esc(t('taste_intro'))+'</h2><a class="btn btn--ghost" href="#sapori">'+esc(t('nav_sapori'))+' →</a></div>'+photoMarkup('fregola')+'</section>'+
  '<section class="blk" id="today"><h2 class="sec">'+esc(t('home_today'))+'</h2><div id="today-box"></div></section>';
 }
-function venueCards(venues){return '<div class="grid venue-grid">'+venues.map((v,i)=>'<article class="card venue" id="'+esc(v.id)+'"><div class="card__body"><span class="ordinal">'+String(i+1).padStart(2,'0')+'</span><h2>'+esc(v.name)+'</h2><p>'+esc(L(v.why))+'</p><div class="card__foot">'+externalLink(mapSearch(v.mapQuery),t('open_map'),'btn btn--map')+(v.site?externalLink(v.site,t('check_menu')):'')+'</div></div></article>').join('')+'</div>';}
+function venueCards(venues){return '<div class="grid venue-grid">'+venues.map((v,i)=>'<article class="card venue" id="'+esc(v.id)+'">'+venueMedia(v)+'<div class="card__body"><span class="ordinal">'+String(i+1).padStart(2,'0')+'</span><h2>'+esc(v.name)+'</h2><p>'+esc(L(v.why))+'</p><div class="card__foot">'+externalLink(mapSearch(v.mapQuery),t('open_map'),'btn btn--map')+(v.site?externalLink(v.site,t('check_menu')):'')+'</div></div></article>').join('')+'</div>';}
 function pgMangiare(){return pageHeading('nav_mangiare','restaurant_intro')+venueCards(GUIDE.restaurants);}
 function pgAperitivi(){return pageHeading('nav_aperitivi','aperitif_intro')+venueCards(GUIDE.aperitivi);}
 function pgSapori(){return pageHeading('nav_sapori','taste_intro')+'<div class="grid food-grid">'+FOOD.map(f=>'<article class="card food-card" id="'+esc(f.id)+'">'+photoMarkup(f.id)+'<div class="card__body"><h2>'+esc(L(f.name))+'</h2><p>'+esc(L(f.d))+'</p></div></article>').join('')+'</div><p class="credits-link"><a href="#fonti">'+esc(t('photo_credit'))+'</a></p>';}
