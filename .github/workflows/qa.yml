@@ -37,9 +37,5 @@ jobs:
             node --check "$f"
           done
 
-      - name: Concierge rendering, content, photo and PWA verification
-        run: node tests/verify.cjs
-
-      - name: Repository whitespace check
-        shell: bash
-        run: git diff --check HEAD^
+      - name: Concierge regression and privacy verification
+        run: node tests/concierge-ci.cjs
