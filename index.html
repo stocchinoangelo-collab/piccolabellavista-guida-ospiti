@@ -14,6 +14,11 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/boutique.css">
+<style>
+/* Venue cards now include photography/fallback media: avoid legacy text-only card height. */
+.venue .card__body{min-height:220px}
+@media(max-width:719px){.venue .card__body{min-height:0}}
+</style>
 </head>
 <body>
 <a class="skip" href="#view" data-i18n="skip_content"></a>
@@ -60,4 +65,3 @@
 <script src="js/app.js" defer></script>
 </body>
 </html>
-
