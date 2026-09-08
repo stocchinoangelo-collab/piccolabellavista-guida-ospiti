@@ -7,6 +7,7 @@ on:
       - foundation/concierge-content-model
     paths:
       - scripts/prepare-selected-beach-images.py
+      - scripts/sync-selected-beach-photos.py
       - .github/workflows/prepare-selected-beach-images.yml
 
 permissions:
@@ -24,14 +25,15 @@ jobs:
           python-version: '3.12'
       - run: pip install pillow
       - run: python scripts/prepare-selected-beach-images.py
-      - name: Commit generated beach images
+      - run: python scripts/sync-selected-beach-photos.py
+      - name: Commit generated beach images and photo registry
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add images/beaches
+          git add images/beaches js/photos.js
           if git diff --cached --quiet; then
-            echo "No image changes"
+            echo "No image or registry changes"
           else
-            git commit -m "Generate selected beach image assets"
+            git commit -m "Sync selected beach image assets and registry"
             git push
           fi
