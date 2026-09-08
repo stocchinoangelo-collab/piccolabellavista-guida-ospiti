@@ -8,6 +8,7 @@ on:
     paths:
       - scripts/prepare-selected-beach-images.py
       - scripts/sync-selected-beach-photos.py
+      - scripts/normalize-concierge-priority.py
       - .github/workflows/prepare-selected-beach-images.yml
 
 permissions:
@@ -26,14 +27,15 @@ jobs:
       - run: pip install pillow
       - run: python scripts/prepare-selected-beach-images.py
       - run: python scripts/sync-selected-beach-photos.py
-      - name: Commit generated beach images and photo registry
+      - run: python scripts/normalize-concierge-priority.py
+      - name: Commit generated beach assets, registry and normalized dataset
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add images/beaches js/photos.js
+          git add images/beaches js/photos.js data/concierge/beaches.priority.json
           if git diff --cached --quiet; then
-            echo "No image or registry changes"
+            echo "No beach integration changes"
           else
-            git commit -m "Sync selected beach image assets and registry"
+            git commit -m "Normalize and sync selected beach content"
             git push
           fi
