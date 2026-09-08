@@ -1,0 +1,94 @@
+name: Remove Porto Sa Ruxi
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - foundation/concierge-content-model
+    paths:
+      - .github/workflows/remove-porto-sa-ruxi.yml
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: foundation/concierge-content-model
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Remove Porto Sa Ruxi beach object
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('js/data.js')
+          text = path.read_text(encoding='utf-8')
+          marker = '"id": "porto_sa_ruxi"'
+          pos = text.find(marker)
+          if pos < 0:
+              print('Porto Sa Ruxi already absent')
+              raise SystemExit(0)
+
+          obj_start = text.rfind('  {', 0, pos)
+          if obj_start < 0:
+              raise SystemExit('Could not locate object start')
+
+          depth = 0
+          in_string = False
+          escape = False
+          obj_end = None
+          for i in range(obj_start, len(text)):
+              ch = text[i]
+              if in_string:
+                  if escape:
+                      escape = False
+                  elif ch == '\\':
+                      escape = True
+                  elif ch == '"':
+                      in_string = False
+                  continue
+              if ch == '"':
+                  in_string = True
+              elif ch == '{':
+                  depth += 1
+              elif ch == '}':
+                  depth -= 1
+                  if depth == 0:
+                      obj_end = i + 1
+                      break
+          if obj_end is None:
+              raise SystemExit('Could not locate object end')
+
+          # BEACHES entries are comma-separated. Remove the following comma/newline too.
+          j = obj_end
+          while j < len(text) and text[j] in ' \t':
+              j += 1
+          if j < len(text) and text[j] == ',':
+              j += 1
+          if j < len(text) and text[j] == '\r':
+              j += 1
+          if j < len(text) and text[j] == '\n':
+              j += 1
+
+          new_text = text[:obj_start] + text[j:]
+          if marker in new_text or 'Porto Sa Ruxi' in new_text:
+              raise SystemExit('Porto Sa Ruxi reference still present after cleanup')
+          path.write_text(new_text, encoding='utf-8')
+          print('Removed Porto Sa Ruxi from js/data.js')
+          PY
+      - name: Commit cleanup
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add js/data.js
+          if git diff --cached --quiet; then
+            echo "No cleanup changes"
+          else
+            git commit -m "Remove Porto Sa Ruxi from guide beaches"
+            git push
+          fi
