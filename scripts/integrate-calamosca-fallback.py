@@ -11,7 +11,14 @@ thumb = out_dir / 'calamosca-context-cristiano-cani-800.webp'
 
 if not webp.exists():
     if not source.exists():
-        urllib.request.urlretrieve(URL, source)
+        req = urllib.request.Request(
+            URL,
+            headers={
+                'User-Agent': 'PiccolabellavistaGuestGuide/1.0 (https://github.com/stocchinoangelo-collab/piccolabellavista-guida-ospiti)'
+            },
+        )
+        with urllib.request.urlopen(req, timeout=60) as response:
+            source.write_bytes(response.read())
     with Image.open(source) as im:
         im = im.convert('RGB')
         im.save(webp, 'WEBP', quality=86, method=6)
