@@ -32,4 +32,18 @@ Verifica: 8 settembre 2026. Tutte le derivate WebP conservano la licenza della f
 
 - punta_molentis: dronepicr — [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) — [Fonte originale](https://commons.wikimedia.org/wiki/File:Aerial_view_of_Punta_Molentis_Beach_in_Sardinia,_Italy_(48399314582).jpg). Asset: `images/beaches/punta-molentis.webp`.
 
+- simius: Muzzudan — [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) — [Fonte originale](https://commons.wikimedia.org/wiki/File:Simius_Beach_-_Villasimius.jpg). Asset: `images/beaches/simius.webp`.
+
+- cala_sinzias: Giorgio Galeotti — [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) — [Fonte originale](https://commons.wikimedia.org/wiki/File:Spiaggia_-_Cala_Sinzias,_Castiadas,_Cagliari,_Italia_-_29_Maggio_2026_01.jpg). Asset: `images/beaches/cala-sinzias.webp`.
+
+- is_arutas: William Kimmerle — [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — [Fonte originale](https://commons.wikimedia.org/wiki/File:Is_Aruttas_Beach.jpg). Asset: `images/beaches/is-arutas.webp`.
+
+- san_giovanni_sinis: Mike Peel — [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) — [Fonte originale](https://commons.wikimedia.org/wiki/File:At_Tharros,_Sardinia_2024_010.jpg). Asset: `images/beaches/san-giovanni-sinis.webp`.
+
+- la_pelosa: goldpicasa — [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) — [Fonte originale](https://commons.wikimedia.org/wiki/File:Stintino,_La_Pelosa_beach_-_panoramio_(2).jpg). Asset: `images/beaches/la-pelosa.webp`.
+
+- cala_brandinchi: Ramon Espiña Fernandez — [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) — [Fonte originale](https://commons.wikimedia.org/wiki/File:Cala_Brandinchi_-_Cerde%C3%B1a_-_panoramio.jpg). Asset: `images/beaches/cala-brandinchi.webp`.
+
+- cala_luna: Sven Jungnickel — [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) — [Fonte originale](https://commons.wikimedia.org/wiki/File:Cala_Luna.jpg). Asset: `images/beaches/cala-luna.webp`.
+
 - bastione: Elisa.Mnn — [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) — [Fonte originale](https://commons.wikimedia.org/wiki/File:Bastione_di_San_Remy,_prospetto.jpg). Asset: `images/bastione.webp`.
