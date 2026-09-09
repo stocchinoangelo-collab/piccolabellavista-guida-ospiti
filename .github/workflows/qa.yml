@@ -5,6 +5,7 @@ on:
     branches: [main]
   push:
     branches:
+      - main
       - concierge/redesign-v2
 
 permissions:
