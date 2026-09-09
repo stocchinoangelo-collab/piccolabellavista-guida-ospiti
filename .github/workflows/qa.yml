@@ -1,0 +1,41 @@
+name: QA Piccolabellavista Concierge
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches:
+      - concierge/redesign-v2
+
+permissions:
+  contents: read
+
+concurrency:
+  group: qa-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regression:
+    name: Concierge regression suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: JavaScript syntax check
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in js/*.js sw.js tests/*.cjs; do
+            node --check "$f"
+          done
+
+      - name: Concierge regression and privacy verification
+        run: npm test

@@ -3,8 +3,9 @@ function pageHeading(title,sub){return '<section class="hero page-heading"><span
 function mapSearch(query){return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query);}
 function transitLink(query){return 'https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent(CONFIG.home.address)+'&destination='+encodeURIComponent(query)+'&travelmode=transit';}
 function externalLink(url,label,cls='btn btn--ghost'){return '<a class="'+cls+'" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">'+esc(label)+'</a>';}
+const PHOTO_ALIASES={molentis:'punta_molentis',sinzias:'cala_sinzias',pelosa:'la_pelosa',brandinchi:'cala_brandinchi'};
 function photoMarkup(id,hero=false){
- const p=PHOTOS[id];
+ const p=PHOTOS[PHOTO_ALIASES[id]||id];
  if(!p?.file)return '';
  return '<img class="photo'+(hero?' hero-photo':'')+'" src="'+esc(p.file)+'"'+(p.thumb&&!hero?' srcset="'+esc(p.thumb)+' 800w, '+esc(p.file)+' '+p.width+'w" sizes="(max-width:719px) 100vw, (max-width:1100px) 50vw, 33vw"':'')+' alt="'+esc(L(p.alt))+'" width="'+p.width+'" height="'+p.height+'" loading="'+(hero?'eager':'lazy')+'" decoding="async"'+(hero?' fetchpriority="high"':'')+' style="object-position:'+esc(p.position||'50% 50%')+'">';
 }
@@ -16,25 +17,26 @@ const VENUE_MEDIA={
  terrazze:{photo:'calamosca_context',tone:'sea'},
  paillote:{tone:'sea'},
  libarium:{tone:'evening'},
- biffi:{tone:'stone'},
+ biffi:{tone:'evening'},
  su_cumbidu:{tone:'stone'},
  antica_cagliari:{tone:'stone'},
  sa_piola:{tone:'stone'},
- gallo_oro:{tone:'evening'}
+ gallo_oro:{tone:'stone'}
 };
 function venueMedia(v){
  const cfg=VENUE_MEDIA[v.id]||{tone:'stone'};
  const p=cfg.photo&&PHOTOS[cfg.photo];
- if(p?.file&&String(p.status||'').startsWith('APPROVATA_USO'))return photoMarkup(cfg.photo);
- return '<div class="venue-photo-placeholder" data-tone="'+esc(cfg.tone||'stone')+'" aria-hidden="true"></div>';
+ if(p?.file&&String(p.status||'').startsWith('APPROVATA_USO'))return '<figure>'+photoMarkup(cfg.photo)+'<figcaption class="media-caption">'+esc(t('photo_context'))+'</figcaption></figure>';
+ return '<div class="venue-photo-placeholder" data-tone="'+esc(cfg.tone||'stone')+'" role="img" aria-label="'+esc(t('photo_placeholder'))+'"><span>'+esc(t('local_selection'))+'</span></div>';
 }
 
 function pgHome(){
- const tiles=[['spiagge','nav_spiagge','beach_teaser','poetto'],['mangiare','nav_mangiare','food_teaser','porceddu'],['storia','nav_storia','history_teaser','bastione'],['senzaauto','nav_senzaauto','mobility_teaser',null]];
- return '<section class="hero home-hero">'+photoMarkup('hero',true)+'<div class="hero-copy"><span class="kicker">'+esc(t('guide_kicker'))+'</span><h1>'+esc(t('hero_title'))+'</h1><p>'+esc(t('hero_sub'))+'</p><a class="btn btn--primary" href="#esplora" data-explore>'+esc(t('discover'))+'</a></div></section>'+
- '<p class="edition">'+esc(t('style_edition'))+'</p><section class="blk" id="esplora"><h2 class="sec">'+esc(t('choose_day'))+'</h2><div class="discovery-grid">'+tiles.map(([route,key,sub,photo],i)=>'<a class="discovery" href="#'+route+'">'+(photo?photoMarkup(photo):'')+'<div class="discovery-body"><span class="ordinal">0'+(i+1)+'</span><h3>'+esc(t(key))+'</h3><p>'+esc(t(sub))+'</p></div></a>').join('')+'</div></section>'+
- '<section class="blk taste-preview"><div><span class="kicker">'+esc(t('nav_sapori'))+'</span><h2 class="sec">'+esc(t('taste_intro'))+'</h2><a class="btn btn--ghost" href="#sapori">'+esc(t('nav_sapori'))+' →</a></div>'+photoMarkup('fregola')+'</section>'+
- '<section class="blk" id="today"><h2 class="sec">'+esc(t('home_today'))+'</h2><div id="today-box"></div></section>';
+ return '<section class="hero home-hero">'+photoMarkup('hero',true)+'<div class="hero-copy"><span class="kicker">'+esc(t('concierge_name'))+'</span><h1>'+esc(t('hero_title'))+'</h1><p>'+esc(t('host_voice'))+'</p><a class="btn btn--primary" href="#esplora" data-explore>'+esc(t('need_today'))+' ↓</a></div></section>'+
+ '<section class="blk concierge-today" id="esplora" aria-labelledby="today-title"><div><span class="ordinal">01 · '+esc(t('guide_kicker'))+'</span><h2 class="sec" id="today-title">'+esc(t('need_today'))+'</h2><p class="sub">'+esc(t('plan_intro'))+'</p><a class="btn btn--primary" href="#itinerari">'+esc(t('plan_routes'))+' →</a></div><div class="context-links"><a class="quick" href="#senzaauto">'+esc(t('nav_senzaauto'))+'</a><a class="quick" href="#aperitivi">'+esc(t('evening'))+'</a><a class="quick" href="#vento">'+esc(t('beach_teaser'))+'</a></div></section>'+
+ '<section class="blk concierge-food" aria-labelledby="food-title">'+photoMarkup('fregola')+'<div><span class="ordinal">02</span><h2 class="sec" id="food-title">'+esc(t('need_food'))+'</h2><p class="sub">'+esc(t('food_teaser'))+'</p><div class="card__foot"><a class="btn btn--primary" href="#mangiare">'+esc(t('nav_mangiare'))+' →</a><a class="btn btn--ghost" href="#aperitivi">'+esc(t('nav_aperitivi'))+'</a><a class="text-link" href="#sapori">'+esc(t('nav_sapori'))+'</a></div></div></section>'+
+ '<section class="blk" aria-labelledby="sea-title"><span class="ordinal">03</span><h2 class="sec" id="sea-title">'+esc(t('need_sea'))+'</h2><div class="concierge-places">'+[['spiagge','poetto','nav_spiagge','beach_teaser'],['storia','bastione','nav_storia','history_teaser']].map(([route,photo,title,sub])=>'<a class="discovery" href="#'+route+'">'+photoMarkup(photo)+'<div class="discovery-body"><h3>'+esc(t(title))+' →</h3><p>'+esc(t(sub))+'</p></div></a>').join('')+'</div></section>'+
+ '<section class="blk concierge-help" aria-labelledby="help-title"><div><span class="ordinal">04</span><h2 class="sec" id="help-title">'+esc(t('need_help'))+'</h2><p class="sub">'+esc(t('mobility_teaser'))+'</p></div><div class="context-links"><a class="btn btn--primary" href="#senzaauto">'+esc(t('nav_senzaauto'))+' →</a><a class="btn btn--ghost" href="#utili">'+esc(t('help_short'))+'</a><a class="text-link" href="#casa">'+esc(t('nav_casa'))+'</a></div></section>'+
+ '<section class="blk"><details class="today-details"><summary>'+esc(t('home_today'))+'</summary><div id="today-box"></div></details></section>';
 }
 function venueCards(venues){return '<div class="grid venue-grid">'+venues.map((v,i)=>'<article class="card venue" id="'+esc(v.id)+'">'+venueMedia(v)+'<div class="card__body"><span class="ordinal">'+String(i+1).padStart(2,'0')+'</span><h2>'+esc(v.name)+'</h2><p>'+esc(L(v.why))+'</p><div class="card__foot">'+externalLink(mapSearch(v.mapQuery),t('open_map'),'btn btn--map')+(v.site?externalLink(v.site,t('check_menu')):'')+'</div></div></article>').join('')+'</div>';}
 function pgMangiare(){return pageHeading('nav_mangiare','restaurant_intro')+venueCards(GUIDE.restaurants);}

@@ -19,11 +19,31 @@ for(const lang of ['it','en','de']){
   for(const m of html.matchAll(/<img\b[^>]*>/g))assert(/width="\d+"/.test(m[0])&&/height="\d+"/.test(m[0])&&/alt="[^"]+"/.test(m[0]));
   renders++;
  }
+ // Exercise every beach detail, not just top-level page string generation.
+ const sheetNodes={'#sheet-content':{innerHTML:''},'#sheet':{classList:{add(){}}},'#sheet-x':{focus(){}}};
+ ctx.document.querySelector=q=>sheetNodes[q];ctx.document.body={style:{}};
+ const beachIds=run('BEACHES.map(b=>b.id)');
+ for(const id of beachIds){
+  run(`openSheet('${id}')`);
+  const detail=sheetNodes['#sheet-content'].innerHTML;
+  assert(!detail.includes('undefined'),`${lang}/${id} detail undefined`);
+  if(id!=='costa_rei')assert(detail.includes('<img'),`${lang}/${id} approved beach image missing`);
+  if(['pelosa','brandinchi','tuerredda','molentis','porto_giunco'].includes(id))assert(detail.includes(run("esc(t('check_access'))")),`${lang}/${id} seasonal warning missing`);
+ }
+ for(const [route,html] of pages){
+  for(const m of html.matchAll(/href="#([^"\s]+)"/g))assert(run(`Object.hasOwn(ROUTES,'${m[1]}')`)||['esplora','view'].includes(m[1]),`${route}: unknown hash ${m[1]}`);
+ }
  assert.equal(run('FOOD.length'),8);assert.equal(run('GUIDE.restaurants.length'),5);assert.equal(run('GUIDE.aperitivi.length'),4);
  assert(run('pgAperitivi()').includes('Biffi American Bar'));
  assert.equal(run('GUIDE.transit.length'),7);
  assert(run('pgSenzaAuto()').includes('Piazza Nazzari'));
- assert(!run('pgMangiare()+pgAperitivi()').includes('<img'));
+ const venues=run('pgMangiare()+pgAperitivi()');
+ for(const m of venues.matchAll(/<img[^>]+src="([^"]+)"/g))assert(['images/bastione.webp','images/restaurants/calamosca-context-cristiano-cani.webp'].includes(m[1]),'Only approved context photographs in venues');
+ assert(venues.includes(run("t('photo_context')")));
+ assert(!/QuantoBasta|Cala Regina|Porto Sa Ruxi/i.test(pages.map(x=>x[1]).join('')));
+ const home=run('pgHome()');
+ for(const key of ['need_today','need_food','need_sea','need_help'])assert(home.includes(run(`esc(t('${key}'))`)));
+ for(const key of ['photo_placeholder','local_selection','all_sections'])assert(run(`Object.hasOwn(I18N[LANG],'${key}')`));
 }
 assert.equal(run('EVENT_INDEX.filter(e=>e.start).length'),0,'Never promote recurring traditions to confirmed future dates');
 assert.equal(run('csvToUnified({id:"x",nome:"Cancelled",data_inizio:"2026-10-01",stato:"annullato"})'),null);
@@ -31,7 +51,10 @@ assert.equal(run('safeUrl("javascript:alert(1)")'),'');
 ctx.escapeInput='<script>"&';assert.equal(run("esc(escapeInput)"),'&lt;script&gt;&quot;&amp;');
 const photos=JSON.parse(read('credits/photos.json'));
 for(const p of photos){assert(fs.statSync(path.join(root,p.file)).size>1000);assert(p.author&&p.license&&p.source&&p.licenseUrl);assert(!p.status.includes('PENDING'));if(p.thumb)assert(fs.existsSync(path.join(root,p.thumb)));}
-assert.equal(photos.length,11);
+assert(photos.length>=11); // Existing precache registry; runtime coverage checked separately below.
+const runtimePhotos=run('Object.values(PHOTOS).filter(p=>p.file)');
+for(const p of runtimePhotos){assert(p.status.startsWith('APPROVATA_USO'));assert(fs.existsSync(path.join(root,p.file)));assert(p.author&&p.license&&p.source);}
+
 for(const m of read('index.html').matchAll(/(?:src|href)="([^"]+)"/g)){if(!/^(https?:|#)/.test(m[1]))assert(fs.existsSync(path.join(root,m[1])),m[1]);}
 const manifest=JSON.parse(read('manifest.webmanifest'));for(const icon of manifest.icons)assert(fs.existsSync(path.join(root,icon.src)));assert.equal(manifest.display,'standalone');
 // Test service-worker lifecycle and offline responses with the real worker code.
@@ -54,7 +77,11 @@ const manifest=JSON.parse(read('manifest.webmanifest'));for(const icon of manife
  let job;handlers.install({waitUntil:p=>job=p});await job;assert(skipped);
  buckets.set('unrelated-cache',new Map());buckets.set('pbv-guide-other-scope-old',new Map());buckets.set('pbv-v15',new Map());
  handlers.activate({waitUntil:p=>job=p});await job;assert(claimed);assert(deleted.includes('pbv-v15'));assert(buckets.has('unrelated-cache'));assert(buckets.has('pbv-guide-other-scope-old'));
- for(const file of ['index.html','js/app.js',photos[0].file]){let reply;handlers.fetch({request:new Request(scope+file),respondWith:p=>reply=p});const response=await reply;assert.equal(response.status,200);assert((await response.arrayBuffer()).byteLength>0)}
+ for(const file of ['index.html','js/app.js',photos[0].file]){let reply;handlers.fetch({request:new Request(scope+file),respondWith:p=>reply=p});const response=await reply;assert.equal(response.status,503);assert.equal(response.headers.get("cache-control"),"no-store")}
+ online=true;
+ let liveReply;handlers.fetch({request:new Request(scope+'images/online-probe.webp'),respondWith:p=>liveReply=p});assert.equal(await (await liveReply).text(),'live','Network returns after offline');
+ online=false;
+ let savedReply;handlers.fetch({request:new Request(scope+'images/online-probe.webp'),respondWith:p=>savedReply=p});assert.equal((await savedReply).status,503,'Private network response must not be retained');
  let intercepted=false;handlers.fetch({request:new Request('https://api.open-meteo.com/x'),respondWith:()=>intercepted=true});assert.equal(intercepted,false);
- console.log(`PASS: ${renders} route/language renders; 11 licensed photos; 8 foods; 9 venues; 7 transit destinations; manifest/local paths; gate reject/accept; SW install/activate/offline/isolation.`);
+ console.log(`PASS: ${renders} route/language renders; 42 beach detail renders; 13 selected beach photos linked; licensed local photos (runtime and precache); 8 foods; 9 venues; 7 transit destinations; manifest/local paths; gate reject/accept; SW install/activate/fail-closed offline/isolation.`);
 })().catch(e=>{console.error(e);process.exitCode=1});
