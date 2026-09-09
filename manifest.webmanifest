@@ -1,6 +1,6 @@
 {
-  "name": "Piccolabellavista · Guida privata alla Sardegna",
-  "short_name": "PBV Guida",
+  "name": "Piccolabellavista Concierge",
+  "short_name": "PBV Concierge",
   "description": "Guida privata riservata agli ospiti di Piccolabellavista, Pirri/Cagliari.",
   "start_url": "./index.html",
   "scope": ".",

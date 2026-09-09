@@ -5,6 +5,6 @@
   "description": "Static trilingual PWA; no build or runtime dependencies.",
   "scripts": {
     "dev": "node scripts/serve.cjs",
-    "test": "node tests/verify.cjs"
+    "test": "node tests/verify.cjs && node tests/concierge-ci.cjs"
   }
 }

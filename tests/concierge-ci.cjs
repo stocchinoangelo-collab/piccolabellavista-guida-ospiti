@@ -33,6 +33,7 @@ for(const lang of ['it','en','de']){
   if(['pelosa','brandinchi','tuerredda','molentis','porto_giunco'].includes(id))assert(html.includes(run("esc(t('check_access'))")),`${lang}/${id}: warning missing`);
   details++;
  }
+ assert(run('pgSpiagge()').includes(run("esc(t('nav_spiagge'))")),'Beach page must retain its translated heading');
  const home=run('pgHome()');
  for(const key of ['need_today','need_food','need_sea','need_help'])assert(home.includes(run(`esc(t('${key}'))`)),`${lang}: ${key}`);
 }
@@ -44,6 +45,8 @@ assert.equal(run('EVENT_INDEX.filter(e=>e.start).length'),0,'Do not promote recu
 assert.equal(run('safeUrl("javascript:alert(1)")'),'');
 const manifest=JSON.parse(read('manifest.webmanifest'));
 assert.equal(manifest.display,'standalone');
+assert.equal(manifest.name,'Piccolabellavista Concierge');
+assert(/\/\*[\s\S]*Cache-Control: no-store/.test(read('_headers')),'private responses must not persist in HTTP cache');
 for(const icon of manifest.icons)assert(fs.existsSync(path.join(root,icon.src)),`Missing manifest icon ${icon.src}`);
 const runtimePhotos=run('Object.values(PHOTOS).filter(p=>p.file)');
 for(const p of runtimePhotos){assert(p.status.startsWith('APPROVATA_USO'),p.file);assert(fs.existsSync(path.join(root,p.file)),p.file);assert(p.author&&p.license&&p.source,p.file);}
@@ -54,9 +57,9 @@ for(const p of runtimePhotos){assert(p.status.startsWith('APPROVATA_USO'),p.file
   async keys(){return ['pbv-guide-%2Fguide%2F-old','pbv-v15','unrelated-cache','pbv-guide-other-scope-old']},
   async delete(k){deleted.push(k);return true}
  };
- let skipped=false,claimed=false,online=true;
+ let skipped=false,claimed=false,online=true,authorized=true;
  const self={registration:{scope},location:new URL(scope+'sw.js'),addEventListener:(n,fn)=>handlers[n]=fn,skipWaiting:async()=>{skipped=true},clients:{claim:async()=>{claimed=true},matchAll:async()=>[]}};
- const worker={self,caches,URL,Response,fetch:async()=>{if(!online)throw Error('offline');return new Response('live',{status:200})}};
+ const worker={self,caches,URL,Response,fetch:async(request,options)=>{assert.equal(options.cache,'no-store');if(!authorized)return new Response('Access denied',{status:403});if(!online)throw Error('offline');return new Response('live',{status:200})}};
  vm.createContext(worker);vm.runInContext(read('sw.js'),worker);
  let job;handlers.install({waitUntil:p=>job=p});await job;assert(skipped,'SW skipWaiting');
  handlers.activate({waitUntil:p=>job=p});await job;assert(claimed,'SW clients.claim');
@@ -66,6 +69,7 @@ for(const p of runtimePhotos){assert(p.status.startsWith('APPROVATA_USO'),p.file
  assert(!deleted.includes('pbv-guide-other-scope-old'),'other-scope guide cache preserved');
  let reply;handlers.fetch({request:new Request(scope+'index.html'),respondWith:p=>reply=p});
  assert.equal(await (await reply).text(),'live','online request reaches server');
+ authorized=false;reply=null;handlers.fetch({request:new Request(scope+'js/data.js'),respondWith:p=>reply=p});assert.equal((await reply).status,403,'Access revocation must not fall back to cached data');authorized=true;
  online=false;reply=null;handlers.fetch({request:new Request(scope+'index.html'),respondWith:p=>reply=p});
  const offline=await reply;assert.equal(offline.status,503,'offline private guide must fail closed');
  assert((await offline.text()).includes('Connessione necessaria'),'offline response explains network requirement');

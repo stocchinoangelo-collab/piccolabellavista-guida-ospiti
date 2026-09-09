@@ -77,11 +77,11 @@ const manifest=JSON.parse(read('manifest.webmanifest'));for(const icon of manife
  let job;handlers.install({waitUntil:p=>job=p});await job;assert(skipped);
  buckets.set('unrelated-cache',new Map());buckets.set('pbv-guide-other-scope-old',new Map());buckets.set('pbv-v15',new Map());
  handlers.activate({waitUntil:p=>job=p});await job;assert(claimed);assert(deleted.includes('pbv-v15'));assert(buckets.has('unrelated-cache'));assert(buckets.has('pbv-guide-other-scope-old'));
- for(const file of ['index.html','js/app.js',photos[0].file]){let reply;handlers.fetch({request:new Request(scope+file),respondWith:p=>reply=p});const response=await reply;assert.equal(response.status,200);assert((await response.arrayBuffer()).byteLength>0)}
+ for(const file of ['index.html','js/app.js',photos[0].file]){let reply;handlers.fetch({request:new Request(scope+file),respondWith:p=>reply=p});const response=await reply;assert.equal(response.status,503);assert.equal(response.headers.get("cache-control"),"no-store")}
  online=true;
  let liveReply;handlers.fetch({request:new Request(scope+'images/online-probe.webp'),respondWith:p=>liveReply=p});assert.equal(await (await liveReply).text(),'live','Network returns after offline');
  online=false;
- let savedReply;handlers.fetch({request:new Request(scope+'images/online-probe.webp'),respondWith:p=>savedReply=p});assert.equal(await (await savedReply).text(),'live','Successful network response is retained');
+ let savedReply;handlers.fetch({request:new Request(scope+'images/online-probe.webp'),respondWith:p=>savedReply=p});assert.equal((await savedReply).status,503,'Private network response must not be retained');
  let intercepted=false;handlers.fetch({request:new Request('https://api.open-meteo.com/x'),respondWith:()=>intercepted=true});assert.equal(intercepted,false);
- console.log(`PASS: ${renders} route/language renders; 42 beach detail renders; 13 selected beach photos linked; licensed local photos (runtime and precache); 8 foods; 9 venues; 7 transit destinations; manifest/local paths; gate reject/accept; SW install/activate/offline/isolation.`);
+ console.log(`PASS: ${renders} route/language renders; 42 beach detail renders; 13 selected beach photos linked; licensed local photos (runtime and precache); 8 foods; 9 venues; 7 transit destinations; manifest/local paths; gate reject/accept; SW install/activate/fail-closed offline/isolation.`);
 })().catch(e=>{console.error(e);process.exitCode=1});

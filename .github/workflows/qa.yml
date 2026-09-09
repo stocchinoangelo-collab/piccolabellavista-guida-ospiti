@@ -38,4 +38,4 @@ jobs:
           done
 
       - name: Concierge regression and privacy verification
-        run: node tests/concierge-ci.cjs
+        run: npm test

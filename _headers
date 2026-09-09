@@ -1,0 +1,3 @@
+# Private responses must not survive Access revocation in the HTTP cache.
+/*
+  Cache-Control: no-store

@@ -263,7 +263,7 @@ function pgSpiagge(){
  let extra="";
  if(c.size&&!dom.some(x=>c.has(x)))extra='<div class="notice warn">'+esc(t("f_no_match"))+' <button class="chip" data-reset>✕ '+esc(t("f_reset"))+'</button> · <a href="#eventi">'+esc(t("cat_sagra"))+" / "+esc(t("cat_eventi"))+" →</a></div>";
  return '<section class="hero"><span class="kicker">'+BEACHES.length+" · "+esc(t("wind_orient"))+"</span>"+
- '<h2 class="sec">🏖️ '+esc(t("nav_spiagge")).replace(/^\S+\s*/,"")+'</h2><p class="sub">'+esc(t("wind_note"))+"</p></section>"+
+ '<h2 class="sec">🏖️ '+esc(t("nav_spiagge"))+'</h2><p class="sub">'+esc(t("wind_note"))+"</p></section>"+
  filterBar()+extra+grid(items,"beach");
 }
 function pgVento(){

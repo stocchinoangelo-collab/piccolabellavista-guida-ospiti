@@ -2,7 +2,7 @@
    Cloudflare Access remains the real authorization layer. The worker must never
    turn a previously cached private response into an authorization bypass. */
 const PREFIX='pbv-guide-'+encodeURIComponent(new URL(self.registration.scope).pathname)+'-';
-const CACHE=PREFIX+'2026-09-08-concierge-v2-privacy1';
+const CACHE=PREFIX+'2026-09-09-concierge-v2-closure';
 
 self.addEventListener('install',event=>{
  event.waitUntil(self.skipWaiting());
