@@ -9,7 +9,7 @@ const GUIDE = {
         "en": "Traditional Sardinian cooking for a taste of the island.",
         "de": "Traditionelle sardische Küche, die von der Insel erzählt."
       },
-      "site": "",
+      "site": "https://www.sucumbiduterra.com/menu/",
       "mapQuery": "Su Cumbidu Cagliari",
       "photoStatus": "PENDING_PERMISSION"
     },
