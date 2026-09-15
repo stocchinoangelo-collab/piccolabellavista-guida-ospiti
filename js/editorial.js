@@ -2,6 +2,7 @@
 function pageHeading(title,sub){return '<section class="hero page-heading"><span class="kicker">'+esc(t('guide_kicker'))+'</span><h1>'+esc(t(title))+'</h1>'+(sub?'<p>'+esc(t(sub))+'</p>':'')+'</section>';}
 function mapSearch(query){return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query);}
 function transitLink(query){return 'https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent(CONFIG.home.address)+'&destination='+encodeURIComponent(query)+'&travelmode=transit';}
+function directionsLink(query){return 'https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent(CONFIG.home.address)+'&destination='+encodeURIComponent(query);}
 function externalLink(url,label,cls='btn btn--ghost'){return '<a class="'+cls+'" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">'+esc(label)+'</a>';}
 const PHOTO_ALIASES={molentis:'punta_molentis',sinzias:'cala_sinzias',pelosa:'la_pelosa',brandinchi:'cala_brandinchi'};
 function photoMarkup(id,hero=false){
@@ -41,15 +42,33 @@ function pgHome(){
 function venueCards(venues){return '<div class="grid venue-grid">'+venues.map((v,i)=>'<article class="card venue" id="'+esc(v.id)+'">'+venueMedia(v)+'<div class="card__body"><span class="ordinal">'+String(i+1).padStart(2,'0')+'</span><h2>'+esc(v.name)+'</h2><p>'+esc(L(v.why))+'</p><div class="card__foot">'+externalLink(mapSearch(v.mapQuery),t('open_map'),'btn btn--map')+(v.site?externalLink(v.site,t('check_menu')):'')+'</div></div></article>').join('')+'</div>';}
 function pgMangiare(){return pageHeading('nav_mangiare','restaurant_intro')+venueCards(GUIDE.restaurants);}
 function pgAperitivi(){return pageHeading('nav_aperitivi','aperitif_intro')+venueCards(GUIDE.aperitivi);}
-const TASTE_PATHS=[
- {id:'tradizione',icon:'🍽️',title:'taste_tradition',note:'taste_tradition_note',ids:['malloreddus','porceddu','seadas'],route:'mangiare',cta:'taste_where'},
- {id:'mare',icon:'🌊',title:'taste_sea',note:'taste_sea_note',ids:['fregola','bottarga'],route:'mangiare',cta:'taste_where'},
- {id:'tagliere',icon:'🍷',title:'taste_aperitivo',note:'taste_aperitivo_note',ids:['pane_carasau','pecorino','cannonau'],route:'aperitivi',cta:'nav_aperitivi'}
+const TASTE_VENUES=[
+ {id:'su-cumbidu',name:'Su Cumbidu',fit:'taste_fit_tradition',query:'Su Cumbidu Cagliari',menu:'https://www.sucumbiduterra.com/menu/'},
+ {id:'sa-piola',name:'Sa Piola',fit:'taste_fit_piola',query:'Sa Piola Cagliari',menu:'https://www.sapiola.it/menu/'},
+ {id:'antica-cagliari',name:'Antica Cagliari',fit:'taste_fit_sea',query:'Antica Cagliari Cagliari',menu:'https://www.anticacagliari.it/it/i-menu/menu-ristorante.html'}
 ];
-function tasteCard(id){const f=FOOD.find(item=>item.id===id);return f?'<article class="taste-item" id="'+esc(f.id)+'">'+photoMarkup(f.id)+'<div><h3>'+esc(L(f.name))+'</h3><p>'+esc(L(f.d))+'</p></div></article>':'';}
+const TASTE_ORDERS=[
+ {id:'porceddu',group:'land',venue:'Su Cumbidu',query:'Su Cumbidu Cagliari',menu:'https://www.sucumbiduterra.com/menu/',order:'Maialetto arrosto con contorno',price:'€22',pairing:'Cannonau di Sardegna',note:'taste_confirm_pig'},
+ {id:'malloreddus',group:'land',venue:'Su Cumbidu',query:'Su Cumbidu Cagliari',menu:'https://www.sucumbiduterra.com/menu/',order:'Malloreddus a sa campidanesa',price:'€15',pairing:'Monica di Sardegna'},
+ {id:'pane_carasau',group:'land',venue:'Su Cumbidu',query:'Su Cumbidu Cagliari',menu:'https://www.sucumbiduterra.com/menu/',order:'Pani frattau',price:'€18',pairing:'Cannonau giovane'},
+ {id:'seadas',group:'land',venue:'Su Cumbidu',query:'Su Cumbidu Cagliari',menu:'https://www.sucumbiduterra.com/menu/',order:'Sebadas',price:'€7',pairing:'Moscato di Sardegna'},
+ {id:'fregola',group:'sea',venue:'Sa Piola',query:'Sa Piola Cagliari',menu:'https://www.sapiola.it/menu/',order:'Fregola con le arselle',price:null,pairing:'Vermentino di Sardegna',note:'taste_seasonal'},
+ {id:'bottarga',group:'sea',venue:'Sa Piola',query:'Sa Piola Cagliari',menu:'https://www.sapiola.it/menu/',order:'taste_ask_bottarga',price:null,pairing:'Vermentino di Sardegna',note:'taste_seasonal'},
+ {id:'pecorino',group:'wine',venue:'Antica Cagliari',query:'Antica Cagliari Cagliari',menu:'https://www.anticacagliari.it/it/i-menu/menu-ristorante.html',order:'Pecorino sardo arrosto',price:'€10',pairing:'Cannonau di Sardegna'},
+ {id:'cannonau',group:'wine',venue:'Sa Piola',query:'Sa Piola Cagliari',menu:'https://www.sapiola.it/menu/',order:'taste_ask_cannonau',price:null,pairing:'taste_with_roast',note:'taste_seasonal'}
+];
+const TASTE_GROUPS=[
+ {id:'land',title:'taste_tradition',note:'taste_tradition_note'},
+ {id:'sea',title:'taste_sea',note:'taste_sea_note'},
+ {id:'wine',title:'taste_aperitivo',note:'taste_aperitivo_note'}
+];
+function tasteVenue(v){return '<article class="taste-venue" id="'+esc(v.id)+'"><h3>'+esc(v.name)+'</h3><p>'+esc(t(v.fit))+'</p><div class="card__foot">'+externalLink(v.menu,t('check_menu'),'btn btn--primary')+externalLink(directionsLink(v.query),t('route_from_home'),'btn btn--map')+'</div></article>';}
+function tasteOrder(item){const f=FOOD.find(food=>food.id===item.id);if(!f)return '';const order=item.order.startsWith('taste_')?t(item.order):item.order;const pairing=item.pairing.startsWith('taste_')?t(item.pairing):item.pairing;const ask='https://wa.me/393931104422?text='+encodeURIComponent(t('taste_whatsapp_prefix')+' '+L(f.name));return '<article class="taste-order" id="'+esc(item.id)+'">'+photoMarkup(item.id)+'<div class="taste-order__body"><h3>'+esc(L(f.name))+'</h3><p class="taste-description">'+esc(L(f.d))+'</p><dl><div><dt>'+esc(t('taste_where_label'))+'</dt><dd>'+esc(item.venue)+'</dd></div><div><dt>'+esc(t('taste_order_label'))+'</dt><dd>'+esc(order)+'</dd></div>'+(item.price?'<div><dt>'+esc(t('taste_price_label'))+'</dt><dd>'+esc(item.price)+'</dd></div>':'')+'<div><dt>'+esc(t('taste_pairing_label'))+'</dt><dd>'+esc(pairing)+'</dd></div></dl>'+(item.note?'<p class="taste-caution">'+esc(t(item.note))+'</p>':'')+'<div class="card__foot">'+externalLink(item.menu,t('check_menu'),'btn btn--primary')+externalLink(directionsLink(item.query),t('route_from_home'),'btn btn--map')+externalLink(ask,t('ask_angelo'))+'</div></div></article>';}
 function pgSapori(){return pageHeading('nav_sapori','taste_intro')+
  '<section class="taste-choice" aria-labelledby="taste-question"><span class="ordinal">'+esc(t('host_pick'))+'</span><h2 class="sec" id="taste-question">'+esc(t('taste_question'))+'</h2><p class="sub">'+esc(t('taste_help'))+'</p></section>'+
- '<div class="taste-paths">'+TASTE_PATHS.map((path,i)=>'<section class="taste-path" aria-labelledby="taste-'+esc(path.id)+'"><header><span class="ordinal">'+String(i+1).padStart(2,'0')+'</span><h2 class="sec" id="taste-'+esc(path.id)+'">'+path.icon+' '+esc(t(path.title))+'</h2><p>'+esc(t(path.note))+'</p></header><div class="taste-items">'+path.ids.map(tasteCard).join('')+'</div><a class="btn btn--primary" href="#'+esc(path.route)+'">'+esc(t(path.cta))+' →</a></section>').join('')+'</div>'+
+ '<section class="taste-venue-guide" aria-label="'+esc(t('taste_choose_place'))+'"><h2 class="sec">'+esc(t('taste_choose_place'))+'</h2><div class="taste-venues">'+TASTE_VENUES.map(tasteVenue).join('')+'</div></section>'+
+ '<aside class="taste-verified"><strong>'+esc(t('taste_checked'))+'</strong><span>'+esc(t('taste_verify_note'))+'</span></aside>'+
+ '<div class="taste-order-groups">'+TASTE_GROUPS.map((group,i)=>'<section class="taste-order-group" aria-labelledby="taste-'+esc(group.id)+'"><header><span class="ordinal">'+String(i+1).padStart(2,'0')+'</span><h2 class="sec" id="taste-'+esc(group.id)+'">'+esc(t(group.title))+'</h2><p>'+esc(t(group.note))+'</p></header><div class="taste-orders">'+TASTE_ORDERS.filter(item=>item.group===group.id).map(tasteOrder).join('')+'</div></section>').join('')+'</div>'+
  '<aside class="sommelier-note"><span aria-hidden="true">🍷</span><div><h2>'+esc(t('angelo_pairing'))+'</h2><p>'+esc(t('angelo_pairing_note'))+'</p></div></aside><p class="credits-link"><a href="#fonti">'+esc(t('photo_credit'))+'</a></p>';}
 function pgCasa(){return pageHeading('nav_casa','house_intro')+'<div class="house-layout"><article class="notice"><p>'+esc(t('house_services'))+'</p></article><article class="card"><div class="card__body"><h2>'+esc(t('arrival'))+'</h2><p>'+esc(t('arrival_note'))+'</p><div class="card__foot">'+externalLink('https://piccolabellavista.it/',t('property_site'),'btn btn--primary')+externalLink('https://wa.me/393931104422',t('contact_host'))+'</div></div></article></div>';}
 function pgSenzaAuto(){return pageHeading('nav_senzaauto','mobility_intro')+'<p class="source-link">'+externalLink('https://www.ctmcagliari.it/busfinder/',t('ctm_label'))+'</p><div class="grid transit-grid">'+GUIDE.transit.map(d=>'<article class="card"><div class="card__body"><h2>'+esc(L(d.name))+'</h2><p>'+esc(L(d.note))+'</p><div class="card__foot">'+externalLink(transitLink(d.query),t('plan_transit'),'btn btn--map')+(d.id==='ospedali'?['Ospedale Oncologico Cagliari','Ospedale Microcitemico Cagliari'].map(q=>externalLink(transitLink(q),q.replace('Ospedale ','').replace(' Cagliari',''))).join(''):'')+'</div></div></article>').join('')+'</div><section class="notice"><h2>'+esc(t('taxi_option'))+'</h2><p>'+esc(t('taxi_note'))+'</p></section>';}
