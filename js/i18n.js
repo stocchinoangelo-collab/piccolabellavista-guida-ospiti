@@ -480,7 +480,7 @@ Object.assign(I18N.it, {
   "hospital_warning": "La sede e gli orari possono cambiare. Telefonare prima di recarsi sul posto. Per le emergenze chiamare il 112 o il 118.",
   "hospital_source": "Sede e orari sul sito ASL",
   "hospital_emergency": "Emergenze",
-  "hospital_cta": "Aver bisogno di informazioni per il tuo soggiorno?",
+  "hospital_cta": "Hai bisogno di informazioni per il tuo soggiorno?",
   "hospital_whatsapp": "Scrivi ad Angelo e Viviana su WhatsApp"
 });
 Object.assign(I18N.en, {
