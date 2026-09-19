@@ -14,7 +14,7 @@ for(const [label,width,height] of [['mobile',390,844],['tablet',768,1024],['desk
  await p.locator('main a').first().focus();for(let i=0;i<15;i++){assert(await p.evaluate(()=>document.activeElement.tagName==='A'));assert(await p.evaluate(()=>getComputedStyle(document.activeElement).outlineStyle!=='none'));await p.keyboard.press('Tab');}
  await p.evaluate(()=>navigator.serviceWorker.ready);await p.reload();await p.waitForFunction(()=>navigator.serviceWorker.controller);
  await c.setOffline(true);await p.locator('[data-lang="de"]').click();assert.equal(await p.locator('html').getAttribute('lang'),'de');const response=await p.reload();assert.equal(response.status(),503);assert((await p.locator('body').innerText()).includes('Connessione necessaria'));
- await c.setOffline(false);await p.goto('http://localhost:4173/#ospedali');await p.locator('main h1').waitFor();assert.equal(await p.locator('main h1').count(),1);
+ await c.setOffline(false);const restored=await p.reload();assert.equal(restored.status(),200);await p.locator('main h1').waitFor();assert.equal(await p.locator('main h1').count(),1);
  // Offline 503 is expected and excluded from online console checks.
  errors=errors.filter(e=>!e.includes('503'));assert.deepEqual(errors,[]);results.push(label+': keyboard, online/offline/reconnect, console PASS');await c.close();
 }await b.close();console.log(results.join('\n'));fs.writeFileSync('artifacts/hospitals-browser-results.txt',results.join('\n'));})().catch(e=>{console.error(e);process.exit(1)});
