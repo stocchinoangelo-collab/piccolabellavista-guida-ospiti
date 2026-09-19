@@ -14,7 +14,7 @@ for(const lang of ['it','en','de']){
   assert(html.length>100,route);assert(!html.includes('undefined'),`${lang}/${route} undefined`);
   assert(!/\[DA VERIFICARE\]/.test(html));
   for(const m of html.matchAll(/(?:src|href)="([^"]+)"/g)){
-   const u=m[1].replaceAll('&amp;','&');if(!/^(https?:|#)/.test(u))assert(fs.existsSync(path.join(root,u)),`Missing ${u}`);
+   const u=m[1].replaceAll('&amp;','&');if(!/^(https?:|tel:|#)/.test(u))assert(fs.existsSync(path.join(root,u)),`Missing ${u}`);
   }
   for(const m of html.matchAll(/<img\b[^>]*>/g))assert(/width="\d+"/.test(m[0])&&/height="\d+"/.test(m[0])&&/alt="[^"]+"/.test(m[0]));
   renders++;
@@ -55,7 +55,7 @@ assert(photos.length>=11); // Existing precache registry; runtime coverage check
 const runtimePhotos=run('Object.values(PHOTOS).filter(p=>p.file)');
 for(const p of runtimePhotos){assert(p.status.startsWith('APPROVATA_USO'));assert(fs.existsSync(path.join(root,p.file)));assert(p.author&&p.license&&p.source);}
 
-for(const m of read('index.html').matchAll(/(?:src|href)="([^"]+)"/g)){if(!/^(https?:|#)/.test(m[1]))assert(fs.existsSync(path.join(root,m[1])),m[1]);}
+for(const m of read('index.html').matchAll(/(?:src|href)="([^"]+)"/g)){if(!/^(https?:|tel:|#)/.test(m[1]))assert(fs.existsSync(path.join(root,m[1])),m[1]);}
 const manifest=JSON.parse(read('manifest.webmanifest'));for(const icon of manifest.icons)assert(fs.existsSync(path.join(root,icon.src)));assert.equal(manifest.display,'standalone');
 // Test service-worker lifecycle and offline responses with the real worker code.
 (async()=>{

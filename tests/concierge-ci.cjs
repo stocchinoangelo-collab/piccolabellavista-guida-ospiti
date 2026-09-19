@@ -13,14 +13,14 @@ let renders=0,details=0;
 for(const lang of ['it','en','de']){
  run(`LANG='${lang}';buildEventIndex()`);
  const pages=run('Object.keys(ROUTES).map(k=>[k,ROUTES[k]()])');
- assert.equal(pages.length,17,`${lang}: route count`);
+ assert.equal(pages.length,18,`${lang}: route count`);
  for(const [route,html] of pages){
   assert(html.length>100,`${lang}/${route}`);
   assert(!html.includes('undefined'),`${lang}/${route}: undefined`);
   assert(!/QuantoBasta|Cala Regina|Porto Sa Ruxi/i.test(html),`${lang}/${route}: excluded venue`);
   for(const m of html.matchAll(/(?:src|href)="([^"]+)"/g)){
    const u=m[1].replaceAll('&amp;','&');
-   if(!/^(https?:|#)/.test(u))assert(fs.existsSync(path.join(root,u)),`Missing ${u}`);
+   if(!/^(https?:|tel:|#)/.test(u))assert(fs.existsSync(path.join(root,u)),`Missing ${u}`);
   }
   renders++;
  }
@@ -34,6 +34,13 @@ for(const lang of ['it','en','de']){
   details++;
  }
  assert(run('pgSpiagge()').includes(run("esc(t('nav_spiagge'))")),'Beach page must retain its translated heading');
+ const hospital=run('pgOspedali()');
+ for(const key of ['hospital_title','hospital_access','hospital_warning','hospital_cta'])assert(hospital.includes(run(`esc(t('${key}'))`)),`${lang}: hospital warning/heading ${key}`);
+ for(const key of ['hospital_amenities','hospital_linen'])for(const item of run(`t('${key}')`))assert(hospital.includes(item),`${lang}: missing inclusion ${item}`);
+ for(const number of ['+39070400101','+390706655','+390706095002','+390706095005','+393669336016','112','118'])assert(hospital.includes('href="tel:'+number+'"'),`${lang}: missing phone ${number}`);
+ assert(hospital.includes('https://wa.me/393931104422'),`${lang}: verified host contact`);
+ assert.equal((hospital.match(/travelmode=driving/g)||[]).length,3);
+ assert(hospital.indexOf(run("esc(t('hospital_access'))"))<hospital.indexOf('travelmode=driving'),'Accessibility limit before hospital routes');
  const home=run('pgHome()');
  for(const key of ['need_today','need_food','need_sea','need_help'])assert(home.includes(run(`esc(t('${key}'))`)),`${lang}: ${key}`);
 }
