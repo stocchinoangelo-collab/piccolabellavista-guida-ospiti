@@ -7,7 +7,8 @@ for(const [label,width,height] of [['mobile',390,844],['tablet',768,1024],['desk
  for(const lang of ['it','en','de']){
  await p.locator('[data-lang="'+lang+'"]').click();assert.equal(await p.locator('html').getAttribute('lang'),lang);assert.equal(await p.locator('main h1').count(),1);assert.equal(await p.locator('main a[href^="tel:"]').count(),7);assert.equal(await p.locator('main a[href="https://wa.me/393931104422"]').count(),1);
  assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'overflow '+label+lang);
- const links=await p.locator('main a').evaluateAll(aa=>aa.map(a=>({href:a.href,text:a.textContent})));assert(links.every(a=>a.text.trim()&&/^(https:|tel:)/.test(a.href)));assert(!/undefined|hospital_|nav_ospedali/.test(await p.locator('main').innerText()));
+ const links=await p.locator('main a').evaluateAll(aa=>aa.map(a=>({href:a.href,text:a.textContent.trim()})));assert(links.every(a=>a.text&&/^(https:|tel:)/.test(a.href)));assert(!/undefined|hospital_|nav_ospedali/.test(await p.locator('main').innerText()));
+ const hospitalRoutes=links.filter(a=>a.href.includes('travelmode=driving'));assert.equal(hospitalRoutes.length,3);assert.equal(new Set(hospitalRoutes.map(a=>a.text)).size,3);for(const name of ['Businco','Microcitemico','Brotzu'])assert(hospitalRoutes.some(a=>a.text.includes(name)),`named route ${name}`);
  await p.screenshot({path:'artifacts/hospitals-'+label+'-'+lang+'.png',fullPage:true});results.push(label+'/'+lang+': layout, content, 15 links, no overflow PASS');
  }
  await p.locator('[data-lang="it"]').click();if(width<720)await p.locator('#burger').click();await p.locator('#menu a[href="#ospedali"]').focus();await p.keyboard.press('Enter');
