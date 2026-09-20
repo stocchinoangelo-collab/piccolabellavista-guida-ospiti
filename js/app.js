@@ -379,7 +379,7 @@ let sheetReturnFocus=null;
 function closeSheet(){const wasOpen=$("#sheet").classList.contains("open");$("#sheet").classList.remove("open");document.body.style.overflow="";if(wasOpen&&sheetReturnFocus?.isConnected)sheetReturnFocus.focus();}
 
 /* ---------- router ---------- */
-const ROUTES={home:pgHome,casa:pgCasa,mangiare:pgMangiare,aperitivi:pgAperitivi,senzaauto:pgSenzaAuto,utili:pgUtili,spiagge:pgSpiagge,vento:pgVento,storia:pgStoria,sapori:pgSapori,eventi:pgEventi,itinerari:pgItinerari,mappa:pgMappa,fonti:pgFonti,
+const ROUTES={home:pgHome,casa:pgCasa,mangiare:pgMangiare,aperitivi:pgAperitivi,senzaauto:pgSenzaAuto,utili:pgUtili,ospedali:pgOspedali,spiagge:pgSpiagge,vento:pgVento,storia:pgStoria,sapori:pgSapori,eventi:pgEventi,itinerari:pgItinerari,mappa:pgMappa,fonti:pgFonti,
  perle:()=>gemListPage(()=>true,t("perle_t"),t("perle_s"),"perle"),
  borghi:()=>gemListPage(g=>g.cats.includes("borgo"),t("borgo_t"),t("borgo_s"),"borghi"),
  natura:()=>gemListPage(g=>g.cats.includes("natura"),t("nat_t"),t("nat_s"),"natura")};

@@ -442,3 +442,125 @@ for(const dict of Object.values(I18N)){for(const key of Object.keys(dict)){if(ke
 Object.assign(I18N.it,{"concierge_name": "Piccolabellavista Concierge", "need_today": "Cosa faccio oggi?", "need_food": "Dove mangio?", "need_sea": "Mare & Cagliari", "need_help": "Come mi muovo?", "host_voice": "I consigli di Angelo e Viviana, al tuo fianco durante il soggiorno.", "plan_intro": "Una passeggiata, il mare o un itinerario: scegli il ritmo della tua giornata.", "plan_routes": "Scegli un itinerario", "evening": "Stasera", "help_short": "Ho bisogno di aiuto", "all_sections": "Tutta la guida", "photo_placeholder": "Foto del locale non ancora disponibile.", "photo_context": "Immagine del territorio, non del locale.", "local_selection": "Selezione Piccolabellavista", "doc_title": "Piccolabellavista Concierge"});
 Object.assign(I18N.en,{"concierge_name": "Piccolabellavista Concierge", "need_today": "What shall I do today?", "need_food": "Where shall I eat?", "need_sea": "Sea & Cagliari", "need_help": "How do I get around?", "host_voice": "Tips from Angelo and Viviana, by your side throughout your stay.", "plan_intro": "A walk, the sea or a day trip: choose your own pace.", "plan_routes": "Choose an itinerary", "evening": "This evening", "help_short": "I need help", "all_sections": "Explore the guide", "photo_placeholder": "Venue photo not yet available.", "photo_context": "Area photograph, not a photograph of the venue.", "local_selection": "Selected by Piccolabellavista", "doc_title": "Piccolabellavista Concierge"});
 Object.assign(I18N.de,{"concierge_name": "Piccolabellavista Concierge", "need_today": "Was unternehme ich heute?", "need_food": "Wo gehe ich essen?", "need_sea": "Meer & Cagliari", "need_help": "Wie komme ich ans Ziel?", "host_voice": "Tipps von Angelo und Viviana für deinen Aufenthalt.", "plan_intro": "Ein Spaziergang, das Meer oder ein Ausflug: Gestalte deinen Tag.", "plan_routes": "Eine Route wählen", "evening": "Heute Abend", "help_short": "Ich brauche Hilfe", "all_sections": "Den Reiseführer erkunden", "photo_placeholder": "Ein Foto des Lokals ist noch nicht verfügbar.", "photo_context": "Foto der Umgebung, nicht des Lokals.", "local_selection": "Ausgewählt von Piccolabellavista", "doc_title": "Piccolabellavista Concierge"});
+
+/* Hospital stays: isolated translations, existing copy unchanged. */
+Object.assign(I18N.it, {
+  "nav_ospedali": "Soggiorni vicino agli ospedali",
+  "hospital_title": "Soggiorni pratici vicino agli ospedali di Cagliari",
+  "hospital_intro": "Una base a Pirri per familiari e accompagnatori, pazienti autonomi, personale sanitario e professionisti in trasferta.",
+  "hospital_access": "L’alloggio si trova al terzo piano senza ascensore e potrebbe non essere adatto a persone con mobilità ridotta.",
+  "hospital_route_to": "Percorso per",
+  "hospital_routes": "Gli ospedali dalla casa",
+  "hospital_traffic": "Da Via Bellavista 14, Pirri. Distanze approssimative e tempi indicativi in auto: i tempi dipendono dal traffico. Controlla il percorso prima di partire.",
+  "hospital_drive": "in auto",
+  "hospital_services": "Servizi della casa",
+  "hospital_amenities": [
+    "Massimo 2 ospiti",
+    "Angolo cottura attrezzato",
+    "Microonde, moka e stoviglie",
+    "Lavatrice",
+    "Wi-Fi e TV",
+    "Balcone",
+    "Climatizzatore portatile da 14.000 BTU",
+    "Self check-in assistito",
+    "Gestione diretta di Angelo e Viviana"
+  ],
+  "hospital_clean": "Pulizia e biancheria senza costi aggiuntivi",
+  "hospital_linen": [
+    "Asciugamani puliti ogni 3–4 giorni",
+    "Cambio lenzuola ogni 7 giorni nei soggiorni lunghi",
+    "Pulizia intermedia settimanale per soggiorni di almeno 14 notti",
+    "Pulizia finale inclusa"
+  ],
+  "hospital_useful": "Servizi utili",
+  "hospital_coop": "Supermercato Coop · Via Santa Maria Chiara 159",
+  "hospital_pharmacy": "Cerca farmacie aperte",
+  "hospital_dynamic": "La ricerca mostra informazioni aggiornabili: verifica gli orari e telefona alla farmacia prima di partire. Mappe, ricerca e servizi esterni richiedono una connessione.",
+  "hospital_doctor": "Guardia medica Pirri–Monserrato",
+  "hospital_address": "Cittadella della Salute · Via Romagna 16, Padiglione G, piano terra, Cagliari",
+  "hospital_warning": "La sede e gli orari possono cambiare. Telefonare prima di recarsi sul posto. Per le emergenze chiamare il 112 o il 118.",
+  "hospital_source": "Sede e orari sul sito ASL",
+  "hospital_emergency": "Emergenze",
+  "hospital_cta": "Hai bisogno di informazioni per il tuo soggiorno?",
+  "hospital_whatsapp": "Scrivi ad Angelo e Viviana su WhatsApp"
+});
+Object.assign(I18N.en, {
+  "nav_ospedali": "Stays near hospitals",
+  "hospital_title": "Practical stays near Cagliari’s hospitals",
+  "hospital_intro": "A base in Pirri for relatives and companions, independent patients, healthcare staff and professionals travelling for work.",
+  "hospital_access": "The accommodation is on the third floor with no lift and may not be suitable for people with reduced mobility.",
+  "hospital_route_to": "Directions to",
+  "hospital_routes": "Hospitals from the accommodation",
+  "hospital_traffic": "From Via Bellavista 14, Pirri. Approximate distances and estimated driving times: journey times depend on traffic. Check your route before leaving.",
+  "hospital_drive": "by car",
+  "hospital_services": "Accommodation amenities",
+  "hospital_amenities": [
+    "Maximum 2 guests",
+    "Equipped kitchenette",
+    "Microwave, moka coffee pot and tableware",
+    "Washing machine",
+    "Wi-Fi and TV",
+    "Balcony",
+    "Portable 14,000 BTU air conditioner",
+    "Assisted self check-in",
+    "Managed directly by Angelo and Viviana"
+  ],
+  "hospital_clean": "Cleaning and linen at no extra charge",
+  "hospital_linen": [
+    "Fresh towels every 3–4 days",
+    "Bed linen changed every 7 days for longer stays",
+    "Weekly interim cleaning for stays of at least 14 nights",
+    "Final cleaning included"
+  ],
+  "hospital_useful": "Useful services",
+  "hospital_coop": "Coop supermarket · Via Santa Maria Chiara 159",
+  "hospital_pharmacy": "Search for open pharmacies",
+  "hospital_dynamic": "Search results can change: check opening hours and call the pharmacy before leaving. Maps, search and external services require an internet connection.",
+  "hospital_doctor": "Out-of-hours medical service · Pirri–Monserrato",
+  "hospital_address": "Cittadella della Salute · Via Romagna 16, Building G, ground floor, Cagliari",
+  "hospital_warning": "The location and opening hours may change. Call before visiting. In an emergency, call 112 or 118.",
+  "hospital_source": "Location and hours on the ASL website",
+  "hospital_emergency": "Emergencies",
+  "hospital_cta": "Need information for your stay?",
+  "hospital_whatsapp": "Contact Angelo and Viviana on WhatsApp"
+});
+Object.assign(I18N.de, {
+  "nav_ospedali": "Aufenthalte in Krankenhausnähe",
+  "hospital_title": "Praktische Aufenthalte nahe den Krankenhäusern von Cagliari",
+  "hospital_intro": "Eine Unterkunft in Pirri für Angehörige und Begleitpersonen, selbstständige Patienten, medizinisches Personal und Berufstätige auf Dienstreise.",
+  "hospital_access": "Die Unterkunft liegt im dritten Stock ohne Aufzug und ist möglicherweise für Menschen mit eingeschränkter Mobilität nicht geeignet.",
+  "hospital_route_to": "Route zum",
+  "hospital_routes": "Von der Unterkunft zu den Krankenhäusern",
+  "hospital_traffic": "Ab Via Bellavista 14, Pirri. Ungefähre Entfernungen und geschätzte Fahrzeiten mit dem Auto: Die Zeiten hängen vom Verkehr ab. Prüfen Sie die Route vor der Abfahrt.",
+  "hospital_drive": "mit dem Auto",
+  "hospital_services": "Ausstattung der Unterkunft",
+  "hospital_amenities": [
+    "Maximal 2 Gäste",
+    "Ausgestattete Kochnische",
+    "Mikrowelle, Mokkakanne und Geschirr",
+    "Waschmaschine",
+    "WLAN und Fernseher",
+    "Balkon",
+    "Mobiles Klimagerät mit 14.000 BTU",
+    "Self-Check-in mit Unterstützung",
+    "Direkte Betreuung durch Angelo und Viviana"
+  ],
+  "hospital_clean": "Reinigung und Wäsche ohne Zusatzkosten",
+  "hospital_linen": [
+    "Frische Handtücher alle 3–4 Tage",
+    "Bettwäschewechsel alle 7 Tage bei längeren Aufenthalten",
+    "Wöchentliche Zwischenreinigung bei Aufenthalten ab 14 Nächten",
+    "Endreinigung inklusive"
+  ],
+  "hospital_useful": "Nützliche Dienste",
+  "hospital_coop": "Coop-Supermarkt · Via Santa Maria Chiara 159",
+  "hospital_pharmacy": "Geöffnete Apotheken suchen",
+  "hospital_dynamic": "Suchergebnisse können sich ändern: Prüfen Sie die Öffnungszeiten und rufen Sie vor der Abfahrt in der Apotheke an. Karten, Suche und externe Dienste benötigen eine Internetverbindung.",
+  "hospital_doctor": "Ärztlicher Bereitschaftsdienst · Pirri–Monserrato",
+  "hospital_address": "Cittadella della Salute · Via Romagna 16, Gebäude G, Erdgeschoss, Cagliari",
+  "hospital_warning": "Standort und Öffnungszeiten können sich ändern. Rufen Sie vor einem Besuch an. In Notfällen wählen Sie 112 oder 118.",
+  "hospital_source": "Standort und Öffnungszeiten auf der ASL-Website",
+  "hospital_emergency": "Notfälle",
+  "hospital_cta": "Benötigen Sie Informationen für Ihren Aufenthalt?",
+  "hospital_whatsapp": "Angelo und Viviana auf WhatsApp kontaktieren"
+});
