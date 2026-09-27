@@ -39,7 +39,10 @@ for(const lang of ['it','en','de']){
  for(const key of ['hospital_amenities','hospital_linen'])for(const item of run(`t('${key}')`))assert(hospital.includes(item),`${lang}: missing inclusion ${item}`);
  for(const number of ['+39070400101','+390706655','+390706095002','+390706095005','+393669336016','112','118'])assert(hospital.includes('href="tel:'+number+'"'),`${lang}: missing phone ${number}`);
  assert(hospital.includes('https://wa.me/393931104422'),`${lang}: verified host contact`);
- assert.equal((hospital.match(/travelmode=driving/g)||[]).length,3);
+ assert.equal((hospital.match(/travelmode=driving/g)||[]).length,4);
+ assert(hospital.includes('Policlinico Universitario Duilio Casula'),`${lang}: missing Policlinico route`);
+ assert(hospital.includes(run("esc(t('hospital_live_route'))")),`${lang}: live route note missing`);
+ assert(!/self.?check.?in/i.test(hospital),`${lang}: obsolete self check-in claim`);
  assert(hospital.indexOf(run("esc(t('hospital_access'))"))<hospital.indexOf('travelmode=driving'),'Accessibility limit before hospital routes');
  const home=run('pgHome()');
  for(const key of ['need_today','need_food','need_sea','need_help'])assert(home.includes(run(`esc(t('${key}'))`)),`${lang}: ${key}`);
