@@ -62,6 +62,20 @@ const runtimePhotos=run('Object.values(PHOTOS).filter(p=>p.file)');
 for(const p of runtimePhotos){assert(p.status.startsWith('APPROVATA_USO'),p.file);assert(fs.existsSync(path.join(root,p.file)),p.file);assert(p.author&&p.license&&p.source,p.file);}
 
 (async()=>{
+ const workerSource=read('_worker.js');
+ const workerModule=await import('data:text/javascript;base64,'+Buffer.from(workerSource).toString('base64'));
+ let assetRequests=0;
+ const pagesEnv={ASSETS:{fetch:async()=>{assetRequests++;return new Response('asset',{status:200})}}};
+ const canonical=await workerModule.default.fetch(new Request('https://piccolabellavista-guida-ospiti.pages.dev/index.html'),pagesEnv);
+ assert.equal(canonical.status,200,'canonical Pages host must serve assets');
+ assert.equal(assetRequests,1,'canonical request must reach Pages assets');
+ for(const hostname of ['fix-hospital-access-readiness.piccolabellavista-guida-ospiti.pages.dev','b43b40b1.piccolabellavista-guida-ospiti.pages.dev','example.com']){
+  const blocked=await workerModule.default.fetch(new Request(`https://${hostname}/index.html`),pagesEnv);
+  assert.equal(blocked.status,404,`${hostname}: preview/noncanonical host must fail closed`);
+  assert.equal(blocked.headers.get('cache-control'),'no-store',`${hostname}: denial must not be cached`);
+  assert.match(blocked.headers.get('x-robots-tag'),/noindex/,`${hostname}: denial must not be indexed`);
+ }
+ assert.equal(assetRequests,1,'blocked hosts must never reach Pages assets');
  const handlers={},deleted=[],scope='https://example.com/guide/';
  const caches={
   async keys(){return ['pbv-guide-%2Fguide%2F-old','pbv-v15','unrelated-cache','pbv-guide-other-scope-old']},
