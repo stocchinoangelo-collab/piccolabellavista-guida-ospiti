@@ -80,11 +80,16 @@ function pgFonti(){return pageHeading('nav_fonti','credits_intro')+'<section cla
 function pgOspedali(){
  const list=key=>'<ul>'+t(key).map(item=>'<li>'+esc(item)+'</li>').join('')+'</ul>';
  const phone=(number,label)=>'<a class="btn btn--ghost" href="tel:'+number+'">'+esc(label)+'</a>';
- const hospitals=[['Ospedale Oncologico Businco','2,5','5–10'],['Ospedale Microcitemico','2,6','5–10'],['Ospedale San Michele / Brotzu','3,7','7–12']];
+ const hospitals=[
+  {name:'Ospedale Oncologico Businco',query:'Ospedale Oncologico Businco Cagliari',km:'2,5',time:'5–10'},
+  {name:'Ospedale Microcitemico',query:'Ospedale Microcitemico Cagliari',km:'2,6',time:'5–10'},
+  {name:'Ospedale San Michele / Brotzu',query:'Ospedale San Michele / Brotzu Cagliari',km:'3,7',time:'7–12'},
+  {name:'Policlinico Universitario Duilio Casula',query:'Policlinico Universitario Duilio Casula Monserrato'}
+ ];
  return pageHeading('hospital_title','hospital_intro')+
  '<aside class="notice"><strong>'+esc(t('hospital_access'))+'</strong></aside>'+
 
- '<section class="blk"><h2 class="sec">'+esc(t('hospital_routes'))+'</h2><p class="sub">'+esc(t('hospital_traffic'))+'</p><div class="grid">'+hospitals.map(([name,km,time])=>'<article class="card"><div class="card__body"><h3>'+esc(name)+'</h3><p>≈ '+(LANG==='en'?km.replace(',','.'):km)+' km · '+time+' min '+esc(t('hospital_drive'))+'</p>'+externalLink(directionsLink(name+' Cagliari')+'&travelmode=driving',t('hospital_route_to')+' '+name,'btn btn--map')+'</div></article>').join('')+'</div></section>'+
+ '<section class="blk"><h2 class="sec">'+esc(t('hospital_routes'))+'</h2><p class="sub">'+esc(t('hospital_traffic'))+'</p><div class="grid">'+hospitals.map(({name,query,km,time})=>'<article class="card"><div class="card__body"><h3>'+esc(name)+'</h3><p>'+(km?'≈ '+(LANG==='en'?km.replace(',','.'):km)+' km · '+time+' min '+esc(t('hospital_drive')):esc(t('hospital_live_route')))+'</p>'+externalLink(directionsLink(query)+'&travelmode=driving',t('hospital_route_to')+' '+name,'btn btn--map')+'</div></article>').join('')+'</div></section>'+
  '<section class="blk"><div class="house-layout"><article class="card"><div class="card__body"><h2>'+esc(t('hospital_services'))+'</h2>'+list('hospital_amenities')+'</div></article><article class="card"><div class="card__body"><h2>'+esc(t('hospital_clean'))+'</h2>'+list('hospital_linen')+'</div></article></div></section>'+
  '<section class="blk"><h2 class="sec">'+esc(t('hospital_useful'))+'</h2><div class="card__foot">'+externalLink(directionsLink('Coop Via Santa Maria Chiara 159 Pirri Cagliari'),t('hospital_coop'),'btn btn--map')+externalLink('https://www.ctmcagliari.it/busfinder/','CTM BusFinder')+phone('+39070400101','Taxi Quattro Mori · 070 400 101')+phone('+390706655','Radio Taxi Rossoblù · 070 6655')+externalLink(mapSearch('farmacie aperte ora vicino a Via Bellavista 14 Pirri Cagliari'),t('hospital_pharmacy'))+'</div><p class="sub">'+esc(t('hospital_dynamic'))+'</p></section>'+
  '<section class="blk notice"><h2>'+esc(t('hospital_doctor'))+'</h2><p>'+esc(t('hospital_address'))+'</p><div class="card__foot">'+phone('+390706095002','070 6095002')+phone('+390706095005','070 6095005')+phone('+393669336016','366 9336016')+externalLink('https://www.asl8cagliari.it/strutture/guardia-medica-distretto-1-pirri-e-monserrato/',t('hospital_source'))+'</div><p><strong>'+esc(t('hospital_warning'))+'</strong></p></section>'+

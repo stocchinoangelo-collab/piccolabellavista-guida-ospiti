@@ -453,6 +453,7 @@ Object.assign(I18N.it, {
   "hospital_routes": "Gli ospedali dalla casa",
   "hospital_traffic": "Da Via Bellavista 14, Pirri. Distanze approssimative e tempi indicativi in auto: i tempi dipendono dal traffico. Controlla il percorso prima di partire.",
   "hospital_drive": "in auto",
+  "hospital_live_route": "Distanza e tempi aggiornati su Google Maps",
   "hospital_services": "Servizi della casa",
   "hospital_amenities": [
     "Massimo 2 ospiti",
@@ -462,7 +463,7 @@ Object.assign(I18N.it, {
     "Wi-Fi e TV",
     "Balcone",
     "Climatizzatore portatile da 14.000 BTU",
-    "Self check-in assistito",
+    "Accoglienza personale di Angelo: verifica dei documenti originali e consegna delle chiavi",
     "Gestione diretta di Angelo e Viviana"
   ],
   "hospital_clean": "Pulizia e biancheria senza costi aggiuntivi",
@@ -493,6 +494,7 @@ Object.assign(I18N.en, {
   "hospital_routes": "Hospitals from the accommodation",
   "hospital_traffic": "From Via Bellavista 14, Pirri. Approximate distances and estimated driving times: journey times depend on traffic. Check your route before leaving.",
   "hospital_drive": "by car",
+  "hospital_live_route": "Current distance and travel time on Google Maps",
   "hospital_services": "Accommodation amenities",
   "hospital_amenities": [
     "Maximum 2 guests",
@@ -502,7 +504,7 @@ Object.assign(I18N.en, {
     "Wi-Fi and TV",
     "Balcony",
     "Portable 14,000 BTU air conditioner",
-    "Assisted self check-in",
+    "Personal welcome by Angelo: original documents checked and keys handed over",
     "Managed directly by Angelo and Viviana"
   ],
   "hospital_clean": "Cleaning and linen at no extra charge",
@@ -533,6 +535,7 @@ Object.assign(I18N.de, {
   "hospital_routes": "Von der Unterkunft zu den Krankenhäusern",
   "hospital_traffic": "Ab Via Bellavista 14, Pirri. Ungefähre Entfernungen und geschätzte Fahrzeiten mit dem Auto: Die Zeiten hängen vom Verkehr ab. Prüfen Sie die Route vor der Abfahrt.",
   "hospital_drive": "mit dem Auto",
+  "hospital_live_route": "Aktuelle Entfernung und Fahrzeit auf Google Maps",
   "hospital_services": "Ausstattung der Unterkunft",
   "hospital_amenities": [
     "Maximal 2 Gäste",
@@ -542,7 +545,7 @@ Object.assign(I18N.de, {
     "WLAN und Fernseher",
     "Balkon",
     "Mobiles Klimagerät mit 14.000 BTU",
-    "Self-Check-in mit Unterstützung",
+    "Persönlicher Empfang durch Angelo: Prüfung der Originaldokumente und Schlüsselübergabe",
     "Direkte Betreuung durch Angelo und Viviana"
   ],
   "hospital_clean": "Reinigung und Wäsche ohne Zusatzkosten",
