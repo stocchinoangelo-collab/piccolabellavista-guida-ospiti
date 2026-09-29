@@ -36,3 +36,14 @@ Per i percorsi si usa l'indirizzo testuale della struttura e Maps/Busfinder. Le 
 ## Foto
 Undici originali esatti Wikimedia, verificati e convertiti in WebP. I due fallback gastronomici non annullano le scelte dell'utente. Le nove schede dei locali non caricano foto senza permesso. credits/beach-images.json è un archivio storico non attivo da rivalidare.
 La pagina Fonti e crediti mostra autore, fonte e licenza. Le derivate CC BY-SA conservano la licenza originale, separata dal codice.
+## Accesso ospiti senza email
+Il branch `feature/guest-pin-access` introduce un gate lato server con Cloudflare Pages Functions. Il middleware in `functions/_middleware.js` intercetta anche i file statici: senza sessione valida HTML, JavaScript, immagini, manifest e service worker non vengono consegnati. La sessione usa un cookie firmato `HttpOnly`, `Secure` e `SameSite=Strict`; tutte le risposte restano `Cache-Control: no-store`.
+
+Prima di usare questa modalità in produzione, nel progetto Cloudflare Pages vanno creati due **Secrets** runtime:
+- `GUEST_PIN`: codice da comunicare agli ospiti (meglio 8+ cifre o una passphrase non ovvia).
+- `SESSION_SECRET`: valore casuale lungo almeno 24 caratteri, distinto dal PIN e mai condiviso con gli ospiti.
+
+Opzionale: `GUEST_SESSION_HOURS` (variabile non segreta) controlla la durata della sessione; il default è 168 ore, massimo 720. Se i secret mancano o sono invalidi il middleware fallisce chiuso con HTTP 503: la guida non diventa pubblica per errore.
+
+La precedente policy Cloudflare Access basata su email va lasciata attiva finché il deploy con questi secret non è stato verificato. Solo dopo un test positivo in finestra privata si potrà rimuovere il vincolo email.
+
