@@ -29,7 +29,7 @@ const next=async()=>new Response('PRIVATE GUIDE',{status:200,headers:{'Content-T
  r=await onRequest({request:new Request('https://guide.example/js/app.js',{headers:{Cookie:cookie}}),env,next});
  assert.equal(r.status,200);assert.equal(await r.text(),'PRIVATE GUIDE');assert.equal(r.headers.get('cache-control'),'no-store');
 
- const tampered=cookie.replace(/.$/,'0');
+ const tampered=cookie.slice(0,-1)+(cookie.endsWith('0')?'1':'0');
  r=await onRequest({request:new Request('https://guide.example/',{headers:{Accept:'text/html',Cookie:tampered}}),env,next});
  assert.equal(r.status,302);
 
