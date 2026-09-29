@@ -34,7 +34,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for f in js/*.js sw.js tests/*.cjs; do
+          for f in js/*.js sw.js functions/*.js tests/*.cjs; do
             node --check "$f"
           done
 
