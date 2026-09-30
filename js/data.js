@@ -2623,13 +2623,13 @@ const EVENTS = [
     "end": "2026-10-04",
     "cat": {"it": "tradizione e gusto", "en": "tradition and food", "de": "Tradition und Genuss"},
     "d": {
-      "it": "Passeggiate nel villaggio storico, trenino nelle saline, attività per bambini e, il 4 ottobre alle 12:00, laboratorio con degustazione sul cappero selargino. Prenotazione obbligatoria; attività €6–20.",
-      "en": "Walks through the historic village, saltpan train rides, children’s activities and, on 4 October at 12:00, a tasting workshop on Selargius capers. Booking required; activities €6–20.",
-      "de": "Spaziergänge durch das historische Dorf, Rundfahrt durch die Salinen, Kinderangebote und am 4. Oktober um 12:00 Uhr ein Verkostungs-Workshop zur Selargius-Kaper. Reservierung erforderlich; Angebote 6–20 €."
+      "it": "Il 3 e 4 ottobre: passeggiate al Villaggio Macchiareddu alle 10:00, attività per bambini alle 16:00 e tour in trenino. Il laboratorio sul cappero selargino è stato rinviato al 18 ottobre. Prenotazione consigliata; verificare disponibilità e prezzi sul sito FAI.",
+      "en": "On 3–4 October: 10:00 walks at Villaggio Macchiareddu, children’s activities at 16:00 and saltpan train rides. The Selargius caper workshop has been moved to 18 October. Advance booking recommended; check availability and prices on the FAI website.",
+      "de": "Am 3.–4. Oktober: Spaziergänge im Villaggio Macchiareddu um 10:00 Uhr, Kinderangebote um 16:00 Uhr und Rundfahrten mit dem Zug durch die Salinen. Der Workshop zur Selargius-Kaper wurde auf den 18. Oktober verschoben. Reservierung empfohlen; Verfügbarkeit und Preise auf der FAI-Website prüfen."
     },
     "checked": "30/09/2026",
     "source": "verified",
-    "url": "https://cagliariturismo.comune.cagliari.it/index.php/it/events/festa-della-raccolta-del-sale-2"
+    "url": "https://fondoambiente.it/eventi/festa-della-raccolta-del-sale"
   },
   {
     "id": "wine-not-2026",
