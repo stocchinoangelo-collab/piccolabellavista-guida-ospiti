@@ -253,7 +253,7 @@ async function renderToday(){
  box.innerHTML=head+'<div class="grid">'+picks.map(p=>{
   const x=p[1],isEv=p[2];
   const dateTxt=isEv?(x.dateNoteObj?L(x.dateNoteObj):(x.start?fmtRange(x.start,x.end):"")):"";
-  const meta=isEv?'<div class="meta"><span>📌 '+esc(x.city||"")+"</span>"+(dateTxt?"<span>🗓️ "+esc(dateTxt)+"</span>":"")+"</div>"
+  const meta=isEv?'<div class="meta"><span>📌 '+esc(L(x.city)||"")+"</span>"+(dateTxt?"<span>🗓️ "+esc(dateTxt)+"</span>":"")+"</div>"
    :'<div class="meta"><span>🚗 ~'+fmtDrive(x.driveMin)+"</span><span>👥 "+x.crowd+"/5</span></div>";
   const txt='<p style="font-size:.87rem;color:var(--ink-soft)">'+esc(isEv?(L(x.d)||(x.dateNoteObj?L(x.dateNoteObj):"")):(L(x.desc||x.why)))+"</p>";
   const u=isEv?safeUrl(x.url):"";
@@ -307,9 +307,9 @@ function evCard(e){
  (dateTxt?'<span class="ev__date">'+esc(dateTxt)+"</span>":"")+"</div>"+
  (e.d&&L(e.d)?"<p>"+esc(L(e.d))+"</p>":"")+
  '<div class="ev__meta">'+
- (e.city?'<span>📌 '+esc(e.city)+"</span>":"")+
+ (e.city?'<span>📌 '+esc(L(e.city))+"</span>":"")+
  (e.distMin?'<span>🚗 ~'+fmtDrive(e.distMin)+"</span>":"")+
- (e.cat?'<span>#'+esc(e.cat)+"</span>":"")+
+ (e.cat?'<span>#'+esc(L(e.cat))+"</span>":"")+
  evStatusBadge(e)+
  (e.checked?'<span class="chk">✅ '+esc(t("ev_last_check"))+": "+esc(e.checked)+"</span>":"")+
  (u?'<a target="_blank" rel="noopener" href="'+esc(u)+'">🔗 '+esc(t("src_site"))+"</a>":"")+

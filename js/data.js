@@ -2598,10 +2598,10 @@ const EVENTS = [
       "en": "Forma e Poesia nel Jazz",
       "de": "Forma e Poesia im Jazz"
     },
-    "city": "Cagliari · sedi diverse",
+    "city": {"it": "Cagliari · sedi diverse", "en": "Cagliari · multiple venues", "de": "Cagliari · verschiedene Orte"},
     "date": "2026-10-01",
     "end": "2026-10-04",
-    "cat": "musica e territorio",
+    "cat": {"it": "musica e territorio", "en": "music and landscape", "de": "Musik und Landschaft"},
     "d": {
       "it": "Concerti e appuntamenti tra Teatro delle Saline, Teatro Doglio, Molentargius e Sella del Diavolo. Concerti principali €27–30; verificare la prenotazione dei singoli appuntamenti.",
       "en": "Concerts and special events at Teatro delle Saline, Teatro Doglio, Molentargius and Sella del Diavolo. Main concerts €27–30; check booking requirements for each event.",
@@ -2618,10 +2618,10 @@ const EVENTS = [
       "en": "Salt Harvest Festival",
       "de": "Fest der Salzernte"
     },
-    "city": "Saline Conti Vecchi · Macchiareddu",
+    "city": {"it": "Saline Conti Vecchi · Macchiareddu", "en": "Conti Vecchi Saltworks · Macchiareddu", "de": "Salinen Conti Vecchi · Macchiareddu"},
     "date": "2026-10-03",
     "end": "2026-10-04",
-    "cat": "tradizione e gusto",
+    "cat": {"it": "tradizione e gusto", "en": "tradition and food", "de": "Tradition und Genuss"},
     "d": {
       "it": "Passeggiate nel villaggio storico, trenino nelle saline, attività per bambini e, il 4 ottobre alle 12:00, laboratorio con degustazione sul cappero selargino. Prenotazione obbligatoria; attività €6–20.",
       "en": "Walks through the historic village, saltpan train rides, children’s activities and, on 4 October at 12:00, a tasting workshop on Selargius capers. Booking required; activities €6–20.",
@@ -2638,10 +2638,10 @@ const EVENTS = [
       "en": "Wine Not? Festival",
       "de": "Wine Not? Festival"
     },
-    "city": "Cagliari · MusiCA Arena",
+    "city": {"it": "Cagliari · MusiCA Arena", "en": "Cagliari · MusiCA Arena", "de": "Cagliari · MusiCA Arena"},
     "date": "2026-10-24",
     "end": "2026-10-24",
-    "cat": "vino e musica",
+    "cat": {"it": "vino e musica", "en": "wine and music", "de": "Wein und Musik"},
     "d": {
       "it": "Serata dedicata a vino, musica dal vivo e DJ set, dalle 19:00 alle 04:00. Ingresso gratuito con registrazione online obbligatoria; consumazioni a pagamento.",
       "en": "An evening of wine, live music and DJ sets, from 19:00 to 04:00. Free admission with mandatory online registration; drinks are charged separately.",
