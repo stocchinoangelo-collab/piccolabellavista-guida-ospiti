@@ -89,7 +89,17 @@ function csvToUnified(r){
 }
 
 function staticToUnified(e){
- return Object.assign({},e,{start:null,end:null,recurring:true,dateNoteObj:e.dateNote||null,coords:null,stato:"",source:"local"});
+ const start=parseISOorEU(e.date),rawEnd=parseISOorEU(e.end);
+ return Object.assign({},e,{
+  start,
+  end:start?(rawEnd&&rawEnd>start?rawEnd:start):null,
+  recurring:!start,
+  dateNoteObj:e.dateNote||null,
+  coords:Array.isArray(e.coords)?e.coords:null,
+  checked:e.checked||"",
+  stato:e.stato||"",
+  source:e.source||"local"
+ });
 }
 
 function buildEventIndex(){
@@ -238,7 +248,7 @@ async function renderToday(){
  if(cult)picks.push(["🏺 "+t("today_culture"),cult,false]);
  const green=GEMS.filter(g=>(g.cats.includes("natura")||g.cats.includes("borgo"))&&g.driveMin<=50).sort((a,b)=>a.driveMin-b.driveMin)[0];
  if(green)picks.push(["🌿 "+t("today_green"),green,false]);
- const ev=nextFixedIn(7).find(x=>x.source==="csv");
+ const ev=nextFixedIn(7).find(x=>x.start);
  if(ev)picks.push(["🎭 "+t("today_event"),ev,true]);
  box.innerHTML=head+'<div class="grid">'+picks.map(p=>{
   const x=p[1],isEv=p[2];
@@ -319,8 +329,8 @@ function updStamp(){
  return '<div class="upd">🔄 '+esc(t("ev_verified"))+" "+esc(L(CONFIG.lastChecked))+"<br><small>"+esc(t("ev_local_list"))+"</small></div>";}
 
 function pgEventi(){
- const confirmed=EVENT_INDEX.filter(e=>e.source==="csv"&&e.start&&evVisible(e)&&!e.stato);
- const traditions=EVENTS.filter(e=>e.id!=="timeinjazz").map(staticToUnified);
+ const confirmed=EVENT_INDEX.filter(e=>e.start&&evVisible(e)&&!e.stato);
+ const traditions=EVENTS.filter(e=>e.id!=="timeinjazz"&&!parseISOorEU(e.date)).map(staticToUnified);
  return pageHeading("nav_eventi","events_intro")+
  '<section class="blk"><h2 class="sec">'+esc(t("confirmed_events"))+'</h2>'+
  (confirmed.length?confirmed.sort(evSorter).map(evCard).join(""):'<p class="sub">'+esc(t("no_confirmed_events"))+'</p>')+'</section>'+
