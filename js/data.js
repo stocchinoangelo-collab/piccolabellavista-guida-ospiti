@@ -11,9 +11,9 @@ const CONFIG = {
     "passSha256": ""
   },
   "lastChecked": {
-    "it": "Contenuti storici; confermare orari e accessi sui siti ufficiali.",
-    "en": "Reference content; confirm hours and access on official websites.",
-    "de": "Hintergrundinformationen; Öffnungszeiten und Zugang auf offiziellen Seiten prüfen."
+    "it": "Eventi di ottobre verificati il 30/09/2026; confermare orari, disponibilità e accesso sui siti ufficiali il giorno stesso.",
+    "en": "October events checked on 30/09/2026; confirm times, availability and access on official websites on the day.",
+    "de": "Oktober-Veranstaltungen am 30.09.2026 geprüft; Zeiten, Verfügbarkeit und Zugang am selben Tag auf den offiziellen Seiten bestätigen."
   }
 };
 const WINDS = [
@@ -2591,6 +2591,66 @@ const FOOD = [
   }
 ];
 const EVENTS = [
+  {
+    "id": "forma-poesia-jazz-2026",
+    "name": {
+      "it": "Forma e Poesia nel Jazz",
+      "en": "Forma e Poesia nel Jazz",
+      "de": "Forma e Poesia im Jazz"
+    },
+    "city": "Cagliari · sedi diverse",
+    "date": "2026-10-01",
+    "end": "2026-10-04",
+    "cat": "musica e territorio",
+    "d": {
+      "it": "Concerti e appuntamenti tra Teatro delle Saline, Teatro Doglio, Molentargius e Sella del Diavolo. Concerti principali €27–30; verificare la prenotazione dei singoli appuntamenti.",
+      "en": "Concerts and special events at Teatro delle Saline, Teatro Doglio, Molentargius and Sella del Diavolo. Main concerts €27–30; check booking requirements for each event.",
+      "de": "Konzerte und besondere Termine im Teatro delle Saline, Teatro Doglio, in Molentargius und an der Sella del Diavolo. Hauptkonzerte 27–30 €; Reservierung für jeden Termin prüfen."
+    },
+    "checked": "30/09/2026",
+    "source": "verified",
+    "url": "https://cagliariturismo.comune.cagliari.it/it/events/forma-e-poesia-nel-jazz-29-edizione"
+  },
+  {
+    "id": "festa-sale-ottobre-2026",
+    "name": {
+      "it": "Festa della Raccolta del Sale",
+      "en": "Salt Harvest Festival",
+      "de": "Fest der Salzernte"
+    },
+    "city": "Saline Conti Vecchi · Macchiareddu",
+    "date": "2026-10-03",
+    "end": "2026-10-04",
+    "cat": "tradizione e gusto",
+    "d": {
+      "it": "Passeggiate nel villaggio storico, trenino nelle saline, attività per bambini e, il 4 ottobre alle 12:00, laboratorio con degustazione sul cappero selargino. Prenotazione obbligatoria; attività €6–20.",
+      "en": "Walks through the historic village, saltpan train rides, children’s activities and, on 4 October at 12:00, a tasting workshop on Selargius capers. Booking required; activities €6–20.",
+      "de": "Spaziergänge durch das historische Dorf, Rundfahrt durch die Salinen, Kinderangebote und am 4. Oktober um 12:00 Uhr ein Verkostungs-Workshop zur Selargius-Kaper. Reservierung erforderlich; Angebote 6–20 €."
+    },
+    "checked": "30/09/2026",
+    "source": "verified",
+    "url": "https://cagliariturismo.comune.cagliari.it/index.php/it/events/festa-della-raccolta-del-sale-2"
+  },
+  {
+    "id": "wine-not-2026",
+    "name": {
+      "it": "Wine Not? Festival",
+      "en": "Wine Not? Festival",
+      "de": "Wine Not? Festival"
+    },
+    "city": "Cagliari · MusiCA Arena",
+    "date": "2026-10-24",
+    "end": "2026-10-24",
+    "cat": "vino e musica",
+    "d": {
+      "it": "Serata dedicata a vino, musica dal vivo e DJ set, dalle 19:00 alle 04:00. Ingresso gratuito con registrazione online obbligatoria; consumazioni a pagamento.",
+      "en": "An evening of wine, live music and DJ sets, from 19:00 to 04:00. Free admission with mandatory online registration; drinks are charged separately.",
+      "de": "Ein Abend mit Wein, Live-Musik und DJ-Sets von 19:00 bis 04:00 Uhr. Eintritt frei nach verpflichtender Online-Registrierung; Getränke kostenpflichtig."
+    },
+    "checked": "30/09/2026",
+    "source": "verified",
+    "url": "https://cagliariturismo.comune.cagliari.it/it/events/wine-not-festival"
+  },
   {
     "id": "sartiglia",
     "name": {
