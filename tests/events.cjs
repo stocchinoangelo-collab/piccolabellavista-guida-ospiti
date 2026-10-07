@@ -31,6 +31,15 @@ instant='2026-10-18T22:00:00Z';
 assert(!run('pgEventi()').includes('Creative Corner'));
 assert(!run('pgEventi()').includes('Gesico'));
 assert(!run('pgEventi()').includes('Vallermosa'));
+// Wine Not? ends after midnight on the day Italy returns to standard time.
+for(const now of ['2026-10-24T22:30:00Z','2026-10-25T00:30:00Z','2026-10-25T01:30:00Z','2026-10-25T02:59:59Z']){
+ instant=now;
+ assert(run('pgEventi()').includes('Wine Not?'),'Overnight event remains visible until 04:00 in Cagliari');
+ assert(run('evOngoing(EVENT_INDEX.find(e=>e.id==="wine-not-2026"))'));
+}
+instant='2026-10-25T03:00:00Z'; // 04:00 CET: hide at the actual closing time.
+assert(!run('pgEventi()').includes('Wine Not?'));
+for(const selector of ['nextFixedIn(30)','upcomingFixed(10)','monthEvents()'])assert(!run(`${selector}.some(e=>e.id==="wine-not-2026")`),'Finished overnight event excluded from all suggestions');
 instant='2026-11-01T12:00:00Z';
 assert(!run('pgEventi()').includes('Wine Not?'));
 assert(run('pgEventi()').includes(run('t("no_confirmed_events")')));
