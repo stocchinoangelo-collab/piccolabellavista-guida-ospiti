@@ -11,9 +11,9 @@ const CONFIG = {
     "passSha256": ""
   },
   "lastChecked": {
-    "it": "Eventi di ottobre verificati il 30/09/2026; confermare orari, disponibilità e accesso sui siti ufficiali il giorno stesso.",
-    "en": "October events checked on 30/09/2026; confirm times, availability and access on official websites on the day.",
-    "de": "Oktober-Veranstaltungen am 30.09.2026 geprüft; Zeiten, Verfügbarkeit und Zugang am selben Tag auf den offiziellen Seiten bestätigen."
+    "it": "Eventi di ottobre verificati il 07/10/2026; confermare orari, disponibilità e accesso sui siti ufficiali il giorno stesso.",
+    "en": "October events checked on 07/10/2026; confirm times, availability and access on official websites on the day.",
+    "de": "Oktober-Veranstaltungen am 07.10.2026 geprüft; Zeiten, Verfügbarkeit und Zugang am selben Tag auf den offiziellen Seiten bestätigen."
   }
 };
 const WINDS = [
@@ -2592,44 +2592,146 @@ const FOOD = [
 ];
 const EVENTS = [
   {
-    "id": "forma-poesia-jazz-2026",
+    "id": "fai-autunno-cagliari-2026",
     "name": {
-      "it": "Forma e Poesia nel Jazz",
-      "en": "Forma e Poesia nel Jazz",
-      "de": "Forma e Poesia im Jazz"
+      "it": "Giornate FAI d’Autunno",
+      "en": "FAI Autumn Days",
+      "de": "FAI-Herbsttage"
     },
-    "city": {"it": "Cagliari · sedi diverse", "en": "Cagliari · multiple venues", "de": "Cagliari · verschiedene Orte"},
-    "date": "2026-10-01",
-    "end": "2026-10-04",
-    "cat": {"it": "musica e territorio", "en": "music and landscape", "de": "Musik und Landschaft"},
+    "city": {
+      "it": "Cagliari · Ammiragliato / Saline Conti Vecchi, Macchiareddu",
+      "en": "Cagliari · Admiralty / Conti Vecchi Saltworks, Macchiareddu",
+      "de": "Cagliari · Admiralität / Salinen Conti Vecchi, Macchiareddu"
+    },
+    "date": "2026-10-10",
+    "end": "2026-10-11",
+    "cat": {
+      "it": "cultura e visite",
+      "en": "culture and visits",
+      "de": "Kultur und Besichtigungen"
+    },
     "d": {
-      "it": "Concerti e appuntamenti tra Teatro delle Saline, Teatro Doglio, Molentargius e Sella del Diavolo. Concerti principali €27–30; verificare la prenotazione dei singoli appuntamenti.",
-      "en": "Concerts and special events at Teatro delle Saline, Teatro Doglio, Molentargius and Sella del Diavolo. Main concerts €27–30; check booking requirements for each event.",
-      "de": "Konzerte und besondere Termine im Teatro delle Saline, Teatro Doglio, in Molentargius und an der Sella del Diavolo. Hauptkonzerte 27–30 €; Reservierung für jeden Termin prüfen."
+      "it": "Il 10 e 11 ottobre: Ammiragliato, piazza Marinai d’Italia 1, ore 09:30–12:30 e 14:30–17:30, senza prenotazione. Saline Conti Vecchi: ore 10:00–19:00, ultimo ingresso alle 17:00; prenotazione disponibile sul sito ufficiale. Visite, trenino e passeggiata storica. Accessibilità limitata: controllare le condizioni per ciascuna sede.",
+      "en": "On 10–11 October: Admiralty, piazza Marinai d’Italia 1, 09:30–12:30 and 14:30–17:30, no booking required. Conti Vecchi Saltworks: 10:00–19:00, last admission 17:00; booking available on the official website. Visits, train tours and a historical walk. Accessibility is limited: check the conditions for each venue.",
+      "de": "Am 10.–11. Oktober: Admiralität, piazza Marinai d’Italia 1, 09:30–12:30 und 14:30–17:30 Uhr, ohne Reservierung. Salinen Conti Vecchi: 10:00–19:00 Uhr, letzter Einlass 17:00 Uhr; Reservierung auf der offiziellen Website möglich. Besichtigungen, Zugfahrten und historischer Spaziergang. Eingeschränkte Zugänglichkeit: Bedingungen je Standort prüfen."
     },
-    "checked": "30/09/2026",
+    "checked": "07/10/2026",
     "source": "verified",
-    "url": "https://cagliariturismo.comune.cagliari.it/it/events/forma-e-poesia-nel-jazz-29-edizione"
+    "url": "https://cagliariturismo.comune.cagliari.it/it/events/15a-giornate-fai-dautunno"
   },
   {
-    "id": "festa-sale-ottobre-2026",
+    "id": "selvatica-cagliari-2026",
     "name": {
-      "it": "Festa della Raccolta del Sale",
-      "en": "Salt Harvest Festival",
-      "de": "Fest der Salzernte"
+      "it": "Festival Selvatica",
+      "en": "Selvatica Festival",
+      "de": "Festival Selvatica"
     },
-    "city": {"it": "Saline Conti Vecchi · Macchiareddu", "en": "Conti Vecchi Saltworks · Macchiareddu", "de": "Salinen Conti Vecchi · Macchiareddu"},
-    "date": "2026-10-03",
-    "end": "2026-10-04",
-    "cat": {"it": "tradizione e gusto", "en": "tradition and food", "de": "Tradition und Genuss"},
+    "city": {
+      "it": "Cagliari · Lazzaretto, Sant’Elia",
+      "en": "Cagliari · Lazzaretto, Sant’Elia",
+      "de": "Cagliari · Lazzaretto, Sant’Elia"
+    },
+    "date": "2026-10-10",
+    "end": "2026-10-11",
+    "cat": {
+      "it": "natura e cultura",
+      "en": "nature and culture",
+      "de": "Natur und Kultur"
+    },
     "d": {
-      "it": "Il 3 e 4 ottobre: passeggiate al Villaggio Macchiareddu alle 10:00, attività per bambini alle 16:00 e tour in trenino. Il laboratorio sul cappero selargino è stato rinviato al 18 ottobre. Prenotazione consigliata; verificare disponibilità e prezzi sul sito FAI.",
-      "en": "On 3–4 October: 10:00 walks at Villaggio Macchiareddu, children’s activities at 16:00 and saltpan train rides. The Selargius caper workshop has been moved to 18 October. Advance booking recommended; check availability and prices on the FAI website.",
-      "de": "Am 3.–4. Oktober: Spaziergänge im Villaggio Macchiareddu um 10:00 Uhr, Kinderangebote um 16:00 Uhr und Rundfahrten mit dem Zug durch die Salinen. Der Workshop zur Selargius-Kaper wurde auf den 18. Oktober verschoben. Reservierung empfohlen; Verfügbarkeit und Preise auf der FAI-Website prüfen."
+      "it": "Due giornate su animali, biodiversità, agricoltura e comunità, con pranzi conviviali e mercatino dei produttori. Apertura sabato alle 10:00; conclusione indicata domenica alle 17:30. Consultare il programma ufficiale per i singoli incontri e chiedere agli organizzatori condizioni e costi dei pranzi.",
+      "en": "Two days exploring animals, biodiversity, farming and communities, with shared lunches and a producers’ market. Opens Saturday at 10:00; the listed closing time is Sunday at 17:30. Check the official programme for individual sessions and ask organisers about lunch arrangements and prices.",
+      "de": "Zwei Tage zu Tieren, Biodiversität, Landwirtschaft und Gemeinschaften, mit gemeinsamen Mittagessen und einem Markt der Erzeuger. Beginn Samstag um 10:00 Uhr; angegebenes Ende Sonntag um 17:30 Uhr. Einzeltermine im offiziellen Programm prüfen; Bedingungen und Preise der Mittagessen beim Veranstalter erfragen."
     },
-    "checked": "30/09/2026",
+    "checked": "07/10/2026",
     "source": "verified",
-    "url": "https://fondoambiente.it/eventi/festa-della-raccolta-del-sale"
+    "url": "https://www.lazzarettodicagliari.it/event/%F0%9F%90%9Dfestival-selvatica-al-lazzaretto-di-cagliari-il-10-e-11-ottobre-2026%F0%9F%8D%84/"
+  },
+  {
+    "id": "creative-corner-ottobre-2026",
+    "name": {
+      "it": "Creative Corner Market · Leaves Edition",
+      "en": "Creative Corner Market · Leaves Edition",
+      "de": "Creative Corner Market · Leaves Edition"
+    },
+    "city": {
+      "it": "Cagliari · Lazzaretto, Sant’Elia",
+      "en": "Cagliari · Lazzaretto, Sant’Elia",
+      "de": "Cagliari · Lazzaretto, Sant’Elia"
+    },
+    "date": "2026-10-17",
+    "end": "2026-10-18",
+    "cat": {
+      "it": "artigianato e illustrazione",
+      "en": "crafts and illustration",
+      "de": "Kunsthandwerk und Illustration"
+    },
+    "d": {
+      "it": "Sabato 17 e domenica 18 ottobre, ore 11:00–20:00. Creazioni di artigiani, maker e illustratori al Lazzaretto. Ingresso gratuito.",
+      "en": "Saturday 17 and Sunday 18 October, 11:00–20:00. Handmade creations and illustrations at the Lazzaretto. Free admission.",
+      "de": "Samstag, 17., und Sonntag, 18. Oktober, 11:00–20:00 Uhr. Handgefertigte Arbeiten und Illustrationen im Lazzaretto. Eintritt frei."
+    },
+    "checked": "07/10/2026",
+    "source": "verified",
+    "url": "https://www.lazzarettodicagliari.it/event/%F0%9F%8D%82il-creative-corner-market-leaves-edition-al-lazzaretto-di-cagliari-il-17-e-18-ottobre-2026%F0%9F%8D%82/"
+  },
+  {
+    "id": "lumaca-gesico-2026",
+    "name": {
+      "it": "Sagra della Lumaca e festa di Sant’Amatore",
+      "en": "Snail Festival and Feast of Sant’Amatore",
+      "de": "Schneckenfest und Fest des Sant’Amatore"
+    },
+    "city": {
+      "it": "Gesico · giornate degli stand",
+      "en": "Gesico · market-stall days",
+      "de": "Gesico · Tage der Marktstände"
+    },
+    "date": "2026-10-17",
+    "end": "2026-10-18",
+    "cat": {
+      "it": "sagra e tradizione",
+      "en": "food festival and tradition",
+      "de": "Kulinarisches Fest und Tradition"
+    },
+    "d": {
+      "it": "L’avviso comunale del 7 ottobre conferma le giornate degli stand del 17–18 ottobre per la 34ª Sagra della Lumaca. Il programma completo, gli orari delle degustazioni e gli eventuali costi sono ancora da confermare. Queste date non descrivono necessariamente l’intera festa: consultare il Comune prima di organizzare la visita.",
+      "en": "The municipal notice of 7 October confirms stall days on 17–18 October for the 34th Snail Festival. The full programme, tasting times and any charges still need confirmation. These dates do not necessarily cover the whole celebration: check with the municipality before planning a visit.",
+      "de": "Die Gemeindemitteilung vom 7. Oktober bestätigt die Tage der Marktstände am 17.–18. Oktober für das 34. Schneckenfest. Vollständiges Programm, Verkostungszeiten und mögliche Kosten sind noch zu bestätigen. Diese Termine umfassen nicht unbedingt das gesamte Fest: vor dem Besuch bei der Gemeinde prüfen."
+    },
+    "checked": "07/10/2026",
+    "source": "verified-date",
+    "url": "https://www.comune.gesico.su.it/novita/manifestazioni-ottobrine-edizione-2026-festa-santamatore-e-34-sagra-della-lumaca/",
+    "stato": "da_verificare"
+  },
+  {
+    "id": "sapori-vallermosa-2026",
+    "name": {
+      "it": "Sapori d’Autunno · Domus e Pratzas",
+      "en": "Autumn Flavours · Domus e Pratzas",
+      "de": "Herbstgenüsse · Domus e Pratzas"
+    },
+    "city": {
+      "it": "Vallermosa",
+      "en": "Vallermosa",
+      "de": "Vallermosa"
+    },
+    "date": "2026-10-17",
+    "end": "2026-10-18",
+    "cat": {
+      "it": "sapori e tradizioni",
+      "en": "food and traditions",
+      "de": "Kulinarik und Traditionen"
+    },
+    "d": {
+      "it": "Manifestazione dedicata ai prodotti tipici e alle tradizioni del paese. Il 17–18 ottobre è indicato nell’avviso comunale per i partecipanti, ma la pagina del bando non è più consultabile. Orari, programma e condizioni di accesso da confermare direttamente con il Comune prima della visita.",
+      "en": "A celebration of local food and village traditions. The municipal notice for participants lists 17–18 October, but that notice is no longer accessible. Confirm times, programme and admission arrangements directly with the municipality before visiting.",
+      "de": "Veranstaltung zu regionalen Produkten und Dorftraditionen. Die Gemeindemitteilung für Teilnehmende nennt den 17.–18. Oktober, ist jedoch nicht mehr abrufbar. Zeiten, Programm und Zugangsbedingungen vor dem Besuch direkt bei der Gemeinde bestätigen."
+    },
+    "checked": "07/10/2026",
+    "source": "verified-date",
+    "url": "https://www.comune.vallermosa.su.it/",
+    "stato": "da_verificare"
   },
   {
     "id": "wine-not-2026",
@@ -2638,16 +2740,24 @@ const EVENTS = [
       "en": "Wine Not? Festival",
       "de": "Wine Not? Festival"
     },
-    "city": {"it": "Cagliari · MusiCA Arena", "en": "Cagliari · MusiCA Arena", "de": "Cagliari · MusiCA Arena"},
+    "city": {
+      "it": "Cagliari · MusiCA Arena",
+      "en": "Cagliari · MusiCA Arena",
+      "de": "Cagliari · MusiCA Arena"
+    },
     "date": "2026-10-24",
     "end": "2026-10-24",
-    "cat": {"it": "vino e musica", "en": "wine and music", "de": "Wein und Musik"},
-    "d": {
-      "it": "Serata dedicata a vino, musica dal vivo e DJ set, dalle 19:00 alle 04:00. Ingresso gratuito con registrazione online obbligatoria; consumazioni a pagamento.",
-      "en": "An evening of wine, live music and DJ sets, from 19:00 to 04:00. Free admission with mandatory online registration; drinks are charged separately.",
-      "de": "Ein Abend mit Wein, Live-Musik und DJ-Sets von 19:00 bis 04:00 Uhr. Eintritt frei nach verpflichtender Online-Registrierung; Getränke kostenpflichtig."
+    "cat": {
+      "it": "vino e musica",
+      "en": "wine and music",
+      "de": "Wein und Musik"
     },
-    "checked": "30/09/2026",
+    "d": {
+      "it": "Sabato 24 ottobre, dalle 19:00 alle 04:00 del 25 ottobre, alla MusiCA Arena della Fiera. Vino, musica dal vivo e DJ set. Ingresso gratuito con registrazione obbligatoria su winenotfest.it; consumazioni facoltative a pagamento.",
+      "en": "Saturday 24 October, 19:00 until 04:00 on 25 October, at the Fiera’s MusiCA Arena. Wine, live music and DJ sets. Free admission with mandatory registration at winenotfest.it; optional drinks are charged separately.",
+      "de": "Samstag, 24. Oktober, von 19:00 bis 04:00 Uhr am 25. Oktober, in der MusiCA Arena der Messe. Wein, Live-Musik und DJ-Sets. Eintritt frei nach verpflichtender Registrierung auf winenotfest.it; Getränke optional und kostenpflichtig."
+    },
+    "checked": "07/10/2026",
     "source": "verified",
     "url": "https://cagliariturismo.comune.cagliari.it/it/events/wine-not-festival"
   },
