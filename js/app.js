@@ -330,7 +330,7 @@ function updStamp(){
   const sn=CSVCFG().sourceName;
   if(sn&&L(sn))s+='<div class="upd">✅ '+esc(t("ev_source"))+": "+esc(L(sn))+"</div>";
   return s;}
- return '<div class="upd">🔄 '+esc(t("ev_verified"))+" "+esc(L(CONFIG.lastChecked))+"<br><small>"+esc(t("ev_local_list"))+"</small></div>";}
+ return '<div class="upd">🔄 '+esc(t("ev_verified"))+" "+esc(L(CONFIG.lastChecked))+"</div>";}
 
 function pgEventi(){
  const confirmed=EVENT_INDEX.filter(e=>e.start&&evVisible(e)&&!e.stato);
