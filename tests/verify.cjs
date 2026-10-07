@@ -45,7 +45,7 @@ for(const lang of ['it','en','de']){
  for(const key of ['need_today','need_food','need_sea','need_help'])assert(home.includes(run(`esc(t('${key}'))`)));
  for(const key of ['photo_placeholder','local_selection','all_sections'])assert(run(`Object.hasOwn(I18N[LANG],'${key}')`));
 }
-assert.equal(run('JSON.stringify(EVENT_INDEX.filter(e=>e.start).map(e=>e.id).sort())'),'["festa-sale-ottobre-2026","forma-poesia-jazz-2026","wine-not-2026"]','Only verified dated events are promoted');
+assert.equal(run('JSON.stringify(EVENT_INDEX.filter(e=>e.start).map(e=>e.id).sort())'),'["creative-corner-ottobre-2026","fai-autunno-cagliari-2026","lumaca-gesico-2026","sapori-vallermosa-2026","selvatica-cagliari-2026","wine-not-2026"]','Dated events match the current selection');
 assert.equal(run('EVENT_INDEX.find(e=>e.id==="efisio").start'),null,'Recurring traditions remain undated');
 assert.equal(run('csvToUnified({id:"x",nome:"Cancelled",data_inizio:"2026-10-01",stato:"annullato"})'),null);
 assert.equal(run('safeUrl("javascript:alert(1)")'),'');

@@ -27,7 +27,11 @@ const state={route:"home",filters:{cats:new Set(),maxDrive:999,crowd:0},apiWind:
 let EVENT_INDEX=[],csvEvents=[],eventSource="local",lastSync=null;
 const CSVCFG=()=>(typeof CONFIG!=="undefined"&&CONFIG.eventsCsv)?CONFIG.eventsCsv:{url:"",enabled:false};
 
-function startOfToday(){const d=new Date();d.setHours(0,0,0,0);return d;}
+function startOfToday(){
+ const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/Rome",year:"numeric",month:"numeric",day:"numeric"}).formatToParts(new Date());
+ const value=k=>Number(parts.find(p=>p.type===k).value);
+ return new Date(value("year"),value("month")-1,value("day"));
+}
 
 function parseISOorEU(s){
  if(!s)return null;s=String(s).trim();
@@ -139,19 +143,19 @@ const evSorter=(a,b)=>{
  return da-db||String(a.id).localeCompare(String(b.id));};
 function recNextMonthDays(x){
  if(!x.months||!x.months.length)return 999;
- const cm=new Date().getMonth()+1;
+ const cm=startOfToday().getMonth()+1;
  return Math.min(...x.months.map(m=>m===cm?0:(((m-cm)+12)%12)*30));}
-const nextFixedIn=n=>EVENT_INDEX.filter(x=>(x.start&&evStartIn(x)>=0&&evStartIn(x)<=n)||evOngoing(x)).sort(evSorter);
+const nextFixedIn=n=>EVENT_INDEX.filter(x=>!x.stato&&((x.start&&evStartIn(x)>=0&&evStartIn(x)<=n)||evOngoing(x))).sort(evSorter);
 function upcomingFixed(n){
- const dated=EVENT_INDEX.filter(x=>x.start&&evStartIn(x)>=0).sort(evSorter).slice(0,n);
+ const dated=EVENT_INDEX.filter(x=>x.start&&evVisible(x)&&!x.stato).sort(evSorter).slice(0,n);
  if(dated.length>=n)return dated;
- return dated.concat(EVENT_INDEX.filter(x=>!x.start&&evVisible(x))
+ return dated.concat(EVENT_INDEX.filter(x=>!x.start&&evVisible(x)&&!x.stato)
   .sort((a,b)=>recNextMonthDays(a)-recNextMonthDays(b)).slice(0,n-dated.length));}
 function monthOverlap(x){
- const now=new Date(),cm=now.getMonth(),cy=now.getFullYear();
+ const now=startOfToday(),cm=now.getMonth(),cy=now.getFullYear();
  if(!x.start)return !!(x.months&&x.months.includes(cm+1));
  return x.start<=new Date(cy,cm+1,0)&&(x.end||x.start)>=new Date(cy,cm,1);}
-const monthEvents=()=>EVENT_INDEX.filter(monthOverlap).sort(evSorter);
+const monthEvents=()=>EVENT_INDEX.filter(x=>monthOverlap(x)&&evVisible(x)&&!x.stato).sort(evSorter);
 
 function fmtRange(s,e){
  try{
@@ -330,10 +334,12 @@ function updStamp(){
 
 function pgEventi(){
  const confirmed=EVENT_INDEX.filter(e=>e.start&&evVisible(e)&&!e.stato);
+ const pending=EVENT_INDEX.filter(e=>e.start&&evVisible(e)&&["da_verificare","da verificare"].includes(e.stato));
  const traditions=EVENTS.filter(e=>e.id!=="timeinjazz"&&!parseISOorEU(e.date)).map(staticToUnified);
- return pageHeading("nav_eventi","events_intro")+
+ return pageHeading("nav_eventi","events_intro")+updStamp()+
  '<section class="blk"><h2 class="sec">'+esc(t("confirmed_events"))+'</h2>'+
  (confirmed.length?confirmed.sort(evSorter).map(evCard).join(""):'<p class="sub">'+esc(t("no_confirmed_events"))+'</p>')+'</section>'+
+ (pending.length?'<section class="blk"><h2 class="sec">'+esc(t("pending_events"))+'</h2><p class="sub">'+esc(t("pending_events_note"))+'</p>'+pending.sort(evSorter).map(evCard).join("")+'</section>':"")+
  '<section class="blk"><h2 class="sec">'+esc(t("traditions"))+'</h2><p class="sub">'+esc(t("traditions_note"))+'</p>'+traditions.map(evCard).join("")+'</section>';
 }
 

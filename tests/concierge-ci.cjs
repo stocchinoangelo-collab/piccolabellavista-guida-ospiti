@@ -48,7 +48,7 @@ assert.equal(run('FOOD.length'),8);
 assert.equal(run('GUIDE.restaurants.length'),5);
 assert.equal(run('GUIDE.aperitivi.length'),4);
 assert.equal(run('GUIDE.transit.length'),7);
-assert.equal(run('JSON.stringify(EVENT_INDEX.filter(e=>e.start).map(e=>e.id).sort())'),'["festa-sale-ottobre-2026","forma-poesia-jazz-2026","wine-not-2026"]','Only verified dated events are promoted');
+assert.equal(run('JSON.stringify(EVENT_INDEX.filter(e=>e.start).map(e=>e.id).sort())'),'["creative-corner-ottobre-2026","fai-autunno-cagliari-2026","lumaca-gesico-2026","sapori-vallermosa-2026","selvatica-cagliari-2026","wine-not-2026"]','Dated events match the current selection');
 assert.equal(run('EVENT_INDEX.find(e=>e.id==="efisio").start'),null,'Recurring traditions remain undated');
 assert.equal(run('safeUrl("javascript:alert(1)")'),'');
 const manifest=JSON.parse(read('manifest.webmanifest'));
