@@ -2746,7 +2746,8 @@ const EVENTS = [
       "de": "Cagliari · MusiCA Arena"
     },
     "date": "2026-10-24",
-    "end": "2026-10-24",
+    "end": "2026-10-25",
+    "expiresAt": "2026-10-25T04:00:00+01:00",
     "cat": {
       "it": "vino e musica",
       "en": "wine and music",

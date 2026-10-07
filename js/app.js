@@ -136,8 +136,11 @@ async function loadEvents(){
 
 /* ---------- finestre temporali ---------- */
 const evStartIn=x=>x.start?Math.round((x.start-startOfToday())/864e5):Infinity;
-const evOngoing=x=>!!x.start&&x.start<=startOfToday()&&(x.end||x.start)>=startOfToday();
-const evVisible=x=>!x.start||(x.end||x.start)>=startOfToday();
+const evVisible=x=>{
+ if(x.expiresAt){const end=Date.parse(x.expiresAt);if(Number.isFinite(end))return Date.now()<end;}
+ return !x.start||(x.end||x.start)>=startOfToday();
+};
+const evOngoing=x=>!!x.start&&x.start<=startOfToday()&&(x.end||x.start)>=startOfToday()&&evVisible(x);
 const evSorter=(a,b)=>{
  const da=a.start?a.start.getTime():9e15,db=b.start?b.start.getTime():9e15;
  return da-db||String(a.id).localeCompare(String(b.id));};
@@ -145,7 +148,7 @@ function recNextMonthDays(x){
  if(!x.months||!x.months.length)return 999;
  const cm=startOfToday().getMonth()+1;
  return Math.min(...x.months.map(m=>m===cm?0:(((m-cm)+12)%12)*30));}
-const nextFixedIn=n=>EVENT_INDEX.filter(x=>!x.stato&&((x.start&&evStartIn(x)>=0&&evStartIn(x)<=n)||evOngoing(x))).sort(evSorter);
+const nextFixedIn=n=>EVENT_INDEX.filter(x=>!x.stato&&evVisible(x)&&((x.start&&evStartIn(x)>=0&&evStartIn(x)<=n)||evOngoing(x))).sort(evSorter);
 function upcomingFixed(n){
  const dated=EVENT_INDEX.filter(x=>x.start&&evVisible(x)&&!x.stato).sort(evSorter).slice(0,n);
  if(dated.length>=n)return dated;
